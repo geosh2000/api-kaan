@@ -50,6 +50,7 @@ class TransportacionController extends BaseController
         $data['guest'] = $guest;
         $data['correo'] = $correo;
         $data['folio'] = $folio;
+        $data['title'] = "Transportaciones ADH";
 
         return view('transpo/index', $data);
     }
@@ -162,15 +163,25 @@ class TransportacionController extends BaseController
             'precio' => $this->request->getPost('precio'),
             'correo' => $this->request->getPost('correo'),
             'phone' => $this->request->getPost('phone'),
-            'tickets' => $this->request->getPost('tickets'),
+            'newTicket' => $this->request->getPost('newTicket') ?? "",
         ];
+
+        $beforeTickets = json_decode($before['tickets']);
+
+        if( $data['newTicket'] != "" ){
+            if( !in_array($data['newTicket'], $beforeTickets) ){
+                array_push($beforeTickets, $data['newTicket']);
+            }
+        }
+
+        $data['tickets'] = json_encode($beforeTickets);
+        unset($data['newTicket']);
 
         // Actualizar los datos en la base de datos
         if ($model->builder()
                 ->where('id', $id)
                 ->update($data)) {
-            // Mostrar la página de edición con un modal de éxito
-            
+              
             $updateFields = [];
 
             foreach( $data as $field => $val ){
@@ -376,6 +387,18 @@ class TransportacionController extends BaseController
 
         $regs = $history->getAll($id);
 
+        if( count($regs) == 0 ){
+            $regs = [
+                ['historyId' => '',
+                'id' => '',
+                'title' => '',
+                'comment' => '',
+                'user' => '',
+                'dtCreated' => ''
+                ]
+            ];
+        }
+        
         return view('transpo/history_table', ['history' => $regs]);
     }
 

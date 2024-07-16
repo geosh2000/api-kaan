@@ -40,7 +40,7 @@
     <?php if(session()->getFlashdata('msg')): ?>
         <div class="alert alert-danger"><?= session()->getFlashdata('msg') ?></div>
     <?php endif; ?>
-    <form action="<?= site_url('login/') ?>" method="POST">
+    <form action="<?= site_url('login') ?>" method="POST">
       <div class="form-group">
         <label for="inputEmail">Correo electrónico</label>
         <input type="text" id="inputEmail" name="username" class="form-control" placeholder="Ingresa tu correo electrónico" required autofocus>

@@ -57,7 +57,8 @@ $routes->group('public', function($routes){
 });
 
 // Transportacion
-$routes->group('transpo', ['filter' => 'authFilter'], function($routes){
+$routes->group('transpo', function($routes){
+// $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('/', 'Transpo\TransportacionController::index');
     $routes->get('create', 'Transpo\TransportacionController::create');
     $routes->post('store', 'Transpo\TransportacionController::store');

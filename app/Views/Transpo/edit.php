@@ -40,13 +40,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="guest">Guest:</label>
-                            <input type="text" name="guest" id="guest" class="form-control" value="<?= $transpo ? $transpo['guest'] : '' ?>">
+                            <input type="text" name="guest" id="guest" class="form-control" value="<?= $transpo ? $transpo['guest'] : '' ?>" required>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="correo">Correo:</label>
-                            <input type="email" name="correo" id="correo" class="form-control" value="<?= $transpo ? $transpo['correo'] : '' ?>" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                            <input type="email" name="correo" id="correo" class="form-control" value="<?= $transpo ? $transpo['correo'] : '' ?>" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}" required>
                         </div>
                         <div class="form-group">
                             <label for="pax">Pax:</label>
@@ -78,9 +78,19 @@
                     </div>
                     <!-- C1 -->
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="folio">Folio:</label>
-                            <input type="text" name="folio" id="folio" class="form-control" value="<?= $transpo ? $transpo['folio'] : '' ?>" <?= isset($transpo['id']) ? 'readonly' : '' ?>>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="folio">Folio:</label>
+                                    <input type="text" name="folio" id="folio" class="form-control" value="<?= $transpo ? $transpo['folio'] : '' ?>" <?= isset($transpo['id']) ? 'readonly' : '' ?>>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="item">item:</label>
+                                    <input type="number" min="1" name="item" id="item" class="form-control" value="<?= $transpo ? $transpo['item'] : '' ?>" <?= isset($transpo['id']) ? 'readonly' : '' ?> autocomplete="off">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="date">Date:</label>
@@ -90,9 +100,18 @@
                             <label for="airline">Airline:</label>
                             <input type="text" name="airline" id="airline" class="form-control" value="<?= $transpo ? $transpo['airline'] : '' ?>">
                         </div>
+
                         <div class="form-group">
-                            <label for="precio">Ticket:</label>
-                            <input type="text" name="tickets" id="tickets" class="form-control" value="<?= $transpo ? $transpo['tickets'] : '' ?>">
+                            <label for="precio">Tickets:</label>
+                            <input type="number" min="111111" max="300000" name="newTicket" id="newTicket" class="form-control">
+                            <?php if ($transpo): ?>
+                                <br>
+                                <?php $tickets = json_decode($transpo['tickets']); ?>
+                                <?php foreach ($tickets as $tkt): ?>
+                                    <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?></a> <i class="fas fa-minus-circle remove-button"></i><br>
+                                <?php endforeach; ?>
+                                <i class="fas fa-plus-circle add-button add-ticket-button"></i>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <!-- C2 -->
@@ -112,7 +131,7 @@
                         </div>
                         <div class="form-group">
                             <label for="time">Time:</label>
-                            <input type="text" name="time" id="time" class="form-control" value="<?= $transpo ? $transpo['time'] : '' ?>">
+                            <input type="time" name="time" id="time" class="form-control" value="<?= $transpo ? $transpo['time'] : '' ?>">
                         </div>
                         <div class="form-group">
                             <label for="flight">Flight:</label>
@@ -120,7 +139,7 @@
                         </div>
                         <div class="form-group" id="campo-pickup" >
                             <label for="pick_up">Pick-Up:</label>
-                            <input type="number" name="pick_up" id="pick_up" class="form-control" value="<?= $transpo ? $transpo['pick_up'] : '' ?>">
+                            <input type="time" name="pick_up" id="pick_up" class="form-control" value="<?= $transpo ? $transpo['pick_up'] : '' ?>">
                         </div>
 
                         <div class="form-group">
@@ -130,9 +149,9 @@
                     </div>
 
                 <?php if (strpos(current_url(), 'create') !== false): ?>
-                    <button type="submit" class="loadbtn btn btn-primary btn-block" id="confirmModal">Guardar Reserva</button>
+                    <button type="submit" class="btn btn-primary btn-block" id="confirmModal">Guardar Reserva</button>
                 <?php else: ?>
-                    <button type="submit" class="loadbtn btn btn-primary btn-block" id="confirmModal">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-primary btn-block" id="confirmModal">Guardar Cambios</button>
                     <?php endif; ?>
                     <button type="button" class="btn btn-danger btn-block mt-3" id="cancelModal">Cancelar</button>
             </form>

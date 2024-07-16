@@ -44,7 +44,7 @@ class App extends BaseConfig
      * something else. If you are using mod_rewrite to remove the page set this
      * variable so that it is blank.
      */
-    public string $indexPage = 'index.php';
+    public string $indexPage = '';
 
     /**
      * --------------------------------------------------------------------------
@@ -188,6 +188,7 @@ class App extends BaseConfig
         // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'development') {
             $this->baseURL = 'http://localhost:8888/adhApi/';
+            $this->indexPage = 'index.php';
         }
     }
 }

@@ -41,11 +41,11 @@ class Login extends BaseController
                 return redirect()->to($redirect_url);
             } else {
                 $session->setFlashdata('msg', 'Wrong Password');
-                return redirect()->to('/login');
+                return redirect()->to(site_url('login'));
             }
         } else {
             $session->setFlashdata('msg', 'Username not Found');
-            return redirect()->to('/login');
+            return redirect()->to(site_url('login'));
         }
 
     }

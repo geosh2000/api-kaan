@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'CodeIgniter App' ?></title>
+    <link rel="icon" href="<?= base_url('favicon-adh.ico') ?>">
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <!-- Bootstrap CSS -->
@@ -170,6 +171,26 @@
         if( error == 1 ){
             errorToast.toast('show');
         }
+
+
+        function copy(texto) {
+
+            // Crea un elemento de texto oculto
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val(texto).select();
+
+            // Copia el texto al portapapeles
+            document.execCommand("copy");
+
+            // Elimina el elemento temporal
+            $temp.remove();
+        }
+
+        $(document).on('click', '.copy-button', function() {
+            var text = $(this).attr('text'); // Obtiene el ID
+            copy(text);
+        });
         
         
     });

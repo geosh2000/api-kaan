@@ -224,6 +224,35 @@
     position: absolute !important; /* Asegura que el dropdown flote */
     will-change: transform; /* Mejora el rendimiento de la animación */
 }
+
+.copy-button {
+            cursor: pointer;
+            font-size: 12px; /* Ajusta el tamaño según tus necesidades */
+            margin-left: 4px;
+            margin-right: 4px;
+            color: brown;
+        }
+
+.add-button {
+    cursor: pointer;
+    font-size: 15px; /* Ajusta el tamaño según tus necesidades */
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #4CAF50;
+}
+
+.remove-button {
+    cursor: pointer;
+    font-size: 15px; /* Ajusta el tamaño según tus necesidades */
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #CC0000;
+}
+
+.actionBtn{
+    zoom:0.8;
+    margin: 1px;
+}
 </style>
 <div class="container-fluid px-5">
     <div class="container">
@@ -352,13 +381,17 @@
 
                     </td>
                     <td><?= $transportacion['hotel'] == "ATELIER" ? "Atelier Playa Mujeres" : ($transportacion['hotel'] == "OLEO" ? "Oleo Cancun Playa" : $transportacion['hotel']) ?></td>
-                    <td class="text-center"><?= $transportacion['folio'] ?></td>
-                    <td class="text-center"><?= $transportacion['tipo'] ?></td>
-                    <td><?= $transportacion['guest'] ?><br><?= $transportacion['correo'] ?></td>
-                    <td class="text-center"><?= $transportacion['date'] ?><br><?= $transportacion['time'] ?></td>
-                    <td class="text-center"><?= $transportacion['airline'] ?><br><?= $transportacion['flight'] ?></td>
-                    <td  class="text-center"><?= $transportacion['pax'] ?></td>
-                    <td  class="text-center"><?= $transportacion['pick_up'] ?></td>
+                    <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['folio'] ?>"></i> <?= $transportacion['folio'] ?>-<?= $transportacion['item'] ?></td>
+                    <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['tipo'] ?>"></i> <?= $transportacion['tipo'] ?></td>
+                    <td><i class="far fa-copy copy-button" text="<?= $transportacion['guest'] ?>"></i><?= $transportacion['guest'] ?><br><i class="far fa-copy copy-button" text="<?= $transportacion['correo'] ?>"></i><?= $transportacion['correo'] ?></td>
+                    <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['date'] ?>"></i><?= $transportacion['date'] ?><br><i class="far fa-copy copy-button" text="<?= $transportacion['time'] ?>"></i> <?= $transportacion['time'] ?></td>
+                    <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['airline'] ?>"></i><?= $transportacion['airline'] ?><br><i class="far fa-copy copy-button" text="<?= $transportacion['flight'] ?>"></i> <?= $transportacion['flight'] ?></td>
+                    <td  class=""><i class="far fa-copy copy-button" text="<?= $transportacion['pax'] ?>"></i> <?= $transportacion['pax'] ?></td>
+                    <td  class="">
+                        <?php if( $transportacion['pick_up'] != null ): ?>
+                            <i class="far fa-copy copy-button" text="<?= $transportacion['pick_up'] ?>"></i> <?= $transportacion['pick_up'] ?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <div class="dropdown text-center">
                             <button style="font-size:smaller" class="btn <?= $styleMap[$transportacion['hotel'].'-'.$transportacion['status']] ?? 'btn-secondary' ?> dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -381,12 +414,12 @@
                     </td>
                     <td  class="text-center">
                         <?php if( $transportacion['status'] == "INCLUIDA" ): ?>
-                            <a href="" class="btn btn-success"><i class="far fa-paper-plane"></i></a>
+                            <a href="" class="actionBtn btn btn-success"><i class="far fa-paper-plane"></i></a>
                         <?php endif; ?>
-                        <button class="btn btn-info edit-button" id="delete-<?= $transportacion['id'] ?>">
+                        <button class="actionBtn btn btn-info edit-button" id="delete-<?= $transportacion['id'] ?>">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
+                        <button class="actionBtn btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                         <!-- <a href="<?= site_url('transpo/confirmDelete/'.$transportacion['id']).'?'.$_SERVER['QUERY_STRING'] ?>" class="btn btn-danger">
@@ -394,7 +427,13 @@
                         </a> -->
                         
                     </td>
-                    <td class="text-center"><a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $transportacion['tickets'] ?>" target="_blank"><?= $transportacion['tickets'] ?></a><td>
+                    <td class="text-center">
+                        <?php $tickets = json_decode($transportacion['tickets']); ?>
+                        <?php foreach ($tickets as $tkt): ?>
+                            <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?></a><br>
+                        <?php endforeach; ?>
+                    </td>
+                    <td>
                         <div class="d-flex justify-content-end">
                             <span class="mr-auto">$</span>    
                             <span><?= $transportacion['precio'] ?></span>    
@@ -506,11 +545,11 @@
             }
 
 
-            $('.loadbtn').on('click', function() {
+            $(document).on('click', '.loadbtn', function() {
                 startLoader();    
             });
-
-            $('.history-button').on('click', function(){
+            
+            $(document).on('click', '.history-button', function() {
                 startLoader();
                 var id = $(this).attr('id').split('-')[1]; // Obtiene el ID después del guion
                 var url = '<?= site_url('transpo/history/') ?>' + id;
@@ -528,6 +567,8 @@
                         $('#historyTable').empty().html(data);
 
                         $('#historyTable').html(data); // Carga los datos en la tabla
+
+                        console.log(data);
                         $('#historyTable').DataTable();
                         $('#historyModal').modal('show'); // Muestra el modal
                         startLoader(false);
@@ -539,7 +580,7 @@
                 });
             });
             
-            $('.delete-button').on('click', function(){
+            $(document).on('click', '.delete-button', function() {
                 startLoader();
                 var id = $(this).attr('id').split('-')[1]; // Obtiene el ID después del guion
                 var url = '<?= site_url('transpo/confirmDelete/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
@@ -576,6 +617,9 @@
                     method: 'GET',
                     success: function(data) {
                         $('#editContent').html(data); // Carga los datos en la tabla
+                        if( !v ){
+                            $('#newTicket').hide();
+                        }
                         $('#editModal').modal('show'); // Muestra el modal
                         startLoader(false);
                     },
@@ -586,11 +630,11 @@
                 });
             }
             
-            $('.edit-button').on('click', function(){
+            $(document).on('click', '.edit-button', function() {
                 create($(this));
             });
             
-            $('.create-button').on('click', function(){
+            $(document).on('click', '.create-button', function() {
                 create($(this), true);
             });
 
@@ -600,8 +644,19 @@
             });
 
             // Delegación de eventos para el botón "Confirmar"
-            $(document).on('click', '#confirmModal', function() {
-                $('.modal').modal('hide');
+            // $(document).on('click', '#confirmModal', function() {
+            //     $('.modal').modal('hide');
+            //     startLoader();
+            // });
+
+            // Agregar Ticket
+            $(document).on('click', '.add-ticket-button', function() {
+                $('#newTicket').show();
+                $(this).hide();
+            });
+
+            $(document).on('submit', 'form', function(event) {
+                console.log("form submitted");
                 startLoader();
             });
         });
