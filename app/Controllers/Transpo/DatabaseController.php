@@ -4,11 +4,42 @@ namespace App\Controllers\Transpo;
 
 use App\Models\Transpo\TransportacionesModel;
 use App\Models\Transpo\TranspoHistoryModel;
+use App\Models\Crs\CrsModel;
 use App\Controllers\BaseController;
+use App\Exceptions\DbConnectionException;
 
 class DatabaseController extends BaseController
 {
 
+    public function getRsva( $f, $from = '20230101', $html = false ){
+
+        $html = boolval($html);
+        $from = $from == 'today' ? date('Y-m-d') : $from;
+
+        $crs = new CrsModel();
+        // $result = $crs->getRsva($f, $from);
+
+        try {
+            $result = $crs->getRsva($f, $from);
+
+            if ($html) {
+                return view('Crs/Lists/rsvList', ['reservations' => $result, 'from' => $from]);
+            } else {
+                return $this->response->setJSON($result);
+            }
+        } catch (DbConnectionException $e) {
+            $error_message = 'Error al conectar a la base de datos.';
+
+            if ($html) {
+                echo $error_message;
+                return;
+            } else {
+                return $this->response->setJSON(['error' => $error_message])->setStatusCode(500);
+            }
+        }
+        
+    }
+    
     public function getIncluded( $days )
     {
         // Obtenemos una instancia de la conexión 'adh_crs'
@@ -22,7 +53,11 @@ class DatabaseController extends BaseController
                     ELSE htl.Name END as Hotel, ReservationNumber, DateFrom, DateTo, 
                     CONCAT(rsv.Adults,'.',COALESCE(rsv.Children,0)+COALESCE(rsv.Teens,0)+COALESCE(rsv.Infants,0)) as pax,
                     CONCAT(rsv.Name,' ',rsv.LastName) as Guest, 
-                    rsv.Email as Email
+                    rsv.Email as Email, 1 as isIncluida, COALESCE(AgencyNumber,CAST(ReservationId AS nvarchar)) as ReservationId,
+                    AgencyNumber as agency_id,
+                    ReservationId as crs_id,
+                    ReservationNumber as pms_id
+
                 FROM 
                     [dbo].[Reservations] rsv
                     LEFT JOIN [dbo].[Hotels] htl ON rsv.HotelId=htl.HotelId
@@ -87,6 +122,7 @@ class DatabaseController extends BaseController
 
         // gg_response(200, ["error" => false, "Registros construidos" => count($dbArray), "Registros Insertados" => $db->affectedRows(), "data" => $dbArray]);
     }
+    
 
     private function getCanceled( $days ){
          // Obtenemos una instancia de la conexión 'adh_crs'
@@ -154,24 +190,32 @@ class DatabaseController extends BaseController
                     "hotel" => $r['Hotel'],
                     "tipo" => "ENTRADA",
                     "folio" => $r['ReservationNumber'],
+                    "crs_id" => $r['ReservationId'],
                     "date" => $r['DateFrom'],
                     "pax" => $r['pax'],
                     "guest" => $r['Guest'],
                     "status" => "INCLUIDA",
                     "correo" => $r['Email'],
-                    "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470
+                    "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470,
+                    "crs_id" => $r['crs_id'],
+                    "agency_id" => $r['agency_id'],
+                    "pms_id" => $r['pms_id']
                 ];
                 $tmpOut = [
                     "shuttle" => "QWANTOUR",
                     "hotel" => $r['Hotel'],
                     "tipo" => "SALIDA",
                     "folio" => $r['ReservationNumber'],
+                    "crs_id" => $r['ReservationId'],
                     "date" => $r['DateTo'],
                     "pax" => $r['pax'],
                     "guest" => $r['Guest'],
                     "status" => "INCLUIDA",
                     "correo" => $r['Email'],
-                    "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470
+                    "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470,
+                    "crs_id" => $r['crs_id'],
+                    "agency_id" => $r['agency_id'],
+                    "pms_id" => $r['pms_id']
                 ];
                 array_push( $regs, $tmpIn );
                 array_push( $regs, $tmpOut );

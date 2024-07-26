@@ -275,4 +275,28 @@ class Tickets extends BaseController{
         gg_response($result['response'], $result['data']);
     }
 
+    public function getPublicKey()
+    {
+        $appId = 1054506;
+        $result = $this->zd->getData( "/api/v2/apps/$appId/public_key.pem", true);
+        
+        echo $result['data'];
+    }
+    
+    public function installations()
+    {
+        $appId = 1054506;
+        $result = $this->zd->getData( "/api/v2/apps/installations.json");
+        
+        gg_response($result['response'], $result['data']);
+    }
+    
+    public function appAud()
+    {
+        $appInsId = 28666254387092;
+        $result = $this->zd->getData( "/api/v2/apps/installations/$appInsId.json");
+        
+        gg_response($result['response'], $result['data']);
+    }
+
 }

@@ -44,6 +44,8 @@ $routes->group('cio', function($routes){
         $routes->get('langs', 'Cio\QueryCalls::langs');
         $routes->get('hotels', 'Cio\QueryCalls::hotels');
         $routes->get('callJourney', 'Cio\QueryCalls::callJourney');
+        $routes->get('callJourney/(:any)', 'Cio\QueryCalls::callJourney/$1');
+        $routes->get('callJourney/(:any)/(:any)', 'Cio\QueryCalls::callJourney/$1/$2');
         $routes->get('calls', 'Cio\QueryCalls::calls');
         $routes->get('calls/(:any)', 'Cio\QueryCalls::calls/$1/');
         $routes->get('calls/(:any)/(:any)/(:any)', 'Cio\QueryCalls::calls/$1/$2/$3');
@@ -57,11 +59,12 @@ $routes->group('public', function($routes){
 });
 
 // Transportacion
-$routes->group('transpo', function($routes){
-// $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
+// $routes->group('transpo', function($routes){
+$routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('/', 'Transpo\TransportacionController::index');
     $routes->get('create', 'Transpo\TransportacionController::create');
     $routes->post('store', 'Transpo\TransportacionController::store');
+    $routes->post('removeTicket/(:num)/(:num)', 'Transpo\TransportacionController::removeTicket/$1/$2');
     $routes->get('edit/(:num)', 'Transpo\TransportacionController::edit/$1');
     $routes->get('editStatus/(:num)/(:any)', 'Transpo\TransportacionController::editStatus/$1/$2');
     $routes->get('confirmDelete/(:num)', 'Transpo\TransportacionController::confirmDelete/$1');
@@ -70,6 +73,47 @@ $routes->group('transpo', function($routes){
     $routes->get('db/get', 'Transpo\DatabaseController::getIncluded/3');
     $routes->get('db/get/(:num)', 'Transpo\DatabaseController::getIncluded/$1');
     $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
+    $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
+    $routes->get('searchFolio/(:num)', 'Transpo\TransportacionController::findByFolio/$1');
+});
+
+// $routes->group('zd|app', function($routes){
+$routes->group('zdapp', ['filter' => 'zendeskFilter'], function($routes){
+    // $routes->post('/', 'Zdapp\ZendeskAppController::index');
+    $routes->post('/', 'Zdapp\ZendeskAppController::transpo');
+    $routes->post('transpo', 'Zdapp\ZendeskAppController::transpo');
+    // $routes->post('/', 'Zdapp\ZendeskAppController::index');
+});
+
+$routes->group('zdappC', function($routes){
+    $routes->group('transpo',  function($routes){
+        $routes->get('/', 'Zdapp\ZendeskAppController::transpo');
+        $routes->post('/', 'Cio\QueryCalls::calls');
+        $routes->get('searchFolios/(:any)', 'Transpo\TransportacionController::search/$1');
+        $routes->get('searchFolio/(:any)', 'Transpo\TransportacionController::findByFolio/$1');
+
+        $routes->get('create', 'Transpo\TransportacionController::create');
+        $routes->post('store', 'Transpo\TransportacionController::store');
+        $routes->post('removeTicket/(:num)/(:num)', 'Transpo\TransportacionController::removeTicket/$1/$2');
+        $routes->get('edit/(:num)', 'Transpo\TransportacionController::edit/$1');
+        $routes->get('editStatus/(:num)/(:any)', 'Transpo\TransportacionController::editStatus/$1/$2');
+        $routes->get('confirmDelete/(:num)', 'Transpo\TransportacionController::confirmDelete/$1');
+        $routes->post('update/(:num)', 'Transpo\TransportacionController::update/$1');
+        $routes->delete('delete/(:num)', 'Transpo\TransportacionController::delete/$1');
+        $routes->get('db/get', 'Transpo\DatabaseController::getIncluded/3');
+        $routes->get('db/get/(:num)', 'Transpo\DatabaseController::getIncluded/$1');
+        $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
+        $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
+        
+        // DBController
+        $routes->get('getRsv/(:any)', 'Transpo\DatabaseController::getRsva/$1');
+        // $routes->get('getRsvHtml/(:any)', 'Transpo\DatabaseController::getRsva/$1/1'); // $2 es boolean para vista html
+        $routes->get('getRsvHtml/(:any)', 'Transpo\DatabaseController::getRsva/$1/today/1'); // $2 es boolean para vista html
+        
+        // CREATE NEW ROUND TRIP
+        $routes->post('saveNewRound', 'Transpo\TransportacionController::storeRound'); 
+
+    });
 });
 
 // Zendesk
@@ -93,6 +137,11 @@ $routes->group('zd', function($routes){
         $routes->delete('closeTicket/(:any)', 'Zd\Tickets::closeTicket/$1');
     });
     $routes->post('webhook', 'Zd\Tickets::webhook');
+    $routes->group('apps', function($routes){
+        $routes->post('key', 'Zd\Tickets::getPublicKey');
+        $routes->post('installations', 'Zd\Tickets::installations');
+        $routes->post('aud', 'Zd\Tickets::appAud');
+    });
 });
 
 $routes->group('view', function($routes){
@@ -126,6 +175,7 @@ $routes->group('login', function($routes){
     $routes->post('/', 'Log\Login::login', ['as' => 'login.login']);
     $routes->get('out', 'Log\Login::logout', ['as' => 'login.logout']);
     $routes->get('show', 'Log\Login::show', ['as' => 'login.show']);
+    $routes->get('perm', 'Log\Login::showSessionData');
 });
 
 // Rutas protegidas por BearerToken

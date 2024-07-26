@@ -61,15 +61,17 @@
                         <div class="form-group">
                             <label for="status">Status:</label>
                             <select name="status" id="status" class="form-control">
+                                <option value="-" <?= ($transpo && $transpo['status'] == '-') ? 'selected' : '' ?>>-</option>
                                 <option value="INCLUIDA" <?= ($transpo && $transpo['status'] == 'INCLUIDA') ? 'selected' : '' ?>>INCLUIDA</option>
-                                <option value="INCLUIDA" <?= ($transpo && $transpo['status'] == 'INCLUIDA (SOLICITADO)') ? 'selected' : '' ?>>INCLUIDA (SOLICITADO)</option>
+                                <option value="INCLUIDA (SOLICITADO)" <?= ($transpo && $transpo['status'] == 'INCLUIDA (SOLICITADO)') ? 'selected' : '' ?>>INCLUIDA (SOLICITADO)</option>
+                                <option value="SOLICITADO" <?= ($transpo && $transpo['status'] == 'SOLICITADO') ? 'selected' : '' ?>>SOLICITADO</option>
                                 <option value="PAGO PENDIENTE" <?= ($transpo && $transpo['status'] == 'PAGO PENDIENTE') ? 'selected' : '' ?>>PAGO PENDIENTE</option>
-                                <option value="CORTESÍA" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>CORTESÍA (CAPTURA PENDIENTE)</option>
-                                <option value="CORTESÍA" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURADO)') ? 'selected' : '' ?>>CORTESÍA (CAPTURADO)</option>
-                                <option value="PAGO EN DESTINO" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
-                                <option value="PAGO EN DESTINO" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURADO)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURADO)</option>
-                                <option value="PAGADA" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGADA (CAPTURA PENDIENTE)</option>
-                                <option value="PAGADA" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURADO)') ? 'selected' : '' ?>>PAGADA (CAPTURDO)</option>
+                                <option value="CORTESÍA (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>CORTESÍA (CAPTURA PENDIENTE)</option>
+                                <option value="CORTESÍA (CAPTURADO)" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURADO)') ? 'selected' : '' ?>>CORTESÍA (CAPTURADO)</option>
+                                <option value="PAGO EN DESTINO (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
+                                <option value="PAGO EN DESTINO (CAPTURADO)" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURADO)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURADO)</option>
+                                <option value="PAGADA (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGADA (CAPTURA PENDIENTE)</option>
+                                <option value="PAGADA (CAPTURDO)" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURADO)') ? 'selected' : '' ?>>PAGADA (CAPTURDO)</option>
                                 <option value="CANCELADA" <?= ($transpo && $transpo['status'] == 'CANCELADA') ? 'selected' : '' ?>>CANCELADA</option>
                                 <!-- Agrega otras opciones de status aquí -->
                             </select>
@@ -108,7 +110,11 @@
                                 <br>
                                 <?php $tickets = json_decode($transpo['tickets']); ?>
                                 <?php foreach ($tickets as $tkt): ?>
-                                    <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?></a> <i class="fas fa-minus-circle remove-button"></i><br>
+                                    <span id="span-<?= $tkt ?>">
+                                        <span id="span-a-<?= $tkt ?>">
+                                            <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?></a> <i class="fas fa-minus-circle remove-button" id="tkt-<?= $tkt ?>"></i><br>
+                                        </span>
+                                    </span>
                                 <?php endforeach; ?>
                                 <i class="fas fa-plus-circle add-button add-ticket-button"></i>
                             <?php endif; ?>

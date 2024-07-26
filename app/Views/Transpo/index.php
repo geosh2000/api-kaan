@@ -5,6 +5,7 @@
     $styleMap = [
         "ATELIER-INCLUIDA"                              => 'btn-incluNoData',
         "ATELIER-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "ATELIER-SOLICITADO"                            => 'btn-incluSolicitado',
         "ATELIER-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "ATELIER-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "ATELIER-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -15,6 +16,7 @@
         "ATELIER-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
         "Atelier Playa Mujeres-INCLUIDA"                              => 'btn-incluNoData',
         "Atelier Playa Mujeres-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "Atelier Playa Mujeres-SOLICITADO"                            => 'btn-incluSolicitado',
         "Atelier Playa Mujeres-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "Atelier Playa Mujeres-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "Atelier Playa Mujeres-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -25,6 +27,7 @@
         "Atelier Playa Mujeres-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
         "OLEO-INCLUIDA"                              => 'btn-incluNoData',
         "OLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "OLEO-SOLICITADO"                           => 'btn-incluSolicitado',
         "OLEO-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "OLEO-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "OLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -35,6 +38,7 @@
         "OLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
         "Oleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "Oleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
         "Oleo Cancun Playa-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "Oleo Cancun Playa-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -43,6 +47,28 @@
         "Oleo Cancun Playa-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
+        "ÓLEO-INCLUIDA"                              => 'btn-incluNoData',
+        "ÓLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "ÓLEO-SOLICITADO"                 => 'btn-incluSolicitado',
+        "ÓLEO-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
+        "ÓLEO-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
+        "ÓLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
+        "ÓLEO-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
+        "ÓLEO-CANCELADA"                             => 'btn-cancel',
+        "ÓLEO-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
+        "ÓLEO-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
+        "ÓLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
+        "Óleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
+        "Óleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
+        "Óleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
+        "Óleo Cancun Playa-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
+        "Óleo Cancun Playa-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
+        "Óleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
+        "Óleo Cancun Playa-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
+        "Óleo Cancun Playa-CANCELADA"                             => 'btn-cancel',
+        "Óleo Cancun Playa-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
+        "Óleo Cancun Playa-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
+        "Óleo Cancun Playa-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
     ];
 
 ?>
@@ -253,6 +279,30 @@
     zoom:0.8;
     margin: 1px;
 }
+
+.ticket-alert {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    animation: fadeIn 0.3s;
+}
+
+.ticket-alert button {
+    background: none;
+    border: none;
+    margin: 0 5px;
+    color: #721c24;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 </style>
 <div class="container-fluid px-5">
     <div class="container">
@@ -290,6 +340,7 @@
                         <select name="status[]" id="status" class="form-control" multiple>
                             <option value="INCLUIDA" <?= in_array('INCLUIDA', $status) ? 'selected' : '' ?>>INCLUIDA</option>
                             <option value="INCLUIDA (SOLICITADO)" <?= in_array('INCLUIDA (SOLICITADO)', $status) ? 'selected' : '' ?>>INCLUIDA (SOLICITADO)</option>
+                            <option value="SOLICITADO" <?= in_array('SOLICITADO', $status) ? 'selected' : '' ?>>SOLICITADO</option>
                             <option value="PAGO PENDIENTE" <?= in_array('PAGO PENDIENTE', $status) ? 'selected' : '' ?>>PAGO PENDIENTE</option>
                             <option value="CORTESÍA (CAPTURA PENDIENTE)" <?= in_array('CORTESÍA (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>CORTESÍA (CAPTURA PENDIENTE)</option>
                             <option value="PAGO EN DESTINO (CAPTURA PENDIENTE)" <?= in_array('PAGO EN DESTINO (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
@@ -329,19 +380,23 @@
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button type="submit" class="loadbtn btn btn-primary mr-2">Filtrar</button>
-                    <button type="button" class="create-button loadbtn btn btn-success mr-2">Crear</button>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            Importar
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/1') ?>">1 día</a></li>
-                            <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/2') ?>">2 días</a></li>
-                            <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/3') ?>">3 días</a></li>
-                            <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/5') ?>">5 días</a></li>
-                            <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/10') ?>">10 días</a></li>
-                        </ul>
-                    </div>
+                    <?php if( permiso("createTransRegs") ): ?>
+                        <button type="button" class="create-button loadbtn btn btn-success mr-2">Crear</button>
+                    <?php endif; ?>
+                    <?php if( permiso("importTransIncluded") ): ?>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                Importar
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/1') ?>">1 día</a></li>
+                                <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/2') ?>">2 días</a></li>
+                                <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/3') ?>">3 días</a></li>
+                                <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/5') ?>">5 días</a></li>
+                                <li><a class="loadbtn dropdown-item" href="<?= site_url('transpo/db/get/10') ?>">10 días</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
@@ -398,8 +453,10 @@
                                 <?= $transportacion && $transportacion['status'] ? $transportacion['status'] : 'Selecciona una opción' ?>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/-') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="-">-</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA">INCLUIDA</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA (SOLICITADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA (SOLICITADO)">INCLUIDA (SOLICITADO)</a>
+                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/SOLICITADO') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="SOLICITADO">SOLICITADO</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO PENDIENTE">PAGO PENDIENTE</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURA PENDIENTE)">CORTESÍA (CAPTURA PENDIENTE)</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURADO)">CORTESÍA (CAPTURADO)</a>
@@ -413,15 +470,19 @@
                         </div>
                     </td>
                     <td  class="text-center">
-                        <?php if( $transportacion['status'] == "INCLUIDA" ): ?>
+                        <?php if( $transportacion['status'] == "INCLUIDA" && permiso("sendRequestForIncluded") ): ?>
                             <a href="" class="actionBtn btn btn-success"><i class="far fa-paper-plane"></i></a>
                         <?php endif; ?>
-                        <button class="actionBtn btn btn-info edit-button" id="delete-<?= $transportacion['id'] ?>">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="actionBtn btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <?php if( permiso("editTransRegs") ): ?>
+                            <button class="actionBtn btn btn-info edit-button" id="edit-<?= $transportacion['id'] ?>">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if( permiso("deleteTransRegs") ): ?>
+                            <button class="actionBtn btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        <?php endif; ?>
                         <!-- <a href="<?= site_url('transpo/confirmDelete/'.$transportacion['id']).'?'.$_SERVER['QUERY_STRING'] ?>" class="btn btn-danger">
                             <i class="fas fa-trash-alt"></i>
                         </a> -->
@@ -600,6 +661,8 @@
                 });
             });
 
+            var editTicket = "";
+
             function create( e, v = false ){
                 startLoader();
 
@@ -608,6 +671,7 @@
                 if( !v ){
                     id = e.attr('id').split('-')[1]; // Obtiene el ID después del guion
                     url = '<?= site_url('transpo/edit/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
+                    editTicket = id;
                 }else{
                     url = '<?= site_url('transpo/create/') ?>?<?= $_SERVER['QUERY_STRING'] ?>';
                 }
@@ -659,6 +723,60 @@
                 console.log("form submitted");
                 startLoader();
             });
+
+            // confirm remove ticket
+            $(document).on('click', '.remove-button', function() {
+                var ticketId = this.id.replace('tkt-', '');
+                var spanId = 'span-' + ticketId;
+                var spanAId = 'span-a-' + ticketId;
+                var $spanElement = $('#' + spanId);
+                var $spanAElement = $('#' + spanAId);
+
+                // Crear el alert de confirmación
+                var $alertElement = $('<div>', { class: 'ticket-alert' }).html(`
+                    <p>¿Desea eliminar ticket #` + ticketId + `?</p>
+                    <button type="button" class="confirm-yes"><i class="fas fa-check"></i></button>
+                    <button type="button" class="confirm-no"><i class="fas fa-times"></i></button>
+                `);
+
+                // Ocultar <a>
+                $spanAElement.hide();
+
+                // Añadir el alert al span
+                $spanElement.append($alertElement);
+
+                // Mostrar el alert con animación
+                $alertElement.fadeIn(300);
+
+                // Manejar la confirmación
+                $alertElement.find('.confirm-yes').on('click', function() {
+                    event.preventDefault();
+                    startLoader();
+                    $.ajax({
+                        url: '<?= site_url('transpo/removeTicket/') ?>' + editTicket + '/' + ticketId,
+                        method: 'POST',
+                        success: function(data) {
+                            startLoader(false);
+                            $spanElement.hide();
+                            $alertElement.remove();
+                        },
+                        error: function() {
+                            startLoader(false);
+                            $spanAElement.show();
+                            $alertElement.remove();
+                        }
+                    });
+                    
+                });
+
+                // Manejar la cancelación
+                $alertElement.find('.confirm-no').on('click', function() {
+                    $spanAElement.show();
+                    $alertElement.remove();
+                });
+            });
+
+            
         });
     </script>
 

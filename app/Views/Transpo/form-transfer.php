@@ -1,56 +1,13 @@
-<?php
-    // Check if 'lang' parameter is set and set default to 'eng' if not
-    $lang = isset($_GET['lang']) ? $_GET['lang'] : 'eng';
-?>
+<?= $this->extend('layouts/confirmations/adhHtml') ?>
 
-<?php
+<?= $this->section('styles') ?>
 
-if (isset($_GET['d'])) {
-    // Decodificar el JSON de base64
-    $encodedData = $_GET['d'];
-    $jsonData = base64_decode($encodedData);
-    
-    // Decodificar el JSON en un array asociativo
-    $data = json_decode($jsonData, true);
-    
-    // Verificar si la decodificación fue exitosa y que el JSON sea válido
-    if ($data === null) {
-        include 'invalid_form.php';
-        exit;
-    }
-}else{
-    include 'invalid_form.php';
-    exit;
-}
-
-
-?>
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= ($lang === 'esp') ? 'Formulario de Transportación' : 'Transfer Form'; ?></title>
-    <link rel="icon" href="<?php echo $data['Hotel'] == "ATELIER" ? "favicon-atelier.png" : "favicon-oleo.ico"; ?>">
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Material Design CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background-color: #f5f5f7;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
         .form-container {
             background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin: 30px auto;
-            max-width: 500px;
         }
         .form-title {
             font-size: 24px;
@@ -73,9 +30,22 @@ if (isset($_GET['d'])) {
             font-size: 0.875em;
             display: none;
         }
-    </style>
-</head>
-<body>
+
+        .loader {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
 <div class="container">
     <div class="form-container">
@@ -86,7 +56,7 @@ if (isset($_GET['d'])) {
             <!-- Guest -->
             <div class="form-group">
                 <label for="guest"><?php echo ($lang === 'esp') ? 'Nombre del Huésped:' : 'Guest Name:'; ?></label>
-                <input type="text" class="form-control" id="guest" name="guest" value="<?php echo $data["Guest"]; ?>" readonly>
+                <input type="text" class="form-control" id="guest" name="guest" value="<?php echo $data["guest"]; ?>" readonly>
             </div>
             <!-- MAIL -->
             <div class="form-group" hidden>
@@ -96,21 +66,30 @@ if (isset($_GET['d'])) {
             <!-- Hotel -->
             <div class="form-group">
                 <label for="hotel"><?php echo ($lang === 'esp') ? 'Hotel:' : 'Hotel:'; ?></label>
-                <input type="text" class="form-control" id="hotel" name="hotel" value="<?php echo $data["Hotel"]; ?>" readonly>
+                <input type="text" class="form-control" id="hotel" name="hotel" value="<?php echo $data["hotel"]; ?>" readonly>
             </div>
             <!-- Folio -->
             <div class="form-group" hidden>
                 <label for="folio"><?php echo ($lang === 'esp') ? 'Folio Reserva:' : 'Booking Folio:'; ?></label>
-                <input type="text" class="form-control" id="folio" name="folio" value="<?php echo $data["Folio"]; ?>" readonly>
+                <input type="text" class="form-control" id="folio" name="folio" value="<?php echo $data["folio"]; ?>" readonly>
             </div>
             <!-- Folio -->
-            <div class="form-group" hidden>
-                <input type="text" class="form-control" id="pago" name="pago" value="<?php echo $data["pago"]; ?>" readonly>
-            </div>
+             <div class="row">
+                <div class="col-8">
+                    <div class="form-group" hidden>
+                        <input type="text" class="form-control" id="pago" name="pago" value="<?php echo $data["pago"]; ?>" readonly>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group" hidden>
+                        <input type="text" class="form-control" id="item" name="item" value="<?php echo $data["item"]; ?>" readonly>
+                    </div>
+                </div>
+             </div>
             <!-- Ticket -->
             <div class="form-group" hidden>
                 <label for="tickets"><?php echo ($lang === 'esp') ? 'ID de Ticket:' : 'Ticket ID:'; ?></label>
-                <input type="text" class="form-control" id="tickets" name="tickets" value="<?php echo $data["Ticket"]; ?>" readonly>
+                <input type="text" class="form-control" id="tickets" name="newTicket" value="<?php echo $data["ticket"]; ?>" readonly>
             </div>
             <!-- Trip Type -->
             <div class="form-group">
@@ -129,7 +108,7 @@ if (isset($_GET['d'])) {
             <!-- Pax number -->
             <div class="form-group">
                 <label for="pax"><?php echo ($lang === 'esp') ? 'Número de personas:' : 'How many people:'; ?></label>
-                <input type="number" class="form-control" id="pax" name="pax" required>
+                <input type="number" min="1" max="<?= $hotel == 'atpm' ? "6" : "8"  ?>" class="form-control" id="pax" name="pax" required>
             </div>
             <!-- Arrival details -->
             <div id="arrival-section">
@@ -166,7 +145,7 @@ if (isset($_GET['d'])) {
                 </div>
                 <div class="form-group">
                     <label for="departure-flight-number"><?php echo ($lang === 'esp') ? 'Número de vuelo:' : 'Flight number:'; ?></label>
-                    <input type="text" class="form-control" id="departure-flight-number" idnamedeparture-flight-number" required>
+                    <input type="text" class="form-control" id="departure-flight-number" name="departure-flight-number" required>
                 </div>
                 <div class="form-group">
                     <label for="departure-airline"><?php echo ($lang === 'esp') ? 'Compañía aérea:' : 'Airline company:'; ?></label>
@@ -185,45 +164,67 @@ if (isset($_GET['d'])) {
     </div>
 </div>
 
-<!-- jQuery and Bootstrap JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    $(document).ready(function() {
-    $('#trip-type').change(function() {
-        var tripType = $(this).val();
-        if (tripType === 'round-trip') {
-            $('#arrival-section input').prop('required', true);
-            $('#departure-section input').prop('required', true);
-            $('#arrival-section').show();
-            $('#departure-section').show();
-        } else if (tripType === 'one-way-airport-hotel') {
-            $('#arrival-section input').prop('required', true);
-            $('#departure-section input').prop('required', false);
-            $('#arrival-section').show();
-            $('#departure-section').hide();
-        } else if (tripType === 'one-way-hotel-airport') {
-            $('#arrival-section input').prop('required', false);
-            $('#departure-section input').prop('required', true);
-            $('#arrival-section').hide();
-            $('#departure-section').show();
-        }
-    }).change(); // Trigger change event on page load to set the initial state
+<!-- Loader -->
+<div id="loader" class="loader" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
 
-    $('#flight-form').submit(function(event) {
-        var tripType = $('#trip-type').val();
-        if (tripType === 'round-trip') {
-            var arrivalDate = new Date($('#arrival-date').val());
-            var departureDate = new Date($('#departure-date').val());
-            if (arrivalDate >= departureDate) {
-                $('#date-error').removeClass('d-none');
-                event.preventDefault();
-            } else {
-                $('#date-error').addClass('d-none');
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+
+<!-- jQuery and Bootstrap JS -->
+   <script>
+        $(document).ready(function() {
+
+            function startLoader( v = true ){
+                if( v ){
+                    $('#loader').css('display', 'flex');
+                }else{
+                    $('#loader').css('display', 'none');
+                }
             }
-        }
-    });
-});
+
+            $('#flight-form').submit(function(event) {
+                    startLoader(true);
+            });
+
+            $('#trip-type').change(function() {
+                var tripType = $(this).val();
+                if (tripType === 'round-trip') {
+                    $('#arrival-section input').prop('required', true);
+                    $('#departure-section input').prop('required', true);
+                    $('#arrival-section').show();
+                    $('#departure-section').show();
+                } else if (tripType === 'one-way-airport-hotel') {
+                    $('#arrival-section input').prop('required', true);
+                    $('#departure-section input').prop('required', false);
+                    $('#arrival-section').show();
+                    $('#departure-section').hide();
+                } else if (tripType === 'one-way-hotel-airport') {
+                    $('#arrival-section input').prop('required', false);
+                    $('#departure-section input').prop('required', true);
+                    $('#arrival-section').hide();
+                    $('#departure-section').show();
+                }
+            }).change(); // Trigger change event on page load to set the initial state
+
+            $('#flight-form').submit(function(event) {
+                var tripType = $('#trip-type').val();
+                if (tripType === 'round-trip') {
+                    var arrivalDate = new Date($('#arrival-date').val());
+                    var departureDate = new Date($('#departure-date').val());
+                    if (arrivalDate >= departureDate) {
+                        $('#date-error').removeClass('d-none');
+                        event.preventDefault();
+                    } else {
+                        $('#date-error').addClass('d-none');
+                    }
+                }
+            });
+        });
 </script>
-</body>
-</html>
+<?= $this->endSection() ?>
+

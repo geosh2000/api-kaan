@@ -82,31 +82,31 @@ class Mailing extends BaseController{
         $params = [
             "data"  => [
                 "hotel"=>"hotel_atpm",
-                "conf_number"   => "59829",
-                "main_guest"    => "Alfonso Pérez",
-                "date_in"   => "2024-07-13",
+                "conf_number"   => "409287",
+                "main_guest"    => "Carmen Zaldivar",
+                "date_in"   => "2024-07-20",
                 "time_in"   => "",
-                "date_out"  => "2024-07-14",
+                "date_out"  => "2024-07-21",
                 "time_out"  => "",
                 "room_code" => "",
                 "room_name" => "",
                 "adults"    => "2",
                 "children"  => "",
-                "payment_type"  => "Pago al Check-In",
+                "payment_type"  => "Pre-pago",
                 "currency"  => "mxn",
-                "total" => "7024.5",
+                "total" => "11822.63",
                 "notes" => "",
                 "xld_policy"    => "-",
                 "rsv_channel"   => "rsv_chan_direct",
-                "deposit"   => "",
+                "deposit"   => "0",
                 "rate_type" => "-",
                 "isa" => "$40 MXN por persona por noche"
             ],
             "params" => [
                 'ROOM TYPE'     =>  false,
-                'BALANCE'       => 'hide_balance',
+                'BALANCE'       => 'show_balance',
                 'AutoXld'   => '-',
-                'DEPOSITOS' => 'hide_deposit',
+                'DEPOSITOS' => 'show_deposit',
                 "AMOUNT" => 'show_amount'
             ]
         ];
@@ -142,12 +142,17 @@ class Mailing extends BaseController{
 
         $lang = $_GET['lang'] ?? $lang;
 
-        $fileLang = $lang == 'spanish' || $lang == 'Español (Latinoamérica)' ? 'Esp' : 'Eng';
+        $fileLang = $lang == 'spanish' || $lang == 'Español (Latinoamérica)' ? 'esp' : 'eng';
 
         $params['query'] = [
             "inicio"    => $params['data']['date_in'],
             "lang"      => $fileLang
         ];
+
+        // children
+        $params['data']['children'] ?? 0;
+        $params['data']['children'] = $params['data']['children'] == "" ? 0 : $params['data']['children'];
+
 
         $params['data']['date_in'] = longDateFormat($params['data']['date_in'], $fileLang);
         $params['data']['date_out'] = longDateFormat($params['data']['date_out'], $fileLang);
@@ -218,7 +223,7 @@ class Mailing extends BaseController{
         }
 
         // Obtiene el contenido HTML del archivo remoto
-        $html = $this->getRemoteHtml(templates::$templates.'mailConf'.$html_url.'.html');
+        $html = $this->getRemoteHtml(templates::$templates.'mailConf.php?lang='.$fileLang);
 
         // Desactiva bloques false
         foreach($params['params'] as $bloque => $b){

@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      *    http://example.com/
      */
-    public string $baseURL = 'https://atelier-cc.azurewebsites.net/api/index.php/';
+    public string $baseURL = 'https://atelier-cc.azurewebsites.net/index.php/';
 
     public $sessionDriver   = 'CodeIgniter\Session\Handlers\FileHandler';
     public $sessionSavePath = WRITEPATH . 'session';

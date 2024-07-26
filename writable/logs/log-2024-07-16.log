@@ -59,3 +59,242 @@ INFO - 2024-07-16 12:35:31 --> Session: Class initialized using 'CodeIgniter\Ses
 INFO - 2024-07-16 12:35:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-07-16 12:35:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 INFO - 2024-07-16 12:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:12:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:12:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:12:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-07-16 13:12:10 --> mysqli_sql_exception: Column 'id' in where clause is ambiguous in /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php(306): mysqli->query('SELECT `a`.*, C...', 0)
+#1 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(760): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `a`.*, C...')
+#2 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(674): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `a`.*, C...')
+#3 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, C...', Array, false)
+#4 /Users/geosh/Sites/localhost/adhApi/app/Models/Usuarios/UserModel.php(54): CodeIgniter\Database\BaseBuilder->get()
+#5 /Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+#6 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+#7 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+#8 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 /Users/geosh/Sites/localhost/adhApi/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2024-07-16 13:12:10 --> Column 'id' in where clause is ambiguous
+in SYSTEMPATH/Database/BaseConnection.php on line 714.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, CONCAT(\'[\', GROUP_CONCAT(\'\\\'\', `permissionName`, \'\\\'\'), \']\') AS permissions
+FROM (`usuarios`, `usuarios` `a`)
+LEFT JOIN `profiles_permissions` `b` ON `a`.`role_id` = `b`.`profileId`
+LEFT JOIN `permissions` `p` ON `b`.`permissionId` = `p`.`id`
+WHERE `id` = :id:
+GROUP BY `a`.`id`', [...], false)
+ 2 APPPATH/Models/Usuarios/UserModel.php(54): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+ 4 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 6 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:17:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:17:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-07-16 13:17:13 --> mysqli_sql_exception: Column 'id' in where clause is ambiguous in /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php(306): mysqli->query('SELECT `a`.*, C...', 0)
+#1 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(760): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `a`.*, C...')
+#2 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(674): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `a`.*, C...')
+#3 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, C...', Array, false)
+#4 /Users/geosh/Sites/localhost/adhApi/app/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+#5 /Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+#6 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+#7 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+#8 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 /Users/geosh/Sites/localhost/adhApi/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2024-07-16 13:17:13 --> Column 'id' in where clause is ambiguous
+in SYSTEMPATH/Database/BaseConnection.php on line 714.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, CONCAT(\'[\', GROUP_CONCAT(\'\\\'\', `permissionName`, \'\\\'\'), \']\') AS permissions
+FROM `usuarios` `a`
+LEFT JOIN `profiles_permissions` `b` ON `a`.`role_id` = `b`.`profileId`
+LEFT JOIN `permissions` `p` ON `b`.`permissionId` = `p`.`id`
+WHERE `id` = :id:
+GROUP BY `a`.`id`', [...], false)
+ 2 APPPATH/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+ 4 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 6 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:18:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:18:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-07-16 13:18:07 --> mysqli_sql_exception: Unknown column 'b.profileId' in 'on clause' in /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php(306): mysqli->query('SELECT `a`.*, C...', 0)
+#1 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(760): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `a`.*, C...')
+#2 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(674): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `a`.*, C...')
+#3 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, C...', Array, false)
+#4 /Users/geosh/Sites/localhost/adhApi/app/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+#5 /Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+#6 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+#7 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+#8 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 /Users/geosh/Sites/localhost/adhApi/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2024-07-16 13:18:07 --> Unknown column 'b.profileId' in 'on clause'
+in SYSTEMPATH/Database/BaseConnection.php on line 714.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, CONCAT(\'[\', GROUP_CONCAT(\'\\\'\', `permissionName`, \'\\\'\'), \']\') AS permissions
+FROM `usuarios` `a`
+LEFT JOIN `profiles_permissions` `b` ON `a`.`role_id` = `b`.`profileId`
+LEFT JOIN `permissions` `p` ON `b`.`permissionId` = `p`.`id`
+WHERE `a`.`id` = :a.id:
+GROUP BY `a`.`id`', [...], false)
+ 2 APPPATH/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+ 4 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 6 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:19:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:19:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-07-16 13:19:36 --> mysqli_sql_exception: Unknown column 'b.profileId' in 'on clause' in /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php(306): mysqli->query('SELECT `a`.*, C...', 0)
+#1 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(760): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `a`.*, C...')
+#2 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(674): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `a`.*, C...')
+#3 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, C...', Array, false)
+#4 /Users/geosh/Sites/localhost/adhApi/app/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+#5 /Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+#6 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+#7 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+#8 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 /Users/geosh/Sites/localhost/adhApi/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2024-07-16 13:19:36 --> Unknown column 'b.profileId' in 'on clause'
+in SYSTEMPATH/Database/BaseConnection.php on line 714.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, CONCAT(\'[\', GROUP_CONCAT(\'\\\'\', `permissionName`, \'\\\'\'), \']\') AS permissions
+FROM `usuarios` `a`
+LEFT JOIN `profiles_permissions` `b` ON `a`.`role_id` = `b`.`profileId`
+LEFT JOIN `permissions` `p` ON `b`.`b`.`permission_id` = `p`.`id`
+WHERE `a`.`id` = :a.id:
+GROUP BY `a`.`id`', [...], false)
+ 2 APPPATH/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+ 4 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 6 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:19:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:19:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-07-16 13:19:59 --> mysqli_sql_exception: Unknown column 'b.b.permission_id' in 'on clause' in /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /Users/geosh/Sites/localhost/adhApi/system/Database/MySQLi/Connection.php(306): mysqli->query('SELECT `a`.*, C...', 0)
+#1 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(760): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `a`.*, C...')
+#2 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseConnection.php(674): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `a`.*, C...')
+#3 /Users/geosh/Sites/localhost/adhApi/system/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, C...', Array, false)
+#4 /Users/geosh/Sites/localhost/adhApi/app/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+#5 /Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+#6 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+#7 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+#8 /Users/geosh/Sites/localhost/adhApi/system/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 /Users/geosh/Sites/localhost/adhApi/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2024-07-16 13:19:59 --> Unknown column 'b.b.permission_id' in 'on clause'
+in SYSTEMPATH/Database/BaseConnection.php on line 714.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1615): CodeIgniter\Database\BaseConnection->query('SELECT `a`.*, CONCAT(\'[\', GROUP_CONCAT(\'\\\'\', `permissionName`, \'\\\'\'), \']\') AS permissions
+FROM `usuarios` `a`
+LEFT JOIN `profiles_permissions` `b` ON `a`.`role_id` = `b`.`profile_id`
+LEFT JOIN `permissions` `p` ON `b`.`b`.`permission_id` = `p`.`id`
+WHERE `a`.`id` = :a.id:
+GROUP BY `a`.`id`', [...], false)
+ 2 APPPATH/Models/Usuarios/UserModel.php(53): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Log/Login.php(30): App\Models\Usuarios\UserModel->sessionData('1')
+ 4 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 5 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 6 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:20:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:20:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-07-16 13:20:11 --> Undefined array key "permissions"
+in APPPATH/Controllers/Log/Login.php on line 37.
+ 1 APPPATH/Controllers/Log/Login.php(37): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "permissions"', '/Users/geosh/Sites/localhost/adhApi/app/Controllers/Log/Login.php', 37)
+ 2 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Log\Login->login()
+ 3 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Log\Login))
+ 4 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2024-07-16 13:21:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:21:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:21:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:21:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:21:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:21:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:22:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:25:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:25:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:25:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:25:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:25:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:26:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:30:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:30:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:32:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:34:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-07-16 13:35:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-07-16 17:24:45 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:24:47 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:24:58 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '0', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:24:58 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '0', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:24:59 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '0', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:25:00 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '0', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2024-07-16 17:25:01 --> bcsub(): Argument #1 ($num1) is not well-formed
+in APPPATH/Controllers/Zd/Mailing.php on line 184.
+ 1 APPPATH/Controllers/Zd/Mailing.php(184): bcsub('11,822.63', '0', 2)
+ 2 APPPATH/Controllers/Zd/Mailing.php(115): App\Controllers\Zd\Mailing->buildConfData([...], 'atpm', 'spanish')
+ 3 SYSTEMPATH/CodeIgniter.php(919): App\Controllers\Zd\Mailing->getConf()
+ 4 SYSTEMPATH/CodeIgniter.php(494): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Zd\Mailing))
+ 5 SYSTEMPATH/CodeIgniter.php(353): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()

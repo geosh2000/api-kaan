@@ -115,6 +115,16 @@
         return preg_replace('/[^\p{L}\p{N}_]/u', '', $texto);
     }
 
+    function permiso( $p ){
+        $session = session();
+        $perm = $session->get('permissions');
+        $jsonData = base64_decode($perm);
+        $permisos = json_decode($jsonData, true);
+
+    //    return in_array($p, $permisos);
+    return true;
+    }
+
 
 ?>
 

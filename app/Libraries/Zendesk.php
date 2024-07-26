@@ -63,7 +63,7 @@ class Zendesk{
         return array( 'response' => $status, 'data' => json_decode($data) );
     }
     
-    public function getData( $url ){
+    public function getData( $url, $noJson = false ){
         
         $ch = curl_init();
         
@@ -79,7 +79,7 @@ class Zendesk{
         
         curl_close( $ch );
         
-        return array( 'response' => $status, 'data' => json_decode($data) );
+        return array( 'response' => $status, 'data' => $noJson ? $data : json_decode($data) );
     }
     
     public function getDataO( $url ){

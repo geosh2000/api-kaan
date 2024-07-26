@@ -30,6 +30,8 @@ class Filters extends BaseConfig
         'timezone'  => \App\Filters\TimezoneFilter::class,
         'bearerToken' => \App\Filters\BearerTokenFilter::class,
         'verificarPermiso' => \App\Filters\VerificarPermiso::class,
+        'zendeskFilter' => \App\Filters\ZendeskFilter::class,
+        'zdCookie' => \App\Filters\ZdCookieFilter::class,
     ];
 
 

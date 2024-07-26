@@ -191,6 +191,8 @@
             var text = $(this).attr('text'); // Obtiene el ID
             copy(text);
         });
+
+        
         
         
     });

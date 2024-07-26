@@ -1,0 +1,147 @@
+<style>
+    .conf-font{ font-family:Arial,Helvetica Neue,Helvetica,sans-serif;margin:0; }
+    .detail-font{ color: rgb(85, 85, 85) !important; font-size: 12px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; margin: 0px; padding: 0px 10px; line-height: 1.2; }
+    .gray-hr {
+        border: none;
+        height: 1px;
+        background-color: #dddddd;
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+    .conf-margin{ margin:0;line-height:1.5; }
+    .conf-value{ margin:0;padding:0 10px 0 10px;vertical-align:top;display:inline-block;text-align: left; width: 430px; }
+    .conf-label{ margin:0;width: 215px;vertical-align:top;display:inline-block;text-align: left; }
+</style>
+<div style="margin: 0 auto; width: 720px;transform: scale(0.85625, 0.85625);transform-origin: left top;">
+    <div style="background-color: black !important; margin: 0px; padding: 15px;">
+        <div align="left" style="margin:0;padding:0 10px 0 20px;">
+            <img data-imagetype="External" src="https://glassboardengine.azurewebsites.net//assets/img/logo.png" border="0" alt="Texto alternativo" title="Texto alternativo" style="display:block;width:105px;text-decoration:none;max-width:105px;border-width:0;border-style:none;"> 
+        </div>
+    
+    </div>
+    
+    
+    <div>
+        <div align="left" style="vertical-align:middle;display:inline-block;padding:20px 20px 0px 58px;">
+            <img data-imagetype="External" src="https://glassboardengine.azurewebsites.net/assets/img/okok.png" align="middle" border="0" alt="Confirmada" title="Confirmada" style="display:block;width:49px;text-decoration:none;max-width:49px;border-width:0;border-style:none;"> 
+        </div>
+        <div style="vertical-align:top;display:inline-block;margin:0;padding:20px 10px 0 10px;border:0 solid transparent;">              
+                    <p class="conf-font" style="font-size:14px;line-height:1.2;"><strong>Hola ${main_guest}, ¡gracias por reservar en ${rsv_channel}</strong></p>           
+                    <p class="conf-font" style="font-size:24px;word-break:break-word;line-height:1.5;"><span style="color: rgb(81, 194, 125) !important; font-size: 24px;"><strong>Su reserva está confirmada</strong></span></p>    
+                    <p class="conf-font" style="font-size:16px;line-height:1.2;"><strong>Número de reserva: ${conf_number}</strong></p>
+    
+        </div>
+    </div>
+    
+    <hr class="gray-hr">
+    
+    <div class="detail-font">
+        <p style="margin:0;line-height:1.2;"><strong>Atelier Playa Mujeres</strong> lo espera el ${date_in}</p>
+        <p style="margin:0;line-height:1.2;" aria-hidden="true">&nbsp;</p>
+        <p style="margin:0;line-height:1.2;"><strong>DETALLES DE LA RESERVA:</strong></p>
+        <br>
+        <div align="left" style="margin:0;width: 230px;vertical-align:top;display:inline-block;text-align: left;">
+            <p class="conf-margin">ENTRADA:</p>
+            <p class="conf-margin">SALIDA:</p>
+        </div>
+        <div align="left" class="conf-value">
+            <p class="conf-margin"><strong>${date_in}</strong> (${time_in} hrs)</p>
+            <p class="conf-margin"><strong>${date_out}</strong> (${time_out} hrs)</p>
+        </div>
+    </div>
+    
+    <hr class="gray-hr">
+    
+    <div class="detail-font">
+        <div align="left" style="margin:0;width: 230px;vertical-align:top;display:inline-block;text-align: left;">
+            <p class="conf-margin">DIRECCIÓN:</p>
+        </div>
+        <div align="left" class="conf-value">
+            <p class="conf-margin"><strong>Complejo de Condominios Playa Mujeres, SM-3 M-1 L-13 RTH-4,</strong></p>
+            <p class="conf-margin"><strong>Zona Continental Isla Mujeres,    </strong></p> 
+            <p class="conf-margin"><strong>Quintana Roo, México, C.P. 77400  </strong></p>            
+            <p class="conf-margin"><strong>+52 (998) 500 4800</strong></p>
+        </div>
+    </div>
+    
+    <hr class="gray-hr">
+    
+    <div class="detail-font">
+        <div align="left" style="margin:0;width: 230px;vertical-align:top;display:inline-block;text-align: left;">
+            <p class="conf-margin">TITULAR:</p>
+        </div>
+        <div align="left" class="conf-value">
+            <p class="conf-margin"><strong>${main_guest}</strong></p>
+        </div>
+    </div>
+    <br>
+    
+    <div class="detail-font" style="padding: 25px;background-color: rgb(242, 242, 242) !important;">
+    
+        <!-- BLOQUE DE LA SUITE -->
+            <div align="left" class="conf-label">
+                <!-- ROOM TYPE START -->
+                <p class="conf-margin">SUITE 1:</p>
+                <!-- ROOM TYPE END -->
+                <p class="conf-margin">HUÉSPEDES:</p>
+                <p class="conf-margin">TIPO DE TARIFA:</p>
+                <p class="conf-margin">TOTAL:</p>
+                <p class="conf-margin">NOMBRE:</p>
+            </div>
+            <div align="left" class="conf-value">
+                <!-- ROOM TYPE START -->
+                <p class="conf-margin"><strong>${room_code} - ${room_name}</strong></p>
+                <!-- ROOM TYPE END -->
+                <p class="conf-margin"><strong>${adults} Adultos ${children} Niños</strong></p>
+                <p class="conf-margin"><strong>${payment_type}</strong></p>
+                <p class="conf-margin"><strong>${currency}$ ${total}</strong></p>
+                <p class="conf-margin"><strong>${main_guest}</strong></p>
+            </div>
+        <!-- FIN DEL BLOQUE DE LA SUITE -->
+    
+        <br>
+    
+        <div align="left" class="conf-label">
+            <p class="conf-margin">NOTAS:</p>
+        </div>
+        <div align="left" class="conf-value">
+            <p class="conf-margin"><strong>${notes}</strong></p>
+        </div>
+    
+        <br>
+    
+        <div align="left" class="conf-label">
+            <p class="conf-margin">POLÍTICA DE CANCELACIÓN:</p>
+        </div>
+        <div align="left"  class="conf-value">
+            <p class="conf-margin"><strong>${xld_policy}</strong></p>
+        </div>
+    
+    </div>
+    
+    <br>
+    
+    <div class="detail-font" style="padding: 25px;background-color: rgb(242, 242, 242) !important;">
+        <p class="conf-margin">¿NECESITA ASISTENCIA? LLAME A NUESTROS NÚMEROS GRATUITOS</p>
+        <p class="conf-margin"><strong>México: (800) 062 8899</strong></p>
+        <p class="conf-margin"><strong>EE. UU.: 1 (888) 5858 234</strong></p>
+        <p class="conf-margin"><strong>Resto del Mundo: +52 (998) 271 6304</strong></p>
+        
+    </div>
+    
+    <br>
+    
+    <div class="detail-font">
+        <p style="font-size:10px;text-align:center;margin:0;line-height:1.5;"><span style="font-size:10px;">ATELIER de Hoteles SA de CV</span></p>
+        <p style="font-size:10px;text-align:center;margin:0;line-height:1.5;">
+            <span style="font-size:10px;">
+                <a href="https://atelierdehoteles.com.mx/" target="_blank"  style="color: rgb(85, 85, 85) !important; text-decoration: underline;" title="" data-linkindex="0">Política de privacidad</a>
+            </span>
+        </p>    
+    </div>
+    
+</div>  
+    
+    
+                            
+    

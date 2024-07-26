@@ -40,4 +40,18 @@ class UserModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function sessionData($id){
+
+        $builder = $this->db->table('usuarios a');
+
+        $builder->select("a.*, CONCAT('[',GROUP_CONCAT('\"', permissionName, '\"'),']') AS permissions")
+            ->join("profiles_permissions b", "a.role_id = b.profile_id", "left")
+            ->join("permissions p", "b.permission_id = p.id", "left")
+            ->where("a.id", $id)
+            ->groupBy("a.id");
+
+        return $builder->get()->getResultArray();
+
+    }
+
 }

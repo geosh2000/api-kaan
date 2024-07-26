@@ -27,16 +27,20 @@ class Login extends BaseController
             $pass = $user['password'];
             $authenticatePassword = password_verify($password, $pass);
 
+            
             if ($authenticatePassword) {
+                $sd = $userModel->sessionData($user['id']);
+                $encodedData = base64_encode($sd[0]['permissions']);
                 $sessionData = [
                     'id' => $user['id'],
                     'username' => $user['username'],
-                    'logged_in' => TRUE
+                    'logged_in' => TRUE,
+                    'permissions' => $encodedData
                 ];
                 $session->set($sessionData);
 
                 // Redirigir a la URL de origen o a '/adh'
-                $redirect_url = $session->get('redirect_url') ?? '/adh';
+                $redirect_url = $session->get('redirect_url') ?? '/login/perm';
                 $session->remove('redirect_url');
                 return redirect()->to($redirect_url);
             } else {
@@ -69,6 +73,24 @@ class Login extends BaseController
 
     public function showLogin(){
         return view('Login/login');
+    }
+
+    public function showSessionData(){
+        $session = session();
+        $perm = $session->get('permissions');
+
+        $jsonData = base64_decode($perm);
+    
+        // Decodificar el JSON en un array asociativo
+        $data = json_decode($jsonData, true);
+
+        print_r($data);
+        echo "<br>Tiene permiso deleteTransRegs: ";
+        echo permiso("deleteTransRegs") ? "SI" : "NO";
+        echo "<br>Tiene permiso OTROS: ";
+        echo permiso("OTROS") ? "SI" : "NO";
+
+        return;
     }
 }
 
