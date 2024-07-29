@@ -532,12 +532,29 @@ class TransportacionController extends BaseController
         }
 
 
+        $ids = [];
+        $updateModel = new TranspoHistoryModel();
+
         if( $data['trip-type'] == 'round-trip' || $data['trip-type'] == 'one-way-airport-hotel' ){
             if( $existing != null ){
                 foreach($existing as $r => $t){
                     if( $t['tipo'] == 'ENTRADA'){
                         if( strpos($t['status'], 'SOLICITADO') !== false ){
+                            array_push($ids,$t['id']);
                             $model->updateById($t['id'],$data['arrival']);
+                            
+                            $updateFields = [];
+
+                            foreach( $data['arrival'] as $field => $val ){
+                                if( $val != $t[$field] ){
+                                    array_push($updateFields, [$field, $t[$field], $val]);
+                                }
+                            }
+
+                            if( count($updateFields) > 0 ){
+                                $updateModel->edit($t['id'], $updateFields);
+                            }
+
                         }else{
                             return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
                         }
@@ -550,7 +567,20 @@ class TransportacionController extends BaseController
             foreach($existing as $r => $t){
                 if( $t['tipo'] == 'SALIDA'){
                     if( strpos($t['status'], 'SOLICITADO') !== false ){
+                        array_push($ids,$t['id']);
                         $model->updateById($t['id'],$data['departure']);
+
+                        $updateFields = [];
+
+                        foreach( $data['arrival'] as $field => $val ){
+                            if( $val != $t[$field] ){
+                                array_push($updateFields, [$field, $t[$field], $val]);
+                            }
+                        }
+
+                        if( count($updateFields) > 0 ){
+                            $updateModel->edit($t['id'], $updateFields);
+                        }
                     }else{
                         return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
                     }
@@ -558,9 +588,29 @@ class TransportacionController extends BaseController
             }
         }
 
+        // update ticket
+        $zd = new Zendesk();
+        
+        // Reemplaza las variables en el HTML con valores específicos
+        $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? '')]);
+
+        $dataTicket = [
+            "comment"   =>  [
+                "public"        => true,
+                "html_body"     => $html
+            ],
+            "status" => "open"
+        ];
+
+        try{
+
+            $result = $zd->updateTicket($this->request->getPost('newTicket'), $dataTicket);
+        } catch(\Exception $e){
+            $a = 1;
+        }
+
         return view('transpo/completed', ['hotel' => $this->request->getPost('hotel')]);
 
-        gg_response(200, $data);
     }
 
     public function invalid(){

@@ -96,6 +96,11 @@
                 <label for="noRestrict"><?php echo ($lang === 'esp') ? 'ID de Ticket:' : 'Ticket ID:'; ?></label>
                 <input type="text" class="form-control" id="noRestrict" name="noRestrict" value="<?php echo $data["noRestrict"]; ?>" readonly>
             </div>
+            <!-- Lang -->
+            <div class="form-group" hidden>
+                <label for="lang"><?php echo ($lang === 'esp') ? 'ID de Ticket:' : 'Ticket ID:'; ?></label>
+                <input type="text" class="form-control" id="lang" name="lang" value="<?php echo $lang; ?>" readonly>
+            </div>
             <!-- Trip Type -->
             <div class="form-group">
                 <label for="trip-type"><?php echo ($lang === 'esp') ? 'Tipo de viaje:' : 'Trip type:'; ?></label>

@@ -12,14 +12,14 @@
 
         </div>
     </div>
-
+  
     <hr class="gray-hr">
 
 
         <div class="detail-font">
             <p class="conf-margin">
                 <?php if( $lang ): ?>
-                    <p>Hemos recibido tus datos y estamos procesando tu reserva. En las próximas 24 horas recibirás un correo con los pasos a seguir</p>
+                    <p>Hemos recibido tus datos y estamos procesando tu reserva. En las próximas 24 horas recibirás un correo con los pasos a seguir.</p>
                 <?php else: ?>
                     <p>We have received your information and are processing your reservation. Within the next 24 hours, you will receive an email with the next steps.</p>
                 <?php endif; ?></p>
