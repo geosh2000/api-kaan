@@ -91,6 +91,11 @@
                 <label for="tickets"><?php echo ($lang === 'esp') ? 'ID de Ticket:' : 'Ticket ID:'; ?></label>
                 <input type="text" class="form-control" id="tickets" name="newTicket" value="<?php echo $data["ticket"]; ?>" readonly>
             </div>
+            <!-- NoRestrict -->
+            <div class="form-group" hidden>
+                <label for="noRestrict"><?php echo ($lang === 'esp') ? 'ID de Ticket:' : 'Ticket ID:'; ?></label>
+                <input type="text" class="form-control" id="noRestrict" name="noRestrict" value="<?php echo $data["noRestrict"]; ?>" readonly>
+            </div>
             <!-- Trip Type -->
             <div class="form-group">
                 <label for="trip-type"><?php echo ($lang === 'esp') ? 'Tipo de viaje:' : 'Trip type:'; ?></label>
@@ -103,12 +108,12 @@
             <!-- Phone number -->
             <div class="form-group">
                 <label for="phone"><?php echo ($lang === 'esp') ? 'Número de teléfono:' : 'Phone number:'; ?></label>
-                <input type="tel" class="form-control" id="phone" name="phone" required>
+                <input type="tel" class="form-control" id="phone" name="phone" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['phone'] != null): ?> value="<?=$rsva['ENTRADA']['phone'] ?>" readonly <?php endif; ?> required>
             </div>
             <!-- Pax number -->
             <div class="form-group">
                 <label for="pax"><?php echo ($lang === 'esp') ? 'Número de personas:' : 'How many people:'; ?></label>
-                <input type="number" min="1" max="<?= $hotel == 'atpm' ? "6" : "8"  ?>" class="form-control" id="pax" name="pax" required>
+                <input type="number" min="1" max="<?= $hotel == 'atpm' ? "6" : "8"  ?>" class="form-control" id="pax" name="pax" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['pax'] != null): ?> value="<?=$rsva['ENTRADA']['pax'] ?>" readonly <?php endif; ?> required>
             </div>
             <!-- Arrival details -->
             <div id="arrival-section">
@@ -116,19 +121,19 @@
                 <h4><?php echo ($lang === 'esp') ? 'Detalles de llegada:' : 'Arrival details:'; ?></h4>
                 <div class="form-group">
                     <label for="arrival-date"><?php echo ($lang === 'esp') ? 'Fecha de llegada:' : 'Arrival date:'; ?></label>
-                    <input type="date" class="form-control" id="arrival-date"  name="arrival-date" required>
+                    <input type="date" class="form-control" id="arrival-date"  name="arrival-date" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['date'] != null): ?> value="<?=$rsva['ENTRADA']['date'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="arrival-time"><?php echo ($lang === 'esp') ? 'Hora de llegada del vuelo:' : 'Flight arrival time:'; ?></label>
-                    <input type="time" class="form-control" id="arrival-time"  name="arrival-time" required>
+                    <input type="time" class="form-control" id="arrival-time"  name="arrival-time" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['time'] != null): ?> value="<?=$rsva['ENTRADA']['time'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="arrival-flight-number"><?php echo ($lang === 'esp') ? 'Número de vuelo:' : 'Flight number:'; ?></label>
-                    <input type="text" class="form-control" id="arrival-flight-number" name="arrival-flight-number" required>
+                    <input type="text" class="form-control" id="arrival-flight-number" name="arrival-flight-number" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['flight'] != null): ?> value="<?=$rsva['ENTRADA']['flight'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="arrival-airline"><?php echo ($lang === 'esp') ? 'Compañía aérea:' : 'Airline company:'; ?></label>
-                    <input type="text" class="form-control" id="arrival-airline"  name="arrival-airline" required>
+                    <input type="text" class="form-control" id="arrival-airline"  name="arrival-airline" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['airline'] != null): ?> value="<?=$rsva['ENTRADA']['airline'] ?>" readonly <?php endif; ?> required>
                 </div>
             </div>
             <!-- Departure details -->
@@ -137,23 +142,23 @@
                 <h4><?php echo ($lang === 'esp') ? 'Detalles de salida:' : 'Departure details:'; ?></h4>
                 <div class="form-group">
                     <label for="departure-date"><?php echo ($lang === 'esp') ? 'Fecha de salida:' : 'Departure date:'; ?></label>
-                    <input type="date" class="form-control" id="departure-date"  name="departure-date" required>
+                    <input type="date" class="form-control" id="departure-date"  name="departure-date" <?php if( isset($rsva['SALIDA']) && $rsva['SALIDA']['date'] != null): ?> value="<?=$rsva['SALIDA']['date'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="departure-time"><?php echo ($lang === 'esp') ? 'Hora de salida del vuelo:' : 'Flight departure time:'; ?></label>
-                    <input type="time" class="form-control" id="departure-time"  name="departure-time" required>
+                    <input type="time" class="form-control" id="departure-time"  name="departure-time" <?php if( isset($rsva['SALIDA']) && $rsva['SALIDA']['time'] != null): ?> value="<?=$rsva['SALIDA']['time'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="departure-flight-number"><?php echo ($lang === 'esp') ? 'Número de vuelo:' : 'Flight number:'; ?></label>
-                    <input type="text" class="form-control" id="departure-flight-number" name="departure-flight-number" required>
+                    <input type="text" class="form-control" id="departure-flight-number" name="departure-flight-number" <?php if( isset($rsva['SALIDA']) && $rsva['SALIDA']['flight'] != null): ?> value="<?=$rsva['SALIDA']['flight'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="departure-airline"><?php echo ($lang === 'esp') ? 'Compañía aérea:' : 'Airline company:'; ?></label>
-                    <input type="text" class="form-control" id="departure-airline"  name="departure-airline" required>
+                    <input type="text" class="form-control" id="departure-airline"  name="departure-airline" <?php if( isset($rsva['SALIDA']) && $rsva['SALIDA']['airline'] != null): ?> value="<?=$rsva['SALIDA']['airline'] ?>" readonly <?php endif; ?> required>
                 </div>
                 <div class="form-group">
                     <label for="pickup-time"><?php echo ($lang === 'esp') ? 'Hora de recogida requerida:' : 'Pick-up time required:'; ?></label>
-                    <input type="time" class="form-control" id="pickup-time"  name="pickup-time" required>
+                    <input type="time" class="form-control" id="pickup-time"  name="pickup-time" <?php if( isset($rsva['SALIDA']) && $rsva['SALIDA']['pick_up'] != null): ?> value="<?=$rsva['SALIDA']['pick_up'] ?>" readonly <?php endif; ?> required>
                 </div>
             </div>
             <div class="error" id="date-error">

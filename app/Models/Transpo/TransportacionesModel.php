@@ -23,9 +23,9 @@ class TransportacionesModel extends BaseModel
             $builder->like('correo', $correo);
         } else {
 
-            $builder->where('date >=', $inicio);
-            $builder->where('date <=', $fin);
-
+            if( $inicio ){ $builder->where('date >=', $inicio); } 
+            if( $fin ){ $builder->where('date <=', $fin); } 
+            
             if (!empty($status)) {
                 $builder->whereIn('status', $status);
             }
@@ -90,6 +90,37 @@ class TransportacionesModel extends BaseModel
 
     }
 
+    public function searchAllIds( $arr ){
+
+        $builder = $this->db->table('qwt_transportaciones');
+
+        $builder->whereIn('id', $arr);
+
+        $result = $builder->get()->getResultArray();
+
+        foreach( $result as $r => $f ){
+            $tickets = json_decode( $f['tickets'] ?? "[]" );
+            $tickets_payment = json_decode( $f['ticket_payment'] ?? "[]" );
+            $tickets_pago = json_decode( $f['ticket_pago'] ?? "[]" );
+            $tickets_sent_request = json_decode( $f['ticket_sent_request'] ?? "[]" );
+            
+            foreach( $tickets_payment as $t => $tk ){
+                if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
+            }
+            foreach( $tickets_pago as $t => $tk ){
+                if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
+            }
+            foreach( $tickets_sent_request as $t => $tk ){
+                if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
+            }
+            
+            $result[$r]['tickets'] = json_encode( $tickets );
+        }
+
+        return $result;
+
+    }
+
     public function searchAll( $id ){
 
         $builder = $this->db->table('qwt_transportaciones');
@@ -116,9 +147,22 @@ class TransportacionesModel extends BaseModel
     public function updateById($id, $data){
         $builder = $this->db->table('qwt_transportaciones');
 
-        $builder->where('id', $id)->set($data);
+        if( is_array( $id ) ){
+            $builder->whereIn('id', $id);
+        }else{
+            $builder->where('id', $id);
+        }
+        $builder->set($data);
 
         return $builder->update();
+    }
+
+    public function validFormDate( $data ){
+        $db = \Config\Database::connect('production');
+        $query = $db->query("SELECT ADDDATE(CURDATE(),".$data[2].") <= '".$data[0]."' AND ADDDATE(CURDATE(),".$data[2].") <= '".$data[1]."' as valid");
+        $result = $query->getRow();
+
+        return boolval($result->valid);
     }
 
     

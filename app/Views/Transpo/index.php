@@ -6,6 +6,7 @@
         "ATELIER-INCLUIDA"                              => 'btn-incluNoData',
         "ATELIER-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "ATELIER-SOLICITADO"                            => 'btn-incluSolicitado',
+        "ATELIER-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "ATELIER-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "ATELIER-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "ATELIER-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -17,6 +18,7 @@
         "Atelier Playa Mujeres-INCLUIDA"                              => 'btn-incluNoData',
         "Atelier Playa Mujeres-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Atelier Playa Mujeres-SOLICITADO"                            => 'btn-incluSolicitado',
+        "Atelier Playa Mujeres-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "Atelier Playa Mujeres-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "Atelier Playa Mujeres-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "Atelier Playa Mujeres-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -28,6 +30,7 @@
         "OLEO-INCLUIDA"                              => 'btn-incluNoData',
         "OLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "OLEO-SOLICITADO"                           => 'btn-incluSolicitado',
+        "OLEO-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "OLEO-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "OLEO-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "OLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -39,6 +42,7 @@
         "Oleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
         "Oleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Oleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
+        "Oleo Cancun Playa-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "Oleo Cancun Playa-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "Oleo Cancun Playa-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -50,6 +54,7 @@
         "ÓLEO-INCLUIDA"                              => 'btn-incluNoData',
         "ÓLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "ÓLEO-SOLICITADO"                 => 'btn-incluSolicitado',
+        "ÓLEO-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "ÓLEO-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "ÓLEO-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "ÓLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -61,6 +66,7 @@
         "Óleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
         "Óleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Óleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
+        "Óleo Cancun Playa-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
         "Óleo Cancun Playa-PAGO PENDIENTE"                        => 'btn-pagoPendiente',
         "Óleo Cancun Playa-CORTESÍA (CAPTURA PENDIENTE)"          => 'btn-pagadoSinIngresar',
         "Óleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
@@ -131,6 +137,24 @@
 .btn-incluSolicitado:disabled, .btn-incluSolicitado.disabled {
     background-color: #E0B3E0;
     border-color: #E0B3E0;
+}
+
+/* Botón LigaPendiente - Naranja */
+.btn-ligaPendiente {
+    background-color: #26d2c7;
+    color: white;
+    border: 1px solid #26d2c7;
+}
+.btn-ligaPendiente:hover {
+    background-color: #24a0ae;
+    border-color: #24a0ae;
+}
+.btn-ligaPendiente:focus, .btn-ligaPendiente.focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.5);
+}
+.btn-ligaPendiente:disabled, .btn-ligaPendiente.disabled {
+    background-color: #FFE0B3;
+    border-color: #FFE0B3;
 }
 
 /* Botón PagoPendiente - Naranja */
@@ -329,11 +353,21 @@
                 <div class="row">
                     <div class="col-md-3">
                         <label for="inicio">Fecha de inicio:</label>
-                        <input type="date" name="inicio" id="inicio" class="form-control" value="<?= $inicio ?>">
+                        <div class="input-group">
+                            <input type="date" name="inicio" id="inicio" class="form-control" value="<?= $inicio ?>">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('inicio').value=''">x</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <label for="fin">Fecha de fin:</label>
-                        <input type="date" name="fin" id="fin" class="form-control" value="<?= $fin ?>">
+                        <div class="input-group">
+                            <input type="date" name="fin" id="fin" class="form-control" value="<?= $fin ?>">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fin').value=''">x</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <label for="status">Status:</label>
@@ -341,6 +375,7 @@
                             <option value="INCLUIDA" <?= in_array('INCLUIDA', $status) ? 'selected' : '' ?>>INCLUIDA</option>
                             <option value="INCLUIDA (SOLICITADO)" <?= in_array('INCLUIDA (SOLICITADO)', $status) ? 'selected' : '' ?>>INCLUIDA (SOLICITADO)</option>
                             <option value="SOLICITADO" <?= in_array('SOLICITADO', $status) ? 'selected' : '' ?>>SOLICITADO</option>
+                            <option value="LIGA PENDIENTE" <?= in_array('LIGA PENDIENTE', $status) ? 'selected' : '' ?>>LIGA PENDIENTE</option>
                             <option value="PAGO PENDIENTE" <?= in_array('PAGO PENDIENTE', $status) ? 'selected' : '' ?>>PAGO PENDIENTE</option>
                             <option value="CORTESÍA (CAPTURA PENDIENTE)" <?= in_array('CORTESÍA (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>CORTESÍA (CAPTURA PENDIENTE)</option>
                             <option value="PAGO EN DESTINO (CAPTURA PENDIENTE)" <?= in_array('PAGO EN DESTINO (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
@@ -457,6 +492,7 @@
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA">INCLUIDA</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA (SOLICITADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA (SOLICITADO)">INCLUIDA (SOLICITADO)</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/SOLICITADO') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="SOLICITADO">SOLICITADO</a>
+                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/LIGA PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="LIGA PENDIENTE">LIGA PENDIENTE</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO PENDIENTE">PAGO PENDIENTE</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURA PENDIENTE)">CORTESÍA (CAPTURA PENDIENTE)</a>
                                 <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURADO)">CORTESÍA (CAPTURADO)</a>

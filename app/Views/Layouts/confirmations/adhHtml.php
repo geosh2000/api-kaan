@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= ($lang === 'esp') ? 'Formulario de Transportación' : 'Transfer Form'; ?></title>
-    <link rel="icon" href="<?php echo $data['hotel'] == "ATELIER" ? "favicon-atelier.png" : "favicon-oleo.ico"; ?>">
+    <link rel="icon" href="<?php echo $hotel == "ATELIER" ? "favicon-atelier.png" : "favicon-oleo.ico"; ?>">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Material Design CSS -->

@@ -16,6 +16,11 @@
         color: white;
         border: 1px solid #800080;
     }
+    .btn-ligaPendiente {
+        background-color: #26d2c7;
+        color: white;
+        border: 1px solid #26d2c7;
+    }
     .btn-pagoPendiente {
         background-color: #FFA500;
         color: white;
@@ -87,6 +92,9 @@
         static transpoPago  = 'ticket.customField:custom_field_28630467255444';
         static transpoStatus= 'ticket.customField:custom_field_28774341519636';
         static transpoDefined= 'ticket.customField:custom_field_28802239047828';
+        static idIda        = 'ticket.customField:custom_field_28837284664596';
+        static idVuelta     = 'ticket.customField:custom_field_28837240808724';
+        static ligaPago     = 'ticket.customField:custom_field_28727761630100';
 
     }
 
@@ -111,6 +119,7 @@
             "INCLUIDA": 'btn-incluNoData',
             "INCLUIDA (SOLICITADO)": 'btn-incluSolicitado',
             "SOLICITADO": 'btn-incluSolicitado',
+            "LIGA PENDIENTE": 'btn-ligaPendiente',
             "PAGO PENDIENTE": 'btn-pagoPendiente',
             "CORTESÍA (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
             "CORTESÍA (CAPTURADO)": 'btn-pagadoSinIngresar',
@@ -141,12 +150,15 @@
         
         var zafData = {};
 
+        
         $(document).on('click', '.reloadBtn', function(){
             buildData();
         });
         
         // ZAF METHODS
         var client = ZAFClient.init();
+        // client.invoke('ticketFields:custom_field_28837284664596.hide');
+        // client.invoke('ticketFields:custom_field_28837240808724.hide');
         buildData();
 
         function buildData(  ){
@@ -158,8 +170,10 @@
                 printGuest(data[zdFields.guest]);
                 
                 if( data[zdFields.transpoDefined] == "yes" ){
-                    if( data[zdFields.reserva] == null ){
+                    if( data[zdFields.reserva] == null || data[zdFields.reserva].trim() == "" ){
                         setField(zdFields.transpoDefined, "no", "Transpo Defined");
+                        setField( zdFields.idIda, null, 'id ida' );
+                        setField( zdFields.idVuelta, null, 'id vuelta' );
                     }else{
                         openRsv( data[zdFields.reserva] );
                     }
@@ -257,7 +271,9 @@
                     () => setGuest( selectedData['guest']),
                     () => setTranspoPago( selectedData['isIncluida'] == "0" ? 'transpo_prepago' : 'transpo_cortesia'),
                     () => setField( zdFields.reserva, selectedData['folio'], 'Reserva'),
-                    () => setField( zdFields.transpoStatus, strToTag(selectedData['globalStatus'], 'transpo_status_'), 'Status')
+                    () => setField( zdFields.transpoStatus, strToTag(selectedData['globalStatus'], 'transpo_status_'), 'Status'),
+                    () => setField( zdFields.idIda, selectedData['id_in'] ?? null, 'id Ida'),
+                    () => setField( zdFields.idVuelta, selectedData['id_out'] ?? null, 'id Vuelta')
                 ];
                 
                 // Ejecutar todas las funciones en orden
@@ -321,6 +337,22 @@
             // NEW REG BUTTON
             $(document).on('click', '#newReg', function(){
                 displayNewForm();
+            });
+
+            // SEND REQUEST BUTTON
+            $(document).on('click', '#sendRequest', function(){
+                sendRequest();
+            });
+
+            // SEND MANUAL BUTTON
+            $(document).on('click', '#sendRequestManual', function(){
+                console.log('open manual');
+                openManual();
+            });
+
+            // SEND LINK BUTTON
+            $(document).on('click', '#sendLink', function(){
+                sendLink();
             });
 
 
@@ -472,7 +504,10 @@
                         contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
                         data: $.param(params), // Convierte el objeto params a una cadena de consulta
                         success: function( resp ) {
-                            console.log('saved',data[zdFields.reserva] );
+
+                            setField( zdFields.idIda, resp['ids'][0], 'id ida' );
+                            setField( zdFields.idVuelta, resp['ids'][1], 'id vuelta' );
+
                             // La función a ejecutar si la solicitud es exitosa
                             openRsv( data[zdFields.reserva] );
                             startLoader(false);
@@ -488,31 +523,168 @@
 
             }
 
-            function openRsv( folio ){
+            function sendRequest( nr = 0 ){
+                startLoader();
+
+                var lang = $('#languageSelect').val();
+
+                var fields = [
+                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta
+                ]
+                client.get( fields ).then(function(data) {
+
+                    var params = {
+                        'id1': data[zdFields.idIda],
+                        'id2': data[zdFields.idVuelta],
+                        'ticket': data.ticket.id,
+                        'lang': lang,
+                        "author": data.currentUser.id,
+                        "noRestrict": nr
+                    }
+    
+                    $.ajax({
+                        url: '<?= site_url('zdappC/transpo/requestTemplate') ?>', // La URL a la que se envía la solicitud
+                        method: 'POST', // El método HTTP a utilizar para la solicitud
+                        contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
+                        data: $.param(params), // Convierte el objeto params a una cadena de consulta
+                        success: function( resp ) {
+
+                            startLoader(false);
+                            openRsv();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // La función a ejecutar si la solicitud falla
+                            console.error("Error:", textStatus, errorThrown);
+                            startLoader(false);
+                        }
+                    });
+
+                });
+
+            }
+
+            function sendLink(){
+                $('#warnMsg').html("");
+                startLoader();
+
+                var lang = $('#languageSelect').val();
+
+                var fields = [
+                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta, zdFields.ligaPago
+                ]
+                client.get( fields ).then(function(data) {
+
+                    var params = {
+                        'id1': data[zdFields.idIda],
+                        'id2': data[zdFields.idVuelta],
+                        'ticket': data.ticket.id,
+                        'lang': lang,
+                        'link': data[zdFields.ligaPago] ?? "",
+                        "author": data.currentUser.id
+                    }
+
+                    if( params.link.trim() == "" ){
+                        $('#warnMsg').html(`<div class="alert alert-danger">Ingresa la liga de pago en el formulario</div>`);
+                        startLoader(false);
+                        return;
+                    }
+    
+                    $.ajax({
+                        url: '<?= site_url('zdappC/transpo/requestLink') ?>', // La URL a la que se envía la solicitud
+                        method: 'POST', // El método HTTP a utilizar para la solicitud
+                        contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
+                        data: $.param(params), // Convierte el objeto params a una cadena de consulta
+                        success: function( resp ) {
+                            startLoader(false);
+                            openRsv();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // La función a ejecutar si la solicitud falla
+                            console.error("Error:", textStatus, errorThrown);
+                            startLoader(false);
+                        }
+                    });
+
+                });
+
+            }
+
+            function openRsv(){
                 startLoader();
 
                 setField(zdFields.transpoDefined, "yes", "Transpo Defined");
 
-                $.ajax({
-                    url: '<?= site_url('zdappC/transpo/searchFolio') ?>/' + folio, // La URL a la que se envía la solicitud
-                    method: 'GET', // El método HTTP a utilizar para la solicitud
-                    success: function( resp ) {
+                client.get([zdFields.idIda, zdFields.idVuelta]).then( function(zd){
+                    var url = '<?= site_url('zdappC/transpo/searchIds') ?>/' +( zd[zdFields.idIda] ?? '0') + '/' + (zd[zdFields.idVuelta] ?? '0');
 
-                        if( resp['data'].length > 0 ){
-                            // La función a ejecutar si la solicitud es exitosa
-                            buildTable(resp.data);
-                        }else{
-                            setField(zdFields.transpoDefined, "no", "Transpo Defined");
+                    $.ajax({
+                        url: url, // La URL a la que se envía la solicitud
+                        method: 'GET', // El método HTTP a utilizar para la solicitud
+                        success: function( resp ) {
+    
+                            if( resp['data'].length > 0 ){
+                                // La función a ejecutar si la solicitud es exitosa
+                                buildTable(resp.data);
+                            }else{
+                                setField(zdFields.transpoDefined, "no", "Transpo Defined");
+                                setField( zdFields.idIda, null, 'id ida' );
+                                setField( zdFields.idVuelta, null, 'id vuelta' );
+                            }
+                            startLoader(false);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // La función a ejecutar si la solicitud falla
+                            console.error("Error:", textStatus, errorThrown);
+                            startLoader(false);
                         }
-                        startLoader(false);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        // La función a ejecutar si la solicitud falla
-                        console.error("Error:", textStatus, errorThrown);
-                        startLoader(false);
-                    }
+                    });
                 });
 
+
+            }
+
+            function openManual(){
+
+                startLoader();
+
+                var lang = $('#languageSelect').val();
+
+                var fields = [
+                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta
+                ]
+                client.get( fields ).then(function(data) {
+    
+                    var params = {
+                        'id1': data[zdFields.idIda],
+                        'id2': data[zdFields.idVuelta],
+                        'ticket': data.ticket,
+                        'lang': data.lang,
+                        "author": data.currentUser.id,
+                        "noRestrict": 1
+                    };
+    
+                    // Crea un formulario
+                    var $form = $('<form>', {
+                        method: 'POST',
+                        action: '<?= site_url('zdappC/transpo/requestTemplate') ?>', // URL de destino
+                        target: '_blank'
+                    });
+    
+                    // Añade campos de entrada al formulario
+                    $.each(params, function(key, value) {
+                        $('<input>', {
+                            type: 'hidden',
+                            name: key,
+                            value: value
+                        }).appendTo($form);
+                    });
+    
+                    // Añade el formulario al cuerpo y envíalo
+                    $form.appendTo('body').submit().remove();
+
+                    startLoader(false);
+                });
+                
             }
 
         // AJAX REQUESTS END
@@ -536,27 +708,27 @@
                 }
             }
 
-            function buildTable( data ){
+            function buildTable(data) {
                 $('#result').html = '';
-    
+
                 console.log(data);
-                setHotel( data[0].hotel );
-                setGuest( data[0].guest );
-                setField( zdFields.transpoStatus, strToTag(data[0]['status'], 'transpo_status_'), 'Status');
-    
+                setHotel(data[0].hotel);
+                setGuest(data[0].guest);
+                setField(zdFields.transpoStatus, strToTag(data[0]['status'], 'transpo_status_'), 'Status');
+
                 var cardHeader = `<div class="card-header" style="line-height:0.5">
-                                <h5 class="card-title">${data[0].guest}</h5>
-                                <div class="card-text d-flex justify-content-between">
-                                    <div>
-                                        <p class="card-text"><small class="text-muted">Mail: ${data[0].correo} / Tel: ${data[0].phone}</small></p>
-                                        <p class="card-text"><small class="text-muted">${data[0].hotel} ( ${data[0].isIncluida == "0" ? "Con Costo" : "Incluida"} ) / ${data[0].folio} - ${data[0].pax} pax</small></p>
+                                    <h5 class="card-title">${data[0].guest}</h5>
+                                    <div class="card-text d-flex justify-content-between">
+                                        <div>
+                                            <p class="card-text"><small class="text-muted">Mail: ${data[0].correo} / Tel: ${data[0].phone}</small></p>
+                                            <p class="card-text"><small class="text-muted">${data[0].hotel} ( ${data[0].isIncluida == "0" ? "Con Costo" : "Incluida"} ) / ${data[0].folio} - ${data[0].pax} pax</small></p>
+                                        </div>
+                                        <a class="ml-auto btn btn-warning" href="<?= site_url('/transpo') ?>?folio=${data[0].folio}" target="_blank"><i class="far fa-edit"></i></a>
                                     </div>
-                                    <a class="ml-auto btn btn-warning" href="<?= site_url('/transpo') ?>?folio=${data[0].folio}" target="_blank"><i class="far fa-edit"></i></a>
-                                </div>
-                            </div>`;
-                    
+                                </div>`;
+                            
                 var htmlLine = "";
-    
+
                 // Iterar sobre los elementos del arreglo y construir el HTML
                 data.forEach(function(item) {
                     var ticketsArray = [];
@@ -565,35 +737,59 @@
                     } catch (e) {
                         console.error("Error parsing tickets:", e);
                     }
-    
+
                     var ticketsString = "";
-                    ticketsArray.forEach( function(item) {
-                        ticketsString = `${ticketsString}<button type="button" data-ticket-id="${item}" class="btn btn-link" style="zoom: 0.7">${item}</button> `;
+                    ticketsArray.forEach(function(ticket) {
+                        ticketsString = `${ticketsString}<button type="button" data-ticket-id="${ticket}" class="btn btn-link" style="zoom: 0.7">${ticket}</button> `;
                     });
-    
-    
+
                     htmlLine = `${htmlLine}
                         <h5> ${item.tipo} [${item.item}]</h5>
                         <p class="card-text"><strong>Fecha:</strong> ${item.date} (${item.time})</p>
                         <p class="card-text"><strong>Vuelo:</strong> ${item.airline} (${item.flight})</p>
-                        <p class="card-text ${ htmlTemplates.status[item.status] ?? '' }"><strong>Status:</strong> ${item.status}</p>
-                        <p class="card-text"><strong>Tickets:</strong> ${ ticketsString } </p>
+                        <p class="card-text ${htmlTemplates.status[item.status] ?? ''}" style="line-height: normal"><strong>Status:</strong> ${item.status}</p>
+                        <p class="card-text"><strong>Tickets:</strong> ${ticketsString} </p>
                         <hr>
                     `;
                 });
-    
+
+                var additionalControls = '';
+                if (data[0].status === "INCLUIDA" || data[0].status === "-" || data[0].status === "INCLUIDA (SOLICITADO)" || data[0].status === "SOLICITADO") {
+                    additionalControls = `
+                        <select id="languageSelect" class="form-select" style="margin-right: 10px;">
+                            <option value="es-419">Español</option>
+                            <option value="en-US">Inglés</option>
+                        </select>
+                        <button class="btn btn-success mr-1" id="sendRequest">Enviar</button>
+                        <button class="btn btn-primary" id="sendRequestManual">Manual</button>
+                    `;
+                }
+
+                if( data[0].status === "LIGA PENDIENTE" || data[0].status === "PAGO PENDIENTE" ){
+                    additionalControls = `
+                        <select id="languageSelect" class="form-select" style="margin-right: 10px;">
+                            <option value="es-419">Español</option>
+                            <option value="en-US">Inglés</option>
+                        </select>
+                        <button class="btn btn-ligaPendiente" id="sendLink">Enviar Liga</button>
+                    `;
+                }
+
                 var html = `
                     <div class="card mb-3">
                         ${cardHeader}
-                        <div class="card-body" style="line-height:normal">
-                            ${ htmlLine }
+                        <div class="card-body" style="line-height:0.7">
+                            ${htmlLine}
+                        </div>
+                        <div id="warnMsg"></div>
+                        <div class="card-footer d-flex justify-content-end">
+                            ${additionalControls}
                         </div>
                     </div>
                 `;
                 $('#result').html(html);
-    
-
             }
+
 
             function displayNewForm(){
                 

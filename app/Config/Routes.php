@@ -55,8 +55,14 @@ $routes->group('cio', function($routes){
 $routes->group('public', function($routes){
     $routes->post('addTransfer', 'Transpo\TransportacionController::storeForm');
     $routes->get('transfer-reg', 'Transpo\TransportacionController::showForm');
+    $routes->get('transfer-reg/(:num)', 'Transpo\TransportacionController::showForm/$1');
     $routes->get('invalid_form', 'Transpo\TransportacionController::invalid');
 });
+
+$routes->group('mailing', function($routes){
+    $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
+});
+
 
 // Transportacion
 // $routes->group('transpo', function($routes){
@@ -73,7 +79,6 @@ $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('db/get', 'Transpo\DatabaseController::getIncluded/3');
     $routes->get('db/get/(:num)', 'Transpo\DatabaseController::getIncluded/$1');
     $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
-    $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
     $routes->get('searchFolio/(:num)', 'Transpo\TransportacionController::findByFolio/$1');
 });
 
@@ -85,12 +90,16 @@ $routes->group('zdapp', ['filter' => 'zendeskFilter'], function($routes){
     // $routes->post('/', 'Zdapp\ZendeskAppController::index');
 });
 
+
 $routes->group('zdappC', function($routes){
     $routes->group('transpo',  function($routes){
         $routes->get('/', 'Zdapp\ZendeskAppController::transpo');
         $routes->post('/', 'Cio\QueryCalls::calls');
         $routes->get('searchFolios/(:any)', 'Transpo\TransportacionController::search/$1');
         $routes->get('searchFolio/(:any)', 'Transpo\TransportacionController::findByFolio/$1');
+        $routes->get('searchIds/(:num)/(:num)', 'Transpo\TransportacionController::findById/$1/$2');
+        $routes->post('requestTemplate', 'Transpo\TransportacionController::mailRequest');
+        $routes->post('requestLink', 'Transpo\TransportacionController::linkRequest');
 
         $routes->get('create', 'Transpo\TransportacionController::create');
         $routes->post('store', 'Transpo\TransportacionController::store');
@@ -103,7 +112,6 @@ $routes->group('zdappC', function($routes){
         $routes->get('db/get', 'Transpo\DatabaseController::getIncluded/3');
         $routes->get('db/get/(:num)', 'Transpo\DatabaseController::getIncluded/$1');
         $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
-        $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
         
         // DBController
         $routes->get('getRsv/(:any)', 'Transpo\DatabaseController::getRsva/$1');

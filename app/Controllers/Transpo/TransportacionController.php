@@ -5,6 +5,9 @@ namespace App\Controllers\Transpo;
 use App\Models\Transpo\TransportacionesModel;
 use App\Models\Transpo\TranspoHistoryModel;
 use App\Controllers\BaseController;
+use App\Controllers\Zd\Mailing;
+use App\Libraries\Zendesk;
+use Config\Globals as templates;
 
 class TransportacionController extends BaseController
 {
@@ -50,6 +53,9 @@ class TransportacionController extends BaseController
         $guest = $this->request->getVar('guest');
         $correo = $this->request->getVar('correo');
         $folio = $this->request->getVar('folio');
+
+        if( $inicio == "" ){ $inicio = false; }
+        if( $fin == "" ){ $fin = false; }
 
         // Convertir a array si es nulo o un solo valor
         $status = is_null($status_raw) ? [] : $status_raw;
@@ -246,18 +252,30 @@ class TransportacionController extends BaseController
         $transpoModel = new TransportacionesModel();
         $updateModel = new TranspoHistoryModel();
         
-        // INSERT IN
-        $transpoModel->insert($in);
-        $lastInsertIdIn = $transpoModel->getInsertID();
-        
-        // INSERT OUT
-        $transpoModel->insert($out);
-        $lastInsertIdOut = $transpoModel->getInsertID();
-        
-        $updateModel->create($lastInsertIdIn, false, $data['user']);
-        $updateModel->create($lastInsertIdOut, false, $data['user']);
-
-        gg_response(200, ['ids' => [$lastInsertIdIn, $lastInsertIdOut]]);
+        try{
+            // INSERT IN
+            $transpoModel->insert($in);
+            $lastInsertIdIn = $transpoModel->getInsertID();
+            
+            // INSERT OUT
+            $transpoModel->insert($out);
+            $lastInsertIdOut = $transpoModel->getInsertID();
+            
+            $updateModel->create($lastInsertIdIn, false, $data['user']);
+            $updateModel->create($lastInsertIdOut, false, $data['user']);
+    
+            gg_response(200, ['ids' => [$lastInsertIdIn, $lastInsertIdOut]]);
+        }catch (\mysqli_sql_exception $e) {
+            if ($e->getCode() === 1062) {
+                // Error de entrada duplicada
+                gg_response(400, ['msg' => 'Registro ya existe'] );
+            } else {
+                // Otros errores de base de datos
+                gg_response(400, ['msg' => 'Error de base de datos'] );
+            }
+        } catch (\Exception $e) {
+            gg_response(400, ['msg' => 'Ha ocurrido un error inesperado'] );
+        }
     }
 
 
@@ -410,12 +428,16 @@ class TransportacionController extends BaseController
         }
     }
 
-    public function showForm(){
-        $lang = ($_GET['lang'] ?? 'esp') == 'esp';
+    public function showForm( $json = false, $encoded = null ){
 
-        if (isset($_GET['d'])) {
+        $encoded = $encoded ?? $_GET['d'];
+        $lang = ($_GET['lang'] ?? 'esp') == 'esp';
+        $json = boolval($json);
+
+        
+        if (isset($encoded)) {
             // Decodificar el JSON de base64
-            $encodedData = $_GET['d'];
+            $encodedData = $encoded;
             $jsonData = base64_decode($encodedData);
             
             // Decodificar el JSON en un array asociativo
@@ -428,8 +450,25 @@ class TransportacionController extends BaseController
         }else{
             return view('/transpo/invalid_form.php');
         }
+        
+        
+        // Verifica status de reserva
+        $ids = $data['ids'];
+        $model = new TransportacionesModel();
+        
+        $rsva = $model->searchAllIds($ids);
+        $info = [];
+        foreach( $rsva as $r => $t ){
+            $info[$t['tipo']] = $t;
+        }
+        
+        $params = ['lang' => $lang, 'rsva' => $info, 'data' => $data, 'hotel' => ($data['hotel'] == 'ATELIER') ? 'atpm' : 'oleo'];
 
-        return view('transpo/form-transfer', ['lang' => $lang, 'data' => $data, 'hotel' => ($data['hotel'] == 'ATELIER') ? 'atpm' : 'oleo']);
+        if($json){
+            gg_response(200, [$params]);
+        }
+
+        return view('transpo/form-transfer', $params);
     }
 
     public function storeForm(){
@@ -450,7 +489,7 @@ class TransportacionController extends BaseController
                 'flight' => $this->request->getPost('arrival-flight-number'),
                 'airline' => $this->request->getPost('arrival-airline'),
                 'precio' => $this->request->getPost('hotel') == "ATELIER" ? 1213.71 : 470,
-                'status' => $this->request->getPost('pago') == 'cortesia' ? 'CORTESÍA (CAPTURA PENDIENTE)' : 'PAGO PENDIENTE',
+                'status' => $this->request->getPost('pago') == 'cortesia' ? 'CORTESÍA (CAPTURA PENDIENTE)' : 'LIGA PENDIENTE',
                 'phone' => $this->request->getPost('phone'),
                 'tickets' => $this->request->getPost('tickets') ?? "[]",
             ],
@@ -468,15 +507,30 @@ class TransportacionController extends BaseController
                 'airline' => $this->request->getPost('departure-airline'),
                 'pick_up' => $this->request->getPost('pickup-time'),
                 'precio' => $this->request->getPost('hotel') == "ATELIER" ? 1213.71 : 470,
-                'status' => $this->request->getPost('pago') == 'cortesia' ? 'CORTESÍA (CAPTURA PENDIENTE)' : 'PAGO PENDIENTE',
+                'status' => $this->request->getPost('pago') == 'cortesia' ? 'CORTESÍA (CAPTURA PENDIENTE)' : 'LIGA PENDIENTE',
                 'phone' => $this->request->getPost('phone'),
                 'tickets' => $this->request->getPost('tickets') ?? "[]",
             ],
         ];
 
+        $noRestrict = boolval($this->request->getPost('noRestrict') ?? 0);
+
         $existing = $this->checkExists($this->request->getPost('folio'), $this->request->getPost('item'));
 
         $model = new TransportacionesModel();
+
+        $validate = [
+            ($data['trip-type'] == 'round-trip' || $data['trip-type'] == 'one-way-airport-hotel') ? $data['arrival']['date'] : $data['departure']['date'],
+            ($data['trip-type'] == 'round-trip' || $data['trip-type'] == 'one-way-hotel-airport') ? $data['departure']['date'] : $data['arrival']['date'],
+            $this->request->getPost('pago') == 'cortesia' ? 2 : 3
+        ];
+
+        if( !$noRestrict ){
+            if( !$model->validFormDate( $validate ) ){
+                return redirect()->to(site_url('public/invalid_form'))->with('error', 'La fecha elegida ya no es posible programarla debido a que el proveedor de nuestra transportación nos pide un mínimo de 3 días de anticipación.<hr>The chosen date is no longer possible to schedule because our transportation provider requires a minimum of 3 days');
+            }
+        }
+
 
         if( $data['trip-type'] == 'round-trip' || $data['trip-type'] == 'one-way-airport-hotel' ){
             if( $existing != null ){
@@ -624,10 +678,23 @@ class TransportacionController extends BaseController
         $lang = ($_GET['lang'] ?? 'esp') == 'esp';
         $hotel = strtolower($rsva['hotel'] ?? 'atpm');
 
-        return view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket), 'hotel' => ($hotel == 'ATELIER') ? 'atpm' : 'oleo', 'lang' => $lang]);
+        return view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2]), 'hotel' => ($hotel == 'ATELIER') ? 'atpm' : 'oleo', 'lang' => $lang]);
     }
 
-    public function mailRequest( $id1, $id2 = 0, $ticket = "123456" ){
+    public function mailRequest(){
+
+        if( !isset( $_POST['ticket'] ) ){
+            gg_response(400, ['msg' => "Ticket requerido"]);
+        }
+
+        $id1 = $_POST['id1'] ?? 0;
+        $id2 = $_POST['id2'] ?? 0;
+        $ticket = $_POST['ticket'];
+        $lang = $_POST['lang'] ?? 0;
+        $author = $_POST['author'] ?? 0;
+        $noRestrict = $_POST['noRestrict'] ?? 0;
+
+
         $model = new TransportacionesModel();
         $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
 
@@ -646,13 +713,123 @@ class TransportacionController extends BaseController
             $id2 = 0;
         }
 
-        $lang = ($_GET['lang'] ?? 'esp') == 'esp';
-        $hotel = strtolower($rsva['hotel'] ?? 'atpm');
+        switch( $lang ){
+            case 'es-419':
+                $lang = 'esp';
+                break;
+            case 'en-US':
+                $lang = 'eng';
+                break;
+            default: 
+                $lang = 'eng';
+                break;
+        }
 
-        return view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket), 'hotel' => ($hotel == 'ATELIER') ? 'atpm' : 'oleo', 'lang' => $lang]);
+        $zd = new Zendesk();
+        
+        // Reemplaza las variables en el HTML con valores específicos
+        if( $noRestrict == "1" ){
+            return $this->showForm( false, $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict) );
+        }
+
+        $html = view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
+
+        $dataTicket = [
+            "comment"   =>  [
+                "public"        => true,
+                "html_body"     => $html,
+            ]
+        ];
+
+        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+
+        $result = $zd->updateTicket($ticket, $dataTicket);
+        
+        $request_tickets = json_decode($rsva[0]['ticket_sent_request'] ?? "[]");
+        if( !in_array($ticket, $request_tickets) ){
+            array_push($request_tickets, $ticket );
+        }
+        $model->updateById([$id1, $id2], ['status' => $rsva[0]['isIncluida'] == "1" ? 'INCLUIDA (SOLICITADO)' : 'SOLICITADO', 'ticket_sent_request' => json_encode($request_tickets)]);
+ 
+        gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
     }
 
-    private function encodeLink( $rsv, $ticket ){
+    public function linkRequest(){
+
+        if( !isset( $_POST['ticket'] ) ){
+            gg_response(400, ['msg' => "Ticket requerido"]);
+        }
+
+        $id1 = $_POST['id1'] ?? 0;
+        $id2 = $_POST['id2'] ?? 0;
+        $ticket = $_POST['ticket'];
+        $lang = $_POST['lang'] ?? 0;
+        $link = $_POST['link'] ?? 0;
+        $author = $_POST['author'] ?? 0;
+
+        if( $link == 0 ){
+            gg_response(404, ["err" => true, "msg" => "No se obtuvo ninguna liga de pago"]);
+        }
+
+
+        $model = new TransportacionesModel();
+        $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
+
+        if( count($rsva) == 0 ){
+            gg_response(404, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+        }
+
+        if( count($rsva) > 1 ){
+            $incons = "datos de reservas no son consistentes";
+            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            $id2 = $rsva[1]['id'];
+        }else{
+            $id2 = 0;
+        }
+
+        switch( $lang ){
+            case 'es-419':
+                $lang = 'esp';
+                break;
+            case 'en-US':
+                $lang = 'eng';
+                break;
+            default: 
+                $lang = 'eng';
+                break;
+        }
+
+        $zd = new Zendesk();
+        
+        // Reemplaza las variables en el HTML con valores específicos
+        $html = view('transpo/mailing/transpoLinkRequest', ['data' => $rsva[0], 'link' => $link, 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2]), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
+
+        $dataTicket = [
+            "comment"   =>  [
+                "public"        => true,
+                "html_body"     => $html
+            ],
+            "custom_status_id" => 27209361873812,
+            "custom_fields" => [["id" => 28727761630100, "value" => $link]]
+        ];
+
+        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+
+        $result = $zd->updateTicket($ticket, $dataTicket);
+        
+        $payment_tickets = json_decode($rsva[0]['ticket_payment'] ?? "[]");
+        if( !in_array($ticket, $payment_tickets) ){
+            array_push($payment_tickets, $ticket );
+        }
+        $model->updateById([$id1, $id2], ['status' => 'PAGO PENDIENTE', 'ticket_payment' => json_encode($payment_tickets)]);
+ 
+        gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
+    }
+
+    private function encodeLink( $rsv, $ticket, $ids, $noRestrict = 0 ){
         $data = [
             "folio" => $rsv[0]['folio'],
             "item" => $rsv[0]['item'],
@@ -660,7 +837,9 @@ class TransportacionController extends BaseController
             "hotel" => $rsv[0]['hotel'],
             "ticket" => $ticket,
             "email" => $rsv[0]['correo'],
-            "pago" => $rsv[0]['isIncluida'] == "1" ? "cortesia" : "pagada"
+            "pago" => $rsv[0]['isIncluida'] == "1" ? "cortesia" : "pagada",
+            "ids" => $ids,
+            "noRestrict" => $noRestrict
         ];
         
         // Encode data to JSON
@@ -673,6 +852,13 @@ class TransportacionController extends BaseController
     public function findByFolio( $id ){
         $model = new TransportacionesModel();
         $rsva = $model->searchAll( $id );
+
+        gg_response(200, ["data" => $rsva]);
+    }
+
+    public function findById( $ida, $vuelta ){
+        $model = new TransportacionesModel();
+        $rsva = $model->searchAllIds( [$ida, $vuelta] );
 
         gg_response(200, ["data" => $rsva]);
     }

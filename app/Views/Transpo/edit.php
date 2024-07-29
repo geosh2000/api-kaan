@@ -65,6 +65,7 @@
                                 <option value="INCLUIDA" <?= ($transpo && $transpo['status'] == 'INCLUIDA') ? 'selected' : '' ?>>INCLUIDA</option>
                                 <option value="INCLUIDA (SOLICITADO)" <?= ($transpo && $transpo['status'] == 'INCLUIDA (SOLICITADO)') ? 'selected' : '' ?>>INCLUIDA (SOLICITADO)</option>
                                 <option value="SOLICITADO" <?= ($transpo && $transpo['status'] == 'SOLICITADO') ? 'selected' : '' ?>>SOLICITADO</option>
+                                <option value="LIGA PENDIENTE" <?= ($transpo && $transpo['status'] == 'LIGA PENDIENTE') ? 'selected' : '' ?>>LIGA PENDIENTE</option>
                                 <option value="PAGO PENDIENTE" <?= ($transpo && $transpo['status'] == 'PAGO PENDIENTE') ? 'selected' : '' ?>>PAGO PENDIENTE</option>
                                 <option value="CORTESÍA (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>CORTESÍA (CAPTURA PENDIENTE)</option>
                                 <option value="CORTESÍA (CAPTURADO)" <?= ($transpo && $transpo['status'] == 'CORTESÍA (CAPTURADO)') ? 'selected' : '' ?>>CORTESÍA (CAPTURADO)</option>
