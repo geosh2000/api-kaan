@@ -123,12 +123,12 @@
             "LIGA PENDIENTE": 'btn-ligaPendiente',
             "PAGO PENDIENTE": 'btn-pagoPendiente',
             "CORTESÍA (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
-            "CORTESÍA (CAPTURADO)": 'btn-pagadoSinIngresar',
             "PAGO EN DESTINO (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
-            "PAGO EN DESTINO (CAPTURADO)": 'btn-cancel',
-            "PAGADA (CAPTURA PENDIENTE)": 'btn-pagadoRegistradoAtpm',
+            "PAGADA (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
+            "CORTESÍA (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
+            "PAGO EN DESTINO (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
             "PAGADA (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
-            "CANCELADA": 'btn-pagadoRegistradoAtpm',
+            "CANCELADA": 'btn-cancel',
         }
     }
 
@@ -612,6 +612,8 @@
 
             function openRsv(){
                 startLoader();
+                client.invoke('ticketFields:custom_field_28837284664596.hide');
+                client.invoke('ticketFields:custom_field_28837240808724.hide');
 
                 setField(zdFields.transpoDefined, "yes", "Transpo Defined");
 

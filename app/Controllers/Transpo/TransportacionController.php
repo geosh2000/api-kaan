@@ -872,7 +872,7 @@ class TransportacionController extends BaseController
                 "html_body"     => $html
             ],
             "custom_status_id" => 27209361873812,
-            "custom_fields" => [["id" => 28727761630100, "value" => $link]]
+            "custom_fields" => [["id" => 28727761630100, "value" => $link], [ "id" => 28774341519636, "value" => 'transpo_status_pago_pendiente' ]]
         ];
 
         if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }

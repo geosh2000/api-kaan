@@ -170,6 +170,7 @@ class TransportacionesModel extends BaseModel
         $builder = $this->db->table('qwt_transportaciones');
 
         $builder->like('status', 'captur')->where('date', 'ADDDATE(CURDATE(), 1)', false);
+        $builder->orderBy('guest');
 
         return $builder->get()->getResultArray();
 
