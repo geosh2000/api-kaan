@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
     <div>
         <div align="left" style="vertical-align:middle;display:inline-block;padding:20px 20px 0px 58px;">
-            <img data-imagetype="External" src="<?= base_url('public/images/shuttle-icon.webp') ?>" align="middle" border="0" alt="Confirmada" title="Confirmada" style="display:block;width:49px;text-decoration:none;max-width:49px;border-width:0;border-style:none;"> 
+            <img data-imagetype="External" src="https://atelier-cc.azurewebsites.net/index.php/public/images/shuttle-icon.webp" align="middle" border="0" alt="Confirmada" title="Confirmada" style="display:block;width:49px;text-decoration:none;max-width:49px;border-width:0;border-style:none;"> 
         </div>
         <div style="vertical-align:top;display:inline-block;margin:0;padding:20px 10px 0 10px;border:0 solid transparent;">              
                     <p class="conf-font" style="font-size:14px;line-height:1.2;"><strong><?php if( $lang ): ?>Hola <?= ucwords(strtolower($data['guest'])); ?>, ¡gracias por reservar con nosotros!<?php else: ?>Hi <?= ucwords(strtolower($data['guest'])); ?>, thank you for booking with us!<?php endif; ?></strong></p>           

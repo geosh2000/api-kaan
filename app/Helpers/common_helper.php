@@ -121,7 +121,7 @@
         $jsonData = base64_decode($perm);
         $permisos = json_decode($jsonData, true);
 
-    //    return in_array($p, $permisos);
+       return in_array($p, $permisos);
     return true;
     }
 

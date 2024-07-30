@@ -675,7 +675,7 @@
                     var params = {
                         'id1': data[zdFields.idIda],
                         'id2': data[zdFields.idVuelta],
-                        'ticket': data.ticket,
+                        'ticket': data.ticket.id,
                         'lang': data.lang,
                         "author": data.currentUser.id,
                         "noRestrict": 1
@@ -816,18 +816,18 @@
                     arr.push({ id: parseInt(valor), value: zd['ticket.customField:custom_field_'+valor] });
                 });
 
-                console.log(arr);
+                var ticketData = {ticket: {
+                                        custom_fields: arr,
+                                        ticket_form_id: 26597917087124
+                                    }}
+                console.log( ticketData );
                  // Actualizar solo los campos necesarios
                  startLoader();
                  client.request({
                         url: `/api/v2/tickets/${globals.ticketId}.json`,
                         type: 'PUT',
                         contentType: 'application/json',
-                        data: JSON.stringify({
-                            ticket: {
-                                custom_fields: arr
-                            }
-                        })
+                        data: JSON.stringify(ticketData)
                     }).then(function(response) {
                         // Ejecutar la nueva función después de que todas las anteriores hayan terminado
                         startLoader(false);

@@ -113,12 +113,12 @@
             <!-- Phone number -->
             <div class="form-group">
                 <label for="phone"><?php echo ($lang === 'esp') ? 'Número de teléfono:' : 'Phone number:'; ?></label>
-                <input type="tel" class="form-control" id="phone" name="phone" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['phone'] != null): ?> value="<?=$rsva['ENTRADA']['phone'] ?>" readonly <?php endif; ?> required>
+                <input type="tel" class="form-control" id="phone" name="phone" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['phone'] != null): ?> value="<?=$rsva['ENTRADA']['phone'] ?>" <?php endif; ?> required>
             </div>
             <!-- Pax number -->
             <div class="form-group">
                 <label for="pax"><?php echo ($lang === 'esp') ? 'Número de personas:' : 'How many people:'; ?></label>
-                <input type="number" min="1" max="<?= $hotel == 'atpm' ? "6" : "8"  ?>" class="form-control" id="pax" name="pax" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['pax'] != null): ?> value="<?=$rsva['ENTRADA']['pax'] ?>" readonly <?php endif; ?> required>
+                <input type="number" min="1" max="<?= $hotel == 'atpm' ? "6" : "8"  ?>" class="form-control" id="pax" name="pax" <?php if( isset($rsva['ENTRADA']) && $rsva['ENTRADA']['pax'] != null): ?> value="<?=$rsva['ENTRADA']['pax'] ?>" <?php endif; ?> required>
             </div>
             <!-- Arrival details -->
             <div id="arrival-section">

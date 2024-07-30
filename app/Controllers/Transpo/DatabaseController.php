@@ -67,6 +67,7 @@ class DatabaseController extends BaseController
                         [ReservationDate] >= DATEADD(DAY, -($days), GETDATE())
                         OR DateFrom BETWEEN GETDATE() AND DATEADD(DAY, 10, GETDATE())
                     )
+                    AND DateFrom >= GETDATE()
                     AND DateCancel IS NULL
                     AND Company IN ('Website','contactcenter')
                     AND (Notes LIKE '%Airport Transfer%' OR Notes LIKE '%Traslados Aeropuerto%')";

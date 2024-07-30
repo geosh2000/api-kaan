@@ -72,7 +72,7 @@
                                 <option value="PAGO EN DESTINO (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
                                 <option value="PAGO EN DESTINO (CAPTURADO)" <?= ($transpo && $transpo['status'] == 'PAGO EN DESTINO (CAPTURADO)') ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURADO)</option>
                                 <option value="PAGADA (CAPTURA PENDIENTE)" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURA PENDIENTE)') ? 'selected' : '' ?>>PAGADA (CAPTURA PENDIENTE)</option>
-                                <option value="PAGADA (CAPTURDO)" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURADO)') ? 'selected' : '' ?>>PAGADA (CAPTURDO)</option>
+                                <option value="PAGADA (CAPTURADO)" <?= ($transpo && $transpo['status'] == 'PAGADA (CAPTURADO)') ? 'selected' : '' ?>>PAGADA (CAPTURADO)</option>
                                 <option value="CANCELADA" <?= ($transpo && $transpo['status'] == 'CANCELADA') ? 'selected' : '' ?>>CANCELADA</option>
                                 <!-- Agrega otras opciones de status aquí -->
                             </select>

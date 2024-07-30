@@ -539,7 +539,7 @@ class TransportacionController extends BaseController
             if( $existing != null ){
                 foreach($existing as $r => $t){
                     if( $t['tipo'] == 'ENTRADA'){
-                        if( strpos($t['status'], 'SOLICITADO') !== false ){
+                        if( strpos($t['status'], 'SOLICITADO') !== false || $noRestrict ){
                             array_push($ids,$t['id']);
                             $model->updateById($t['id'],$data['arrival']);
                             
@@ -566,7 +566,7 @@ class TransportacionController extends BaseController
         if( $data['trip-type'] == 'round-trip' || $data['trip-type'] == 'one-way-hotel-airport' ){
             foreach($existing as $r => $t){
                 if( $t['tipo'] == 'SALIDA'){
-                    if( strpos($t['status'], 'SOLICITADO') !== false ){
+                    if( strpos($t['status'], 'SOLICITADO') !== false || $noRestrict ){
                         array_push($ids,$t['id']);
                         $model->updateById($t['id'],$data['departure']);
 
