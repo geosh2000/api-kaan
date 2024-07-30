@@ -417,7 +417,8 @@
                     <button type="submit" class="loadbtn btn btn-primary mr-2">Filtrar</button>
                     <?php if( permiso("createTransRegs") ): ?>
                         <button type="button" class="create-button loadbtn btn btn-success mr-2">Crear</button>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    <a href="<?= site_url('transpo/nextDay') ?>" target="_blank" class="btn btn-info mr-2" >Next Day</a>
                     <?php if( permiso("importTransIncluded") ): ?>
                         <div class="btn-group">
                             <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">

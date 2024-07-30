@@ -48,7 +48,10 @@ class CrsModel extends BaseModel
 
         // Agrega las condiciones del WHERE
         $f = $this->db->escapeString($folio);
+        $builder->groupStart();
         $builder->where("DateFrom >= '$from'");
+        $builder->orWhere("DateTo >= '$from'");
+        $builder->groupEnd();
         $builder->where("(CAST(ReservationId AS NVARCHAR) = '$f' 
                         OR CAST(ReservationNumber AS NVARCHAR) = '$f' 
                         OR AgencyNumber = '$f'

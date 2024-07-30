@@ -56,8 +56,8 @@ class DatabaseController extends BaseController
                     rsv.Email as Email, 1 as isIncluida, COALESCE(AgencyNumber,CAST(ReservationId AS nvarchar)) as ReservationId,
                     AgencyNumber as agency_id,
                     ReservationId as crs_id,
-                    ReservationNumber as pms_id
-
+                    ReservationNumber as pms_id,
+                    isIncluida = 1
                 FROM 
                     [dbo].[Reservations] rsv
                     LEFT JOIN [dbo].[Hotels] htl ON rsv.HotelId=htl.HotelId

@@ -165,6 +165,16 @@ class TransportacionesModel extends BaseModel
         return boolval($result->valid);
     }
 
+    public function nextDayServices(){
+
+        $builder = $this->db->table('qwt_transportaciones');
+
+        $builder->like('status', 'captur')->where('date', 'ADDDATE(CURDATE(), 1)', false);
+
+        return $builder->get()->getResultArray();
+
+    }
+
     
     
 }

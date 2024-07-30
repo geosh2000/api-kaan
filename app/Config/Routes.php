@@ -81,6 +81,7 @@ $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
     $routes->get('searchFolio/(:num)', 'Transpo\TransportacionController::findByFolio/$1');
     $routes->get('pass', 'Log\Login::passHash');
+    $routes->get('nextDay', 'Transpo\TransportacionController::nextDayServices');
 });
 
 // $routes->group('zd|app', function($routes){

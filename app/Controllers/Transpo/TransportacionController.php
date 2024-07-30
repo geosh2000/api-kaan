@@ -594,12 +594,16 @@ class TransportacionController extends BaseController
         // Reemplaza las variables en el HTML con valores específicos
         $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? '')]);
 
+        $statusVal = $this->request->getPost('pago') == 'cortesia' ? 'transpo_status_cortesia__captura_pendiente_' : 'transpo_status_liga_pendiente';
         $dataTicket = [
             "comment"   =>  [
                 "public"        => true,
                 "html_body"     => $html
             ],
-            "status" => "open"
+            "status" => "open",
+            "custom_fields" => [
+                [ "id" => 28774341519636, "value" => $statusVal ]
+            ]
         ];
 
         try{
@@ -784,12 +788,16 @@ class TransportacionController extends BaseController
 
         $html = view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
 
+        $statusVal = $rsva[0]['isIncluida'] == "1" ? 'transpo_status_incluida__solicitado_' : 'transpo_status_solicitado';
         $dataTicket = [
             "comment"   =>  [
                 "public"        => true,
                 "html_body"     => $html,
             ],
-            "status" => "pending"
+            "status" => "pending",
+            "custom_fields" => [
+                [ "id" => 28774341519636, "value" => $statusVal ]
+            ]
         ];
 
         if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
@@ -927,6 +935,14 @@ class TransportacionController extends BaseController
         }else{
             gg_response(200, ["data" => $rsva]);
         }
+    }
+
+    public function nextDayServices(){
+        $model = new TransportacionesModel();
+
+        $result = $model->nextDayServices();
+
+        return view('Transpo/nextDay', ["transportaciones" => $result]);
     }
 
 }
