@@ -92,5 +92,9 @@ class Login extends BaseController
 
         return;
     }
+
+    public function passHash(){
+        echo password_hash("Atelier2024", PASSWORD_DEFAULT);
+    }
 }
 

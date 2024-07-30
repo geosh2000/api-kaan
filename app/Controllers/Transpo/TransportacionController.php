@@ -788,7 +788,8 @@ class TransportacionController extends BaseController
             "comment"   =>  [
                 "public"        => true,
                 "html_body"     => $html,
-            ]
+            ],
+            "status" => "pending"
         ];
 
         if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }

@@ -80,6 +80,7 @@ $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('db/get/(:num)', 'Transpo\DatabaseController::getIncluded/$1');
     $routes->get('history/(:num)', 'Transpo\TransportacionController::getHistory/$1');
     $routes->get('searchFolio/(:num)', 'Transpo\TransportacionController::findByFolio/$1');
+    $routes->get('pass', 'Log\Login::passHash');
 });
 
 // $routes->group('zd|app', function($routes){

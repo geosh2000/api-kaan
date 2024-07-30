@@ -104,6 +104,7 @@
             this.name = '';
             this.lang = '';
             this.reqId = '';
+            this.ticketId = '';
         }
 
         setVal(key, val) {
@@ -157,14 +158,16 @@
         
         // ZAF METHODS
         var client = ZAFClient.init();
-        // client.invoke('ticketFields:custom_field_28837284664596.hide');
-        // client.invoke('ticketFields:custom_field_28837240808724.hide');
+        client.invoke('ticketFields:custom_field_28837284664596.hide');
+        client.invoke('ticketFields:custom_field_28837240808724.hide');
         buildData();
 
         function buildData(  ){
             client.get(getFields).then(function(data) {
                 console.log(data);
                 zafData = data;
+
+                globals.setVal('ticketId', data.ticket.id);
                 setUser(data.currentUser.name);
                 printRsva(data[zdFields.reserva]);
                 printGuest(data[zdFields.guest]);
@@ -278,9 +281,7 @@
                 
                 // Ejecutar todas las funciones en orden
                 Promise.all(tasks.map(fn => fn())).then(() => {
-                    startLoader(false);
-                    // Ejecutar la nueva función después de que todas las anteriores hayan terminado
-                    openRsv( selectedData['folio'] );
+                   openRsv( selectedData['folio'] );
                 });
 
             });
@@ -614,7 +615,24 @@
 
                 setField(zdFields.transpoDefined, "yes", "Transpo Defined");
 
-                client.get([zdFields.idIda, zdFields.idVuelta]).then( function(zd){
+                // Obtener las claves y valores de las propiedades estáticas
+                const campos = Object.entries(zdFields);
+                var getF = [];
+                var customF = [];
+
+                // Expresión regular para extraer el número después de "field_"
+                const regex = /field_(\d+)/;
+
+                $.each(campos, function(index, [clave, valor]) {
+                    const match = valor.match(regex);
+                    getF.push(valor);
+                    if (match) {
+                        customF.push(match[1]);
+                    }
+                });
+                console.log(getF);
+
+                client.get(getF).then( function(zd){
                     var url = '<?= site_url('zdappC/transpo/searchIds') ?>/' +( zd[zdFields.idIda] ?? '0') + '/' + (zd[zdFields.idVuelta] ?? '0');
 
                     $.ajax({
@@ -624,7 +642,7 @@
     
                             if( resp['data'].length > 0 ){
                                 // La función a ejecutar si la solicitud es exitosa
-                                buildTable(resp.data);
+                                buildTable(resp.data, customF, zd);
                             }else{
                                 setField(zdFields.transpoDefined, "no", "Transpo Defined");
                                 setField( zdFields.idIda, null, 'id ida' );
@@ -708,10 +726,9 @@
                 }
             }
 
-            function buildTable(data) {
+            function buildTable(data, campos, zd) {
                 $('#result').html = '';
 
-                console.log(data);
                 setHotel(data[0].hotel);
                 setGuest(data[0].guest);
                 setField(zdFields.transpoStatus, strToTag(data[0]['status'], 'transpo_status_'), 'Status');
@@ -788,6 +805,37 @@
                     </div>
                 `;
                 $('#result').html(html);
+
+                // Arreglo donde se agregarán los IDs extraídos
+                const arr = [];
+
+                
+
+                // Iterar sobre las propiedades estáticas y extraer el número
+                $.each(campos, function(index, valor) {
+                    arr.push({ id: parseInt(valor), value: zd['ticket.customField:custom_field_'+valor] });
+                });
+
+                console.log(arr);
+                 // Actualizar solo los campos necesarios
+                 startLoader();
+                 client.request({
+                        url: `/api/v2/tickets/${globals.ticketId}.json`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            ticket: {
+                                custom_fields: arr
+                            }
+                        })
+                    }).then(function(response) {
+                        // Ejecutar la nueva función después de que todas las anteriores hayan terminado
+                        startLoader(false);
+                        console.log('Ticket actualizado exitosamente:', response, arr);
+                    }).catch(function(error) {
+                        startLoader(false);
+                        console.error('Error al actualizar el ticket:', error);
+                    });
             }
 
 

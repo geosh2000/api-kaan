@@ -64,9 +64,9 @@
                         <br>
                         <div style="background-color: #e0ffe0; padding: 10px; border-radius: 5px; text-align:center">
                         
-                            Servicio Redondo desde y hacia ÓLEO Cancún Playa por $100 USD por camioneta.
+                            Servicio Redondo desde y hacia ÓLEO Cancún Playa por $100 USD por camioneta. (Sólo Aeropuerto Internacional de Cancún)
                             <br>
-                            Servicio Sencillo desde o hacia ÓLEO Cancún Playa por $60 USD por camioneta.
+                            Servicio Sencillo desde o hacia ÓLEO Cancún Playa por $60 USD por camioneta. (Sólo Aeropuerto Internacional de Cancún)
                         
                     </div>
 
@@ -99,9 +99,9 @@
                         <br>
                         <div style="background-color: #e0ffe0; padding: 10px; border-radius: 5px; text-align:center">
                         
-                            Round-trip service to and from ÓLEO Cancún Playa for $100 USD per van.
+                            Round-trip service to and from ÓLEO Cancún Playa for $100 USD per van. (Only Cancun International Airport)
                             <br>
-                            One-way service to or from ÓLEO Cancún Playa for $60 USD per van.
+                            One-way service to or from ÓLEO Cancún Playa for $60 USD per van. (Only Cancun International Airport)
                         
                     </div>
 
