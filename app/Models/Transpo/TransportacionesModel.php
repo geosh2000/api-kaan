@@ -169,6 +169,12 @@ class TransportacionesModel extends BaseModel
 
         $builder = $this->db->table('qwt_transportaciones');
 
+        $builder->select("id, shuttle, isIncluida, hotel, tipo, folio, item, date, pax, guest, flight, airline, 
+                          status, precio, correo, phone, tickets, related, ticket_payment, ticket_pago, ticket_sent_request, 
+                          crs_id, pms_id, agency_id,
+                          CASE WHEN time IS NOT NULL THEN TIME_FORMAT(time, '%h:%i %p') ELSE NULL END as time,
+                          CASE WHEN pick_up IS NOT NULL THEN TIME_FORMAT(pick_up, '%h:%i %p') ELSE NULL END as pick_up");
+
         $builder->like('status', 'captur')->where('date', 'ADDDATE(CURDATE(), 1)', false);
         $builder->orderBy('guest');
 
