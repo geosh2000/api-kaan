@@ -693,6 +693,9 @@
                                     data: JSON.stringify(ticketData)
                                 }).then(function(response) {
                                     // Ejecutar la nueva función después de que todas las anteriores hayan terminado
+                                    client.set('comment.type', "internalNote").then( function(){
+                                        client.invoke('comment.appendHtml', "Pago recibido en ticket " + ticket);
+                                    });
                                     startLoader(false);
                                     openRsv();
                                 }).catch(function(error) {
