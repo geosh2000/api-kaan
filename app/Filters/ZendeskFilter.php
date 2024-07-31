@@ -26,8 +26,11 @@ class ZendeskFilter implements FilterInterface
         
         
         // Obtén la clave pública desde el entorno o configuración
-        $audience = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/28666254387092.json";
-        $key = "-----BEGIN PUBLIC KEY-----
+        $audienceProd = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/28666254387092.json";
+        $audienceLocal = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/28975884762644.json";
+        $audience = ENVIRONMENT === 'development' ? $audienceLocal : $audienceProd;
+        // PRODUCTION
+        $keyProd = "-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxDGfD2iTUCLItoHoKHTQ
 TBzxWpQrLZYBkgkkGqgrmex8BFnWawYok+LyivQJleW9asInb8PMpR9lVdjX+6cd
 nU7lJtB/w2tImSNjaE10cd+QksvLkY8tcV1IRT34W7hkqvMeyudQ/mvHhIrflT5/
@@ -36,6 +39,18 @@ tbQVYcIkECS4gwEcL3xYAqAhWftfUZHUDQ27S5UsYucs9OxAwcnQFJrJWy7c+Oua
 yyEshKfLbMuegMDli7C79/AXkHe3nbRak7RAz95N4pVspqS5vA3T7cx1g4X5cc4T
 EwIDAQAB
 -----END PUBLIC KEY-----";
+        // LOCALHOST
+        $keyLocal = "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1ffGbLAL4Ek4m95cxe+Q
+LF/UAgPRI+3orQkgVkV+gWLDgVxRLpJ7a3mGH4VofcayJhBqPFIZM5JBBZdAzLYi
+vXMcYuUHEF70OsnqsilTEXjUKJO4KKK6EoKH/3Cv5m/SJYsX27ZUh0R4Mg785O6h
+/icQoO4LGzYQrLES9CfxnBn08551kIGJgEJ+aDKpE//SgWaQLKbHfikUYj7BtBT1
+Ku7IyA4WrX3RB6+yGsxvgWOCalzxNBvlT5E2zqJekOsieeYe1exZaBOT1YqbgWKc
+lcV/qmjQ/lWO38mzt9JqtF6sf7YsQHrpLQoM5yseZslOGYx0n80lmVl/Oa8t4s03
+bQIDAQAB
+-----END PUBLIC KEY-----";
+
+        $key = ENVIRONMENT === 'development' ? $keyLocal : $keyProd;
         // echo $key;
         // return;
         

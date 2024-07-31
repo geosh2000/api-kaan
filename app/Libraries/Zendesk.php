@@ -242,7 +242,6 @@ class Zendesk{
         // cc, group, tags, submitter_id, status, assignee_id, public, author_id
         
         $newTicket = array("ticket" => array("subject" => $params['title'], 
-                "requester_id" => $params['requester'],
                 "submitter_id" => $params['submitter_id'] ?? $this->baseUser,
                 "group_id" => $params['group'] ?? $this->baseGroup,
                 "recipient" => $params['recipient'] ?? 'reservations@adh.com',
@@ -254,6 +253,14 @@ class Zendesk{
             $newTicket['ticket']['comment']['body'] = $params['msg'];
         }
         
+        if( isset($params['requester']) ){
+            $newTicket['ticket']['requester_id'] = $params['requester'];
+        }
+        
+        if( isset($params['requesterNew']) ){
+            $newTicket['ticket']['requester'] = $params['requesterNew'];
+        }
+
         if( isset($params['tags']) ){
             $newTicket['ticket']['tags'] = $params['tags'];
         }
@@ -274,7 +281,14 @@ class Zendesk{
                 array_push($newTicket['ticket']['followers'], ["user_email"=>$f, "action"=>"put"]);
             }
         }
-        
+                
+        if( isset($params['custom_fields']) ){
+            $newTicket['ticket']['custom_fields'] = $params['custom_fields'];
+        }
+                
+        if( isset($params['ticket_form_id']) ){
+            $newTicket['ticket']['ticket_form_id'] = $params['ticket_form_id'];
+        }   
 
         $tkt = json_encode($newTicket);
         $response = $this->postData( $this->baseUrl.'/api/v2/tickets.json', $tkt);

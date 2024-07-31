@@ -304,17 +304,18 @@ class TransportacionController extends BaseController
             'hotel' => $this->request->getPost('hotel'),
             'tipo' => $this->request->getPost('tipo'),
             'folio' => $this->request->getPost('folio'),
-            'date' => $this->request->getPost('date'),
-            'pax' => $this->request->getPost('pax'),
+            'date' => $this->request->getPost('date') == "" ? null : $this->request->getPost('date'),
+            'pax' => $this->request->getPost('pax') == "" ? null : $this->request->getPost('pax'),
             'guest' => $this->request->getPost('guest'),
             'time' => $this->request->getPost('time'),
-            'flight' => $this->request->getPost('flight'),
-            'airline' => $this->request->getPost('airline'),
-            'pick_up' => $this->request->getPost('pick_up'),
+            'flight' => $this->request->getPost('flight') == "" ? null : $this->request->getPost('flight'),
+            'airline' => $this->request->getPost('airline') == "" ? null : $this->request->getPost('airline'),
+            'pick_up' => $this->request->getPost('pick_up') == "" ? null : $this->request->getPost('pick_up'),
             'status' => $this->request->getPost('status'),
             'precio' => $this->request->getPost('precio'),
             'correo' => $this->request->getPost('correo'),
-            'phone' => $this->request->getPost('phone'),
+            'isIncluida' => $this->request->getPost('isIncluida'),
+            'phone' => $this->request->getPost('phone') == "" ? null : $this->request->getPost('phone'),
             'newTicket' => $this->request->getPost('newTicket') ?? "",
         ];
 
@@ -592,7 +593,7 @@ class TransportacionController extends BaseController
         $zd = new Zendesk();
         
         // Reemplaza las variables en el HTML con valores específicos
-        $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? '')]);
+        $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? 'atelier') == 'atelier' ? 'atpm' : 'oleo']);
 
         $statusVal = $this->request->getPost('pago') == 'cortesia' ? 'transpo_status_cortesia__captura_pendiente_' : 'transpo_status_liga_pendiente';
         $dataTicket = [
@@ -813,6 +814,85 @@ class TransportacionController extends BaseController
         gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
     }
 
+    public function newMailRequest( $id ){
+        $model = new TransportacionesModel();
+        $ids = $model->getRoundIds($id);
+
+        $idioma = $_GET['lang'] ?? 'eng';
+        $lang = $idioma == 'esp';
+        
+        if( !$ids ){
+            gg_response(400, "No se encontraron reservas para enviar");
+        }
+
+        $rsva = $model->whereIn('id',$ids)->findAll();
+
+        if( count($rsva) == 0 ){
+            gg_response(400, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+        }
+
+        if( !(($rsva[0]['status'] == '-' || $rsva[0]['status'] == 'INCLUIDA') && ($rsva[1]['status'] == '-' || $rsva[1]['status'] == 'INCLUIDA')) ){
+            gg_response(400, ["err" => true, "msg" => "El status da las reservas debe ser '-' o 'INCLUIDA' para poder ser enviado en nuevo ticket"]);
+        }
+
+        $zd = new Zendesk();
+
+        $params = [
+            "title" => strtoupper($rsva[0]['hotel']).' '.(!$lang ? 'Shuttle Service' : 'Servicio de Traslado').' - '.$rsva[0]['folio'].' '.$rsva[0]['guest'],
+            // "requesterNew" => [ "name" => "Jorge Sanchez", "email" => "geosh2000@gmail.cçom" ],
+            "requesterNew" => [ "name" => $rsva[0]['guest'], "email" => $rsva[0]['correo'] ],
+            "html_body" => "Correo de transportación enviado desde GG - Shuttle Manager",
+            "group" => 26408623595412,
+            "status" => "pending",
+            "public" => false,
+            "custom_fields" => [
+                [ "id" => 26495291237524, "value" => 'categoria_transportacion' ],
+                [ "id" => 28630467255444, "value" => strtolower($rsva[0]['isIncluida']) == '1' ? 'transpo_cortesia' : 'transpo_prepago' ],
+                [ "id" => 26260741418644, "value" => $rsva[0]['folio'] ],
+                [ "id" => 26260771754900, "value" => $rsva[0]['guest'] ],
+                [ "id" => 26493544435220, "value" => strtolower($rsva[0]['hotel']) == 'atelier' ? 'hotel_atpm' : 'hotel_olcp' ],
+                [ "id" => 28774341519636, "value" => 'transpo_status_'.(strtolower($rsva[0]['isIncluida']) == '1' ? 'incluida__solicitado_' : 'solicitado') ],
+                [ "id" => 28802239047828, "value" => "yes" ],
+                [ "id" => 28837284664596, "value" => $rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]['id'] ],
+                [ "id" => 28837240808724, "value" => $rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]['id']]
+            ],
+            "ticket_form_id" => 26597917087124
+        ];
+
+        $ticketId = $zd->newTicketSend($params);
+
+        if (is_int($ticketId)) {
+            $html = view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $rsva[1]['id']], 'token' => $this->encodeLink($rsva, $ticketId, [$rsva[0]['id'], $rsva[1]['id']], 0), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang]);
+
+            $dataTicket = [
+                "comment"   =>  [
+                    "public"        => true,
+                    "html_body"     => $html,
+                ],
+                "status" => "pending"
+            ];
+    
+            $result = $zd->updateTicket($ticketId, $dataTicket);
+            
+            $request_tickets = json_decode($rsva[0]['ticket_sent_request'] ?? "[]");
+            if( !in_array($ticketId, $request_tickets) ){
+                array_push($request_tickets, $ticketId );
+            }
+            $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['status' => $rsva[0]['isIncluida'] == "1" ? 'INCLUIDA (SOLICITADO)' : 'SOLICITADO', 'ticket_sent_request' => json_encode($request_tickets)]);
+     
+            gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
+        } else {
+            gg_response(400, $ticketId);
+        }
+
+
+        
+
+
+
+        
+    }
+
     public function linkRequest(){
 
         if( !isset( $_POST['ticket'] ) ){
@@ -943,6 +1023,52 @@ class TransportacionController extends BaseController
         $result = $model->nextDayServices();
 
         return view('Transpo/nextDay', ["transportaciones" => $result]);
+    }
+
+    public function duplicateService( $id ){
+        $model = new TransportacionesModel();
+        
+        if( $model->duplicate( $id ) ){
+            gg_response(200, ["msg" => "Reserva duplicada"]);
+        }
+        
+        gg_response(400, ["msg" => "Hubo un error al duplicar esta reserva"]);
+
+    }
+
+    public function setPaymentTicket(){
+
+        $id1 = $_POST['id1'];
+        $id2 = $_POST['id2'];
+        $author = $_POST['author'];
+        $paymentTicket = $_POST['paymentTicket'];
+
+        $model = new TransportacionesModel();
+        $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
+
+        $pago_tickets = json_decode($rsva[0]['ticket_pago'] ?? "[]");
+        if( !in_array($paymentTicket, $pago_tickets) ){
+            array_push($pago_tickets, $paymentTicket );
+        }
+
+        $updateData = [
+            "ticket_pago" => json_encode($pago_tickets),
+            "status" => "PAGADA (CAPTURA PENDIENTE)"
+        ];
+
+        $model->updateById( [$id1, $id2], $updateData );
+
+        $updateFields = [
+            ['ticket_pago', $rsva[0]['ticket_pago'], json_encode($pago_tickets)],
+            ['status', "PAGADA (CAPTURA PENDIENTE)", json_encode($pago_tickets)]
+        ];
+
+        $updateModel = new TranspoHistoryModel();
+        $updateModel->edit($id1, $updateFields, $author);
+        $updateModel->edit($id2, $updateFields, $author);
+
+        gg_response(200, ["error" => false, "msg" => "Reservas actualizadas"]);
+
     }
 
 }

@@ -117,7 +117,7 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="toast-body">
+    <div class="toast-body" id="successToastBody">
     <?php if (session()->has('success')): ?>
         <span><?= session('success') ?></span>
     <?php endif; ?>
@@ -136,7 +136,7 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="toast-body">
+    <div class="toast-body" id="errorToastBody">
     <?php if (session()->has('error')): ?>
         <span><?= session('error') ?></span>
     <?php endif; ?>
@@ -171,6 +171,16 @@
         }
         if( error == 1 ){
             errorToast.toast('show');
+        }
+
+        function showToast( msg, error = false ){
+            $( error ? '#errorToastBody' : '#successToastBody').html( msg );
+
+            if( error ){
+                errorToast.toast('show');
+            }else{
+                successToast.toast('show');
+            }
         }
 
 

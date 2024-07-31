@@ -66,7 +66,8 @@ $routes->group('mailing', function($routes){
 
 // Transportacion
 // $routes->group('transpo', function($routes){
-$routes->group('transpo', ['filter' => 'authFilter'], function($routes){
+$routes->group('transpo', function($routes){
+// $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('/', 'Transpo\TransportacionController::index');
     $routes->get('create', 'Transpo\TransportacionController::create');
     $routes->post('store', 'Transpo\TransportacionController::store');
@@ -82,6 +83,8 @@ $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('searchFolio/(:num)', 'Transpo\TransportacionController::findByFolio/$1');
     $routes->get('pass', 'Log\Login::passHash');
     $routes->get('nextDay', 'Transpo\TransportacionController::nextDayServices');
+    $routes->post('duplicate/(:num)', 'Transpo\TransportacionController::duplicateService/$1');
+    $routes->post('sendNewRequest/(:num)', 'Transpo\TransportacionController::newMailRequest/$1');
 });
 
 // $routes->group('zd|app', function($routes){
@@ -106,6 +109,7 @@ $routes->group('zdappC', function($routes){
         $routes->get('create', 'Transpo\TransportacionController::create');
         $routes->post('store', 'Transpo\TransportacionController::store');
         $routes->post('removeTicket/(:num)/(:num)', 'Transpo\TransportacionController::removeTicket/$1/$2');
+        $routes->post('setPayment', 'Transpo\TransportacionController::setPaymentTicket');
         $routes->get('edit/(:num)', 'Transpo\TransportacionController::edit/$1');
         $routes->get('editStatus/(:num)/(:any)', 'Transpo\TransportacionController::editStatus/$1/$2');
         $routes->get('confirmDelete/(:num)', 'Transpo\TransportacionController::confirmDelete/$1');

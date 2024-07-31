@@ -471,7 +471,10 @@
                         </button>
 
                     </td>
-                    <td><?= $transportacion['hotel'] == "ATELIER" ? "Atelier Playa Mujeres" : ($transportacion['hotel'] == "OLEO" ? "Oleo Cancun Playa" : $transportacion['hotel']) ?></td>
+                    <td>
+                        <?= $transportacion['hotel'] == "ATELIER" ? "Atelier Playa Mujeres" : ($transportacion['hotel'] == "OLEO" ? "Oleo Cancun Playa" : $transportacion['hotel']) ?>
+                        <br><span class="text-muted font-weight-lighter"><?= $transportacion['isIncluida'] == "1" ? "Incluida" : "Con costo" ?></span>
+                    </td>
                     <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['folio'] ?>"></i> <?= $transportacion['folio'] ?>-<?= $transportacion['item'] ?></td>
                     <td class=""><i class="far fa-copy copy-button" text="<?= $transportacion['tipo'] ?>"></i> <?= $transportacion['tipo'] ?></td>
                     <td><i class="far fa-copy copy-button" text="<?= $transportacion['guest'] ?>"></i><?= $transportacion['guest'] ?><br><i class="far fa-copy copy-button" text="<?= $transportacion['correo'] ?>"></i><?= $transportacion['correo'] ?></td>
@@ -507,12 +510,17 @@
                         </div>
                     </td>
                     <td  class="text-center">
-                        <?php if( $transportacion['status'] == "INCLUIDA" && permiso("sendRequestForIncluded") ): ?>
-                            <a href="" class="actionBtn btn btn-success"><i class="far fa-paper-plane"></i></a>
+                        <?php if( ($transportacion['status'] == "INCLUIDA" || $transportacion['status'] == "-" && permiso("sendRequestForIncluded")) && isset($transportacion['correo']) ): ?>
+                            <button class="actionBtn btn btn-success sendRequest" data-id="<?= $transportacion['id'] ?>"><i class="far fa-paper-plane"></i></button>
                         <?php endif; ?>
                         <?php if( permiso("editTransRegs") ): ?>
                             <button class="actionBtn btn btn-info edit-button" id="edit-<?= $transportacion['id'] ?>">
                                 <i class="fas fa-edit"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if( permiso("createTransRegs") ): ?>
+                            <button class="actionBtn btn btn-primary clone-button" id="clone-<?= $transportacion['id'] ?>">
+                                <i class="far fa-clone"></i>
                             </button>
                         <?php endif; ?>
                         <?php if( permiso("deleteTransRegs") ): ?>
@@ -526,9 +534,11 @@
                         
                     </td>
                     <td class="text-center">
-                        <?php $tickets = json_decode($transportacion['tickets']); ?>
-                        <?php foreach ($tickets as $tkt): ?>
-                            <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?></a><br>
+                         <?php $tickets = json_decode($transportacion['allTickets'],true); ?>
+                        <?php foreach ($tickets as $tkType => $tktype): ?>
+                            <?php foreach ($tktype as $tk => $tkt): ?>
+                                <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?> (<?= $tkType ?>)</a><br>
+                            <?php endforeach; ?>
                         <?php endforeach; ?>
                     </td>
                     <td>
@@ -613,6 +623,8 @@
 
 
 
+
+
 <?= $this->endSection() ?>
 <?= $this->section('scripts') ?>
     <script>
@@ -629,7 +641,10 @@
                 localStorage.setItem('scrollPosition', $(window).scrollTop());
             });
 
-            $('#transferTable').DataTable();
+            $('#transferTable').DataTable({
+                "order": [], // No hay un orden inicial
+                "ordering": true // Permitir ordenamiento
+            });
         });
 
         $(document).ready(function(){
@@ -674,6 +689,25 @@
                     error: function() {
                         alert('Hubo un error al cargar los datos.');
                         startLoader(false);
+                    }
+                });
+            });
+            
+            $(document).on('click', '.sendRequest', function() {
+                startLoader();
+                var id = $(this).attr('data-id'); // Obtiene el ID después del guion
+                var url = '<?= site_url('transpo/sendNewRequest/') ?>' + id;
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    success: function(data) {
+                        location.reload();
+                        startLoader(false);
+                    },
+                    error: function( err ) {
+                        startLoader(false);
+                        alert( err.responseJSON.msg );
                     }
                 });
             });
@@ -754,6 +788,26 @@
             $(document).on('click', '.add-ticket-button', function() {
                 $('#newTicket').show();
                 $(this).hide();
+            });
+
+            // Duplicar Reserva
+            $(document).on('click', '.clone-button', function() {
+                startLoader();
+                var id = $(this).attr('id').split('-')[1]; // Obtiene el ID después del guion
+                var url = '<?= site_url('transpo/duplicate/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    success: function(data) {
+                        location.reload();
+                        startLoader(false);
+                    },
+                    error: function() {
+                        alert('Hubo un error al cargar los datos.');
+                        startLoader(false);
+                    }
+                });
             });
 
             $(document).on('submit', 'form', function(event) {

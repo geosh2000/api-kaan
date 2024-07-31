@@ -277,7 +277,7 @@ class Tickets extends BaseController{
 
     public function getPublicKey()
     {
-        $appId = 1054506;
+        $appId = 1057090;
         $result = $this->zd->getData( "/api/v2/apps/$appId/public_key.pem", true);
         
         echo $result['data'];

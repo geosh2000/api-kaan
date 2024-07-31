@@ -15,6 +15,8 @@ class TransportacionesModel extends BaseModel
     {
         $builder = $this->db->table('qwt_transportaciones');
 
+        $builder->select("*, CONCAT('{\"requests\":', COALESCE(ticket_sent_request,'[]'),',\"pagos\":', COALESCE(ticket_pago,'[]'),',\"payment\":', COALESCE(ticket_payment,'[]'),'}') as allTickets");
+
         if (!empty($guest)) {
             $builder->like('guest', $guest);
         } elseif (!empty($folio)) {
@@ -39,6 +41,8 @@ class TransportacionesModel extends BaseModel
             }
 
         }
+
+        $builder->orderBy('guest');
 
         return $builder->get()->getResultArray();
     }
@@ -181,6 +185,87 @@ class TransportacionesModel extends BaseModel
         return $builder->get()->getResultArray();
 
     }
+
+    public function getRoundIds($id){
+        $builder = $this->db->table('qwt_transportaciones');
+        
+        // Obtener la reserva original por ID
+        $rsva = $builder->where('id', $id)->get()->getResultArray();
+        if (empty($rsva)) {
+            return false; // Si no se encuentra la reserva, retornar false o manejar el error apropiadamente
+        }
+        
+        // Obtener todas las reservas relacionadas con 'folio' y 'item'
+        $builder = $this->db->table('qwt_transportaciones');
+        $rsvas = $builder->where('folio', $rsva[0]['folio'])
+                        ->where('item', $rsva[0]['item'])
+                        ->get()->getResultArray();
+
+        $ids = [];
+        foreach ($rsvas as $r) {
+            array_push($ids, $r['id']);
+        }
+
+        // Insertar los datos en lote
+        if (!empty($ids)) {
+            return $ids;
+        }
+
+        return false; // Retornar falso si no hubieron ids
+    }
+
+    public function duplicate($id){
+        $builder = $this->db->table('qwt_transportaciones');
+        
+        // Obtener la reserva original por ID
+        $rsva = $builder->where('id', $id)->get()->getResultArray();
+        if (empty($rsva)) {
+            return false; // Si no se encuentra la reserva, retornar false o manejar el error apropiadamente
+        }
+        
+        // Obtener el nuevo valor para 'item'
+        $builder = $this->db->table('qwt_transportaciones');
+        $itemRes = $builder->select('MAX(item) + 1 as newItem')->where('folio', $rsva[0]['folio'])->get()->getResultArray();
+        $item = $itemRes[0]['newItem'] ?? 1; // Si no se encuentra un nuevo item, iniciar en 1
+        
+        // Obtener todas las reservas relacionadas con 'folio' y 'item'
+        $builder = $this->db->table('qwt_transportaciones');
+        $rsvas = $builder->where('folio', $rsva[0]['folio'])
+                        ->where('item', $rsva[0]['item'])
+                        ->get()->getResultArray();
+        
+        // Preparar los datos para la inserción en lote
+        $insData = [];
+        foreach ($rsvas as $r) {
+            $new = [
+                "folio" => $r['folio'],
+                "item" => $item,
+                "tipo" => $r['tipo'],
+                "crs_id" => $r['crs_id'],
+                "pms_id" => $r['pms_id'],
+                "agency_id" => $r['agency_id'],
+                "shuttle" => $r['shuttle'],
+                "hotel" => $r['hotel'],
+                "precio" => $r['precio'],
+                "correo" => $r['correo'],
+                "phone" => $r['phone'],
+                "date" => $r['date'],
+                "status" => "-",
+                "isIncluida" => 0,
+                "guest" => $r['guest']
+            ];
+            array_push($insData, $new);
+        }
+        
+        // Insertar los datos en lote
+        if (!empty($insData)) {
+            $builder = $this->db->table('qwt_transportaciones');
+            $builder->insertBatch($insData);
+        }
+
+        return true; // Retornar true si se realiza la inserción correctamente
+    }
+
 
     
     

@@ -76,6 +76,32 @@
             </div>
         </div>
     </div>
+
+    <!-- PAGO MODAL -->
+    <div class="modal fade" id="setPaymentModal" tabindex="-1" role="dialog" aria-labelledby="setPaymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="setPaymentModalLabel">Ingresar Ticket de Pago</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="ticketPagoSend">Ticket de Pago:</label>
+                            <input type="number" name="ticketPago" class="form-control" id="ticketPagoSend" min="130000" max="999999" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confSetPayment">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -265,8 +291,8 @@
             // SAVE FROM GG
             $(document).on('click', 'button[data-reg]', function(event) {
                 var target = event.target;
-                var pmsId = target.getAttribute('data-reg');
-                var selectedData = JSON.parse($('#json-' + pmsId).val());
+                var idIn = target.getAttribute('data-reg');
+                var selectedData = JSON.parse($('#json-' + idIn).val());
 
                 // Definir las funciones a ejecutar
                 const tasks = [
@@ -354,6 +380,25 @@
             // SEND LINK BUTTON
             $(document).on('click', '#sendLink', function(){
                 sendLink();
+            });
+
+            // SET PAYMENT BUTTON
+            $(document).on('click', '#setPayment', function(){
+                $('#setPaymentModal').modal('show');
+            });
+
+            // CONFIRM SET PAYMENT BUTTON
+            $(document).on('click', '#confSetPayment', function(){
+                var formData = $('#paymentForm').serializeArray();
+
+                var formDataObject = {};
+                $.each(formData, function(i, field){
+                    formDataObject[field.name] = field.value;
+                });
+
+                var ticket = formDataObject.ticketPago;
+
+                setPago( ticket );
             });
 
 
@@ -610,6 +655,63 @@
 
             }
 
+            function setPago( ticket ){
+                $('#setPaymentModal').modal('hide');
+                $('#ticketPagoSend').val('');
+                startLoader();
+
+                client.get( [ 'currentUser', zdFields.idIda, zdFields.idVuelta ] ).then(function(data) {
+
+                    var params = {
+                        'id1': data[zdFields.idIda],
+                        'id2': data[zdFields.idVuelta],
+                        "author": data.currentUser.name,
+                        "paymentTicket": ticket
+                    }
+
+                    if( params.paymentTicket.trim() == "" ){
+                        $('#warnMsg').html(`<div class="alert alert-danger">Ingresa un ticket valido</div>`);
+                        startLoader(false);
+                        return;
+                    }
+    
+                    $.ajax({
+                        url: '<?= site_url('zdappC/transpo/setPayment') ?>', // La URL a la que se envía la solicitud
+                        method: 'POST', // El método HTTP a utilizar para la solicitud
+                        contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
+                        data: $.param(params), // Convierte el objeto params a una cadena de consulta
+                        success: function( resp ) {
+                            if( !resp.error ){
+
+                                var ticketData = {ticket: {
+                                        status: "open"
+                                    }};
+                                return client.request({
+                                    url: `/api/v2/tickets/${globals.ticketId}.json`,
+                                    type: 'PUT',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(ticketData)
+                                }).then(function(response) {
+                                    // Ejecutar la nueva función después de que todas las anteriores hayan terminado
+                                    startLoader(false);
+                                    openRsv();
+                                }).catch(function(error) {
+                                    startLoader(false);
+                                    console.error('Error al actualizar el ticket:', error);
+                                });
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // La función a ejecutar si la solicitud falla
+                            console.error("Error:", textStatus, errorThrown);
+                            startLoader(false);
+                        }
+                    });
+
+                });
+
+            }
+
             function openRsv(){
                 startLoader();
                 client.invoke('ticketFields:custom_field_28837284664596.hide');
@@ -762,10 +864,13 @@
                         ticketsString = `${ticketsString}<button type="button" data-ticket-id="${ticket}" class="btn btn-link" style="zoom: 0.7">${ticket}</button> `;
                     });
 
+                    var pickup = item.tipo == "SALIDA" ? `<p class="card-text" style="line-height: normal"><strong>Pick-up:</strong> ${item.pick_up}</p>` : ""
+
                     htmlLine = `${htmlLine}
                         <h5> ${item.tipo} [${item.item}]</h5>
                         <p class="card-text"><strong>Fecha:</strong> ${item.date} (${item.time})</p>
                         <p class="card-text"><strong>Vuelo:</strong> ${item.airline} (${item.flight})</p>
+                        ${pickup}
                         <p class="card-text ${htmlTemplates.status[item.status] ?? ''}" style="line-height: normal"><strong>Status:</strong> ${item.status}</p>
                         <p class="card-text"><strong>Tickets:</strong> ${ticketsString} </p>
                         <hr>
@@ -785,6 +890,7 @@
                 }
 
                 if( data[0].status === "LIGA PENDIENTE" || data[0].status === "PAGO PENDIENTE" ){
+                    var setPaymentButton = `<button class="ml-1 btn btn-success" id="setPayment">Registrar $</button>`;
                     additionalControls = `
                         <select id="languageSelect" class="form-select" style="margin-right: 10px;">
                             <option value="es-419">Español</option>
@@ -792,6 +898,9 @@
                         </select>
                         <button class="btn btn-ligaPendiente" id="sendLink">Enviar Liga</button>
                     `;
+                    if( data[0].status === "PAGO PENDIENTE" ){
+                        additionalControls += setPaymentButton;
+                    }
                 }
 
                 var html = `

@@ -50,7 +50,7 @@
                         </div>
                         <div class="form-group">
                             <label for="pax">Pax:</label>
-                            <input type="number" name="pax" id="pax" class="form-control" value="<?= $transpo ? $transpo['pax'] : '' ?>">
+                            <input type="number" name="pax" id="pax" class="form-control" <?= $transpo ? "value='".$transpo['pax']."'" : '' ?>>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -102,6 +102,11 @@
                         <div class="form-group">
                             <label for="airline">Airline:</label>
                             <input type="text" name="airline" id="airline" class="form-control" value="<?= $transpo ? $transpo['airline'] : '' ?>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="isIncluida">Incluida:</label>
+                            <input type="checkbox" name="isIncluida" id="isIncluida" value="1" <?= $transpo && $transpo['isIncluida'] == '1' ? 'checked' : '' ?>>
                         </div>
 
                         <div class="form-group">

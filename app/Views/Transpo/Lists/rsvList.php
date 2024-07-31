@@ -9,9 +9,9 @@
                 <p class="card-text"><strong>CRS / PMS:</strong> <?= $reservation['crs_id'] ?> / <?= $reservation['pms_id'] ?></p>
                 <p class="card-text"><strong>Dates:</strong> <?= date('Y-m-d', strtotime($reservation['date_in'])) ?> to <?= date('Y-m-d', strtotime($reservation['date_out'])) ?></p>
                 <p class="card-text" style="line-height: normal"><strong>Agency:</strong> <?= $reservation['agency_id'] ?></p>
-                <input type="text" value='<?= json_encode($reservation) ?>' class="jsonReg" id="json-<?= $reservation['folio'] ?>" hidden>
+                <input type="text" value='<?= json_encode($reservation) ?>' class="jsonReg" id="json-<?= $reservation['id_in'] ?>" hidden>
                 <div class="d-flex justify-content-end">
-                    <button class="ml-auto btn btn-primary btn-select" data-reg="<?= $reservation['folio'] ?>">
+                    <button class="ml-auto btn btn-primary btn-select" data-reg="<?= $reservation['id_in'] ?>">
                         <i class="fas fa-check"></i> Select
                     </button>
                 </div>

@@ -55,7 +55,7 @@ class TranspoHistoryModel extends BaseModel
         $builder->insertBatch($data);
     }
     
-    public function edit($id, $arr)
+    public function edit($id, $arr, $user = "")
     {
         $updateData = [];
 
@@ -64,7 +64,7 @@ class TranspoHistoryModel extends BaseModel
                 'id' => $id,
                 'title' => "Cambio ".$v[0],
                 'comment' => $v[1]." => ".$v[2],
-                'user' => $this->username()
+                'user' => $user == "" ? $this->username() : $user
             ];
             array_push($updateData, $data);
         }
