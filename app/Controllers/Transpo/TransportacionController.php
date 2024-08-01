@@ -716,15 +716,15 @@ class TransportacionController extends BaseController
         $rsva = $model->where_in('id',[$id1, $id2])->findAll();
 
         if( count($rsva) == 0 ){
-            gg_response(404, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+            gg_response(400, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
         }
 
         if( count($rsva) > 1 ){
             $incons = "datos de reservas no son consistentes";
-            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
             $id2 = $rsva[1]['id'];
         }else{
             $id2 = 0;
@@ -754,15 +754,15 @@ class TransportacionController extends BaseController
         $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
 
         if( count($rsva) == 0 ){
-            gg_response(404, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+            gg_response(400, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
         }
 
         if( count($rsva) > 1 ){
             $incons = "datos de reservas no son consistentes";
-            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
             $id2 = $rsva[1]['id'];
         }else{
             $id2 = 0;
@@ -907,7 +907,7 @@ class TransportacionController extends BaseController
         $author = $_POST['author'] ?? 0;
 
         if( $link == 0 ){
-            gg_response(404, ["err" => true, "msg" => "No se obtuvo ninguna liga de pago"]);
+            gg_response(400, ["err" => true, "msg" => "No se obtuvo ninguna liga de pago"]);
         }
 
 
@@ -915,15 +915,15 @@ class TransportacionController extends BaseController
         $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
 
         if( count($rsva) == 0 ){
-            gg_response(404, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+            gg_response(400, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
         }
 
         if( count($rsva) > 1 ){
             $incons = "datos de reservas no son consistentes";
-            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
-            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(404, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
             $id2 = $rsva[1]['id'];
         }else{
             $id2 = 0;
@@ -1058,17 +1058,180 @@ class TransportacionController extends BaseController
 
         $model->updateById( [$id1, $id2], $updateData );
 
-        $updateFields = [
-            ['ticket_pago', $rsva[0]['ticket_pago'], json_encode($pago_tickets)],
-            ['status', "PAGADA (CAPTURA PENDIENTE)", json_encode($pago_tickets)]
-        ];
+        // $updateFields = [
+        //     ['ticket_pago', $rsva[0]['ticket_pago'], json_encode($pago_tickets)],
+        //     ['status', "PAGADA (CAPTURA PENDIENTE)", json_encode($pago_tickets)]
+        // ];
 
-        $updateModel = new TranspoHistoryModel();
-        $updateModel->edit($id1, $updateFields, $author);
-        $updateModel->edit($id2, $updateFields, $author);
+        // $updateModel = new TranspoHistoryModel();
+        // $updateModel->edit($id1, $updateFields, $author);
+        // $updateModel->edit($id2, $updateFields, $author);
 
         gg_response(200, ["error" => false, "msg" => "Reservas actualizadas"]);
 
+    }
+
+    public function confirmTranspoMail(){
+
+        $model = new TransportacionesModel();
+
+        $id1 = $_POST['id1'];
+
+        if( !isset($_POST['id2']) ){
+            $getIds = $model->getRoundIds($id1);
+            $id1 = $getIds[0];
+            $id2 = $getIds[1] ?? $getIds[0];
+        }else{
+            $id2 = $_POST['id2'];
+        }
+
+        $author = $_POST['author'] ?? 0;
+        $hasTicket = isset($_POST['ticket']);
+        $ticket = $_POST['ticket'] ?? '';
+        $lang = $_POST['lang'] ?? 0;
+        switch( $lang ){
+            case 'es-419':
+                $lang = 'esp';
+                break;
+            case 'en-US':
+                $lang = 'eng';
+                break;
+            default: 
+                $lang = 'eng';
+                break;
+        }
+
+        
+        $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
+
+        if( count($rsva) == 0 ){
+            gg_response(400, ["err" => true, "msg" => "No se encontro ninguna reserva"]);
+        }
+
+        $transpo = [
+            'in' => [],
+            'out' => []
+        ];
+
+        foreach( $rsva as $rx => $r ){
+            if( $r['tipo'] == 'ENTRADA' ){ $transpo['in'] = $r; }
+            if( $r['tipo'] == 'SALIDA' ){ $transpo['out'] = $r; }
+
+            if( !$hasTicket ){
+                $req = json_decode($r['ticket_request'] ?? "[]");
+                foreach( $req as $ti => $t){
+                    $ticket = $t > $ticket ? $t : $ticket;
+                }
+            }
+        }
+
+        if( count($rsva) > 1 ){
+            $incons = "datos de reservas no son consistentes";
+            if( $rsva[0]['guest'] != $rsva[1]['guest'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['folio'] != $rsva[1]['folio'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['hotel'] != $rsva[1]['hotel'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            if( $rsva[0]['correo'] != $rsva[1]['correo'] ){ gg_response(400, ["err" => true, "msg" => $incons]); }
+            $id2 = $rsva[1]['id'];
+        }else{
+            $id2 = 0;
+        }
+
+        $html = view('transpo/mailing/confirmTranspo', ['data' => $rsva[0], 'transpo' => $transpo, 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
+
+        $zd = new Zendesk();
+        $dataTicket = [
+            "comment"   =>  [
+                "public"        => true,
+                "html_body"     => $html,
+            ],
+            "status" => "solved"
+        ];
+        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+
+        if( !$hasTicket ){
+
+            if( $ticket != '' ){
+                $tdata = $zd->getTicket($ticket);
+                $status = $tdata['data']->ticket->status;
+                if( $status != 'closed' ){
+                    $result = $zd->updateTicket($ticket, $dataTicket);
+                    $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticket);
+                    $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+                    gg_response(200, ['sent' => true, 'data' => $result ] );
+                }else{
+                    $params = [
+                        "title" => strtoupper($rsva[0]['hotel']).' '.(!$lang ? 'Shuttle Service Confirmation' : 'Servicio de Traslado Confirmado').' - '.$rsva[0]['folio'].' '.$rsva[0]['guest'],
+                        "requester" => $tdata['data']->ticket->requester_id,
+                        "html_body" => $html,
+                        "group" => 26408623595412,
+                        "status" => "solved",
+                        "public" => true,
+                        "custom_fields" => [
+                            [ "id" => 26495291237524, "value" => 'categoria_transportacion' ],
+                            [ "id" => 28630467255444, "value" => strtolower($rsva[0]['isIncluida']) == '1' ? 'transpo_cortesia' : 'transpo_prepago' ],
+                            [ "id" => 26260741418644, "value" => $rsva[0]['folio'] ],
+                            [ "id" => 26260771754900, "value" => $rsva[0]['guest'] ],
+                            [ "id" => 26493544435220, "value" => strtolower($rsva[0]['hotel']) == 'atelier' ? 'hotel_atpm' : 'hotel_olcp' ],
+                            [ "id" => 28774341519636, "value" => 'transpo_status_'.(strtolower($rsva[0]['isIncluida']) == '1' ? 'incluida__capturado_' : 'pagada__capturado_') ],
+                            [ "id" => 28802239047828, "value" => "yes" ],
+                            [ "id" => 28837284664596, "value" => $rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]['id'] ],
+                            [ "id" => 28837240808724, "value" => $rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]['id']]
+                        ],
+                        "ticket_form_id" => 26597917087124,
+                        "tags" => ['solveticket']
+                    ];
+                }
+            }else{
+                $params = [
+                    "title" => strtoupper($rsva[0]['hotel']).' '.(!$lang ? 'Shuttle Service Confirmation' : 'Servicio de Traslado Confirmado').' - '.$rsva[0]['folio'].' '.$rsva[0]['guest'],
+                    "requesterNew" => [ "name" => $rsva[0]['guest'], "email" => $rsva[0]['correo'] ],
+                    "html_body" => $html,
+                    "group" => 26408623595412,
+                    "status" => "solved",
+                    "public" => true,
+                    "custom_fields" => [
+                        [ "id" => 26495291237524, "value" => 'categoria_transportacion' ],
+                        [ "id" => 28630467255444, "value" => strtolower($rsva[0]['isIncluida']) == '1' ? 'transpo_cortesia' : 'transpo_prepago' ],
+                        [ "id" => 26260741418644, "value" => $rsva[0]['folio'] ],
+                        [ "id" => 26260771754900, "value" => $rsva[0]['guest'] ],
+                        [ "id" => 26493544435220, "value" => strtolower($rsva[0]['hotel']) == 'atelier' ? 'hotel_atpm' : 'hotel_olcp' ],
+                        [ "id" => 28774341519636, "value" => 'transpo_status_'.(strtolower($rsva[0]['isIncluida']) == '1' ? 'incluida__capturado_' : 'pagada__capturado_') ],
+                        [ "id" => 28802239047828, "value" => "yes" ],
+                        [ "id" => 28837284664596, "value" => $rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]['id'] ],
+                        [ "id" => 28837240808724, "value" => $rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]['id']]
+                    ],
+                    "ticket_form_id" => 26597917087124,
+                    "tags" => ['solveticket']
+                ];
+        
+            }
+
+            $ticketId = $zd->newTicketSend($params);
+                
+            if (is_int($ticketId)) {
+                $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticketId);
+                $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+            
+                gg_response(200, ['sent' => true ] );
+            } else {
+                gg_response(400, $ticketId);
+            }
+        }else{
+            $result = $zd->updateTicket($ticket, $dataTicket);
+            $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticket);
+            $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+            gg_response(200, ['sent' => true, 'data' => $result ] );
+        }
+
+    }
+
+    private function reBuildTicket( $arr, $t ){
+        $tickets = json_decode($arr ?? "[]");
+        if( !in_array($t, $tickets) ){
+            array_push($tickets, $t );
+        }
+
+        return $tickets;
     }
 
 }

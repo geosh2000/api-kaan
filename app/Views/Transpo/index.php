@@ -513,6 +513,9 @@
                         <?php if( ($transportacion['status'] == "INCLUIDA" || $transportacion['status'] == "-" && permiso("sendRequestForIncluded")) && isset($transportacion['correo']) ): ?>
                             <button class="actionBtn btn btn-success sendRequest" data-id="<?= $transportacion['id'] ?>"><i class="far fa-paper-plane"></i></button>
                         <?php endif; ?>
+                        <?php if( (strpos(strtolower($transportacion['status']), 'capturado') !== false && permiso("sendConfirm")) && isset($transportacion['correo']) ): ?>
+                            <button class="actionBtn btn btn-success sendConfirm" data-id="<?= $transportacion['id'] ?>"><i class="fas fa-envelope-open-text"></i></button>
+                        <?php endif; ?>
                         <?php if( permiso("editTransRegs") ): ?>
                             <button class="actionBtn btn btn-info edit-button" id="edit-<?= $transportacion['id'] ?>">
                                 <i class="fas fa-edit"></i>
@@ -701,6 +704,31 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
+                    success: function(data) {
+                        location.reload();
+                        startLoader(false);
+                    },
+                    error: function( err ) {
+                        startLoader(false);
+                        alert( err.responseJSON.msg );
+                    }
+                });
+            });
+            
+            $(document).on('click', '.sendConfirm', function() {
+                startLoader();
+                var id = $(this).attr('data-id'); // Obtiene el ID después del guion
+                var url = '<?= site_url('transpo/conf') ?>';
+
+                var params = {
+                    id1: id
+                };
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
+                    data: $.param(params), // Convierte el objeto params a una cadena de consulta
                     success: function(data) {
                         location.reload();
                         startLoader(false);

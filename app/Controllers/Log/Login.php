@@ -40,7 +40,7 @@ class Login extends BaseController
                 $session->set($sessionData);
 
                 // Redirigir a la URL de origen o a '/adh'
-                $redirect_url = $session->get('redirect_url') ?? '/login/perm';
+                $redirect_url = $session->get('redirect_url') ?? '/transpo';
                 $session->remove('redirect_url');
                 return redirect()->to($redirect_url);
             } else {

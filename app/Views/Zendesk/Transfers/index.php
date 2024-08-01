@@ -371,6 +371,11 @@
                 sendRequest();
             });
 
+            // SEND CONFIRMATION BUTTON
+            $(document).on('click', '#sendConf', function(){
+                sendConf();
+            });
+
             // SEND MANUAL BUTTON
             $(document).on('click', '#sendRequestManual', function(){
                 console.log('open manual');
@@ -595,6 +600,44 @@
                         data: $.param(params), // Convierte el objeto params a una cadena de consulta
                         success: function( resp ) {
 
+                            startLoader(false);
+                            openRsv();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // La función a ejecutar si la solicitud falla
+                            console.error("Error:", textStatus, errorThrown);
+                            startLoader(false);
+                        }
+                    });
+
+                });
+
+            }
+
+            function sendConf(){
+                startLoader();
+
+                var lang = $('#languageSelect').val();
+
+                var fields = [
+                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta
+                ]
+                client.get( fields ).then(function(data) {
+
+                    var params = {
+                        'id1': data[zdFields.idIda],
+                        'id2': data[zdFields.idVuelta],
+                        'ticket': data.ticket.id,
+                        'lang': lang,
+                        "author": data.currentUser.id
+                    }
+    
+                    $.ajax({
+                        url: '<?= site_url('zdappC/transpo/conf') ?>', // La URL a la que se envía la solicitud
+                        method: 'POST', // El método HTTP a utilizar para la solicitud
+                        contentType: 'application/x-www-form-urlencoded', // Indica que los datos se envían en formato de formulario
+                        data: $.param(params), // Convierte el objeto params a una cadena de consulta
+                        success: function( resp ) {
                             startLoader(false);
                             openRsv();
                         },
@@ -904,6 +947,16 @@
                     if( data[0].status === "PAGO PENDIENTE" ){
                         additionalControls += setPaymentButton;
                     }
+                }
+                
+                if ( data[0].status.includes("CAPTURADO") ) {
+                    additionalControls = `
+                        <select id="languageSelect" class="form-select" style="margin-right: 10px;">
+                            <option value="es-419">Español</option>
+                            <option value="en-US">Inglés</option>
+                        </select>
+                        <button class="btn btn-success" id="sendConf">Enviar Confirmacion</button>
+                    `;
                 }
 
                 var html = `

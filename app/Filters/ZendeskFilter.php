@@ -27,7 +27,7 @@ class ZendeskFilter implements FilterInterface
         
         // Obtén la clave pública desde el entorno o configuración
         $audienceProd = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/28666254387092.json";
-        $audienceLocal = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/28975884762644.json";
+        $audienceLocal = "https://atelierdehoteles.zendesk.com/api/v2/apps/installations/29010367081236.json";
         $audience = ENVIRONMENT === 'development' ? $audienceLocal : $audienceProd;
         // PRODUCTION
         $keyProd = "-----BEGIN PUBLIC KEY-----

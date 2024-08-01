@@ -10,7 +10,7 @@ class TransportacionesModel extends BaseModel
     protected $DBGroup = 'production';
     protected $table = 'qwt_transportaciones';
     protected $primaryKey = ['folio', 'item', 'tipo'];
-    protected $allowedFields = ['id', 'shuttle', 'isIncluida', 'hotel', 'tipo', 'folio', 'item', 'date', 'pax', 'guest', 'time', 'flight', 'airline', 'pick_up', 'status', 'precio', 'correo', 'phone','tickets','related', 'ticket_payment', 'ticket_pago', 'ticket_sent_request', 'crs_id', 'pms_id', 'agency_id'];
+    protected $allowedFields = ['id', 'shuttle', 'isIncluida', 'hotel', 'tipo', 'folio', 'item', 'date', 'pax', 'guest', 'time', 'flight', 'airline', 'pick_up', 'status', 'precio', 'correo', 'phone','tickets','related', 'ticket_payment', 'ticket_pago', 'ticket_sent_request', 'ticket_confirm', 'crs_id', 'pms_id', 'agency_id'];
 
     protected $useSoftDeletes = true;
     protected $deletedField  = 'deleted_at';
@@ -55,7 +55,7 @@ class TransportacionesModel extends BaseModel
 
     public function getFilteredTransportaciones($inicio, $fin, $status, $hotel = null, $tipo = null, $guest = null, $correo = null, $folio = null)
     {
-        $this->builder->select("*, CONCAT('{\"requests\":', COALESCE(ticket_sent_request,'[]'),',\"pagos\":', COALESCE(ticket_pago,'[]'),',\"payment\":', COALESCE(ticket_payment,'[]'),'}') as allTickets");
+        $this->builder->select("*, CONCAT('{\"requests\":', COALESCE(ticket_sent_request,'[]'),',\"confirm\":', COALESCE(ticket_confirm,'[]'),',\"pagos\":', COALESCE(ticket_pago,'[]'),',\"payment\":', COALESCE(ticket_payment,'[]'),'}') as allTickets");
 
         if (!empty($guest)) {
             $this->builder->like('guest', $guest);
@@ -146,6 +146,7 @@ class TransportacionesModel extends BaseModel
             $tickets_payment = json_decode( $f['ticket_payment'] ?? "[]" );
             $tickets_pago = json_decode( $f['ticket_pago'] ?? "[]" );
             $tickets_sent_request = json_decode( $f['ticket_sent_request'] ?? "[]" );
+            $tickets_confirm = json_decode( $f['ticket_confirm'] ?? "[]" );
             
             foreach( $tickets_payment as $t => $tk ){
                 if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
@@ -154,6 +155,9 @@ class TransportacionesModel extends BaseModel
                 if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
             }
             foreach( $tickets_sent_request as $t => $tk ){
+                if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
+            }
+            foreach( $tickets_confirm as $t => $tk ){
                 if( !in_array( $tk, $tickets ) ){ array_push($tickets, $tk); }
             }
             
@@ -183,7 +187,45 @@ class TransportacionesModel extends BaseModel
         return $this->builder->get()->getResultArray();
     }
 
+    protected function afterUpdateAction($id, $data, $old) {
+
+        $oldData = [];
+        $updateData = [];
+        foreach( $old as $k => $r ){
+            $oldData[$r['id']] = $r;
+            $updateData[$r['id']] = [];
+        }
+
+        $updateModel = new TranspoHistoryModel();
+
+        foreach($oldData as $k => $od){
+            foreach( $data as $key => $val ){
+                if( $od[$key] != $val ){
+                    array_push($updateData[$k], [$key, $od[$key], $val]);
+                }
+            }
+        }
+
+        foreach($updateData as $i => $ud){
+            if ( count($ud) > 0) {
+                $updateModel->edit( $i, $ud );
+            }
+        }
+
+    }
+
     public function updateById($id, $data){
+
+        $builder = $this->db->table($this->table);
+        $builder->where('deleted_at', null);
+
+        if( is_array( $id ) ){
+            $builder->whereIn('id', $id);
+        }else{
+            $builder->where('id', $id);
+        }
+        $old = $builder->get()->getResultArray();
+
         if( is_array( $id ) ){
             $this->builder->whereIn('id', $id);
         }else{
@@ -191,7 +233,12 @@ class TransportacionesModel extends BaseModel
         }
         $this->builder->set($data);
 
-        return $this->builder->update();
+        if( $result = $this->builder->update() ){
+            $this->afterUpdateAction($id, $data, $old);
+            return $result;
+        }else{
+            return false;
+        }
     }
 
     public function validFormDate( $data ){

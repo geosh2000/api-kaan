@@ -85,6 +85,7 @@ $routes->group('transpo', function($routes){
     $routes->get('nextDay', 'Transpo\TransportacionController::nextDayServices');
     $routes->post('duplicate/(:num)', 'Transpo\TransportacionController::duplicateService/$1');
     $routes->post('sendNewRequest/(:num)', 'Transpo\TransportacionController::newMailRequest/$1');
+    $routes->post('conf', 'Transpo\TransportacionController::confirmTranspoMail');
 });
 
 // $routes->group('zd|app', function($routes){
@@ -105,6 +106,7 @@ $routes->group('zdappC', function($routes){
         $routes->get('searchIds/(:num)/(:num)', 'Transpo\TransportacionController::findById/$1/$2');
         $routes->post('requestTemplate', 'Transpo\TransportacionController::mailRequest');
         $routes->post('requestLink', 'Transpo\TransportacionController::linkRequest');
+        $routes->post('conf', 'Transpo\TransportacionController::confirmTranspoMail');
 
         $routes->get('create', 'Transpo\TransportacionController::create');
         $routes->post('store', 'Transpo\TransportacionController::store');
