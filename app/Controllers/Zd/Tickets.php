@@ -298,5 +298,7 @@ class Tickets extends BaseController{
         
         gg_response($result['response'], $result['data']);
     }
+    
+
 
 }

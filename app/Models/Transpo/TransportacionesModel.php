@@ -3,6 +3,7 @@
 namespace App\Models\Transpo;
 
 use App\Models\BaseModel;
+use App\Models\Transpo\TranspoHistoryModel;
 
 class TransportacionesModel extends BaseModel
 {
@@ -11,40 +12,79 @@ class TransportacionesModel extends BaseModel
     protected $primaryKey = ['folio', 'item', 'tipo'];
     protected $allowedFields = ['id', 'shuttle', 'isIncluida', 'hotel', 'tipo', 'folio', 'item', 'date', 'pax', 'guest', 'time', 'flight', 'airline', 'pick_up', 'status', 'precio', 'correo', 'phone','tickets','related', 'ticket_payment', 'ticket_pago', 'ticket_sent_request', 'crs_id', 'pms_id', 'agency_id'];
 
+    protected $useSoftDeletes = true;
+    protected $deletedField  = 'deleted_at';
+
+    // Agregar el filtro para excluir los eliminados suavemente en el constructor
+    public function __construct() {
+        parent::__construct();
+        $this->builder = $this->db->table($this->table);
+        $this->builder->where('deleted_at', null);
+    }
+
+    public function delete($id = null, $purge = false)
+    {
+        // Si se pasa $id, ejecutar la acción antes del borrado con el ID
+        if ($id !== null) {
+            $this->beforeDeleteAction($id);
+            return parent::delete($id, $purge);
+        }
+
+        // Obtener los registros que serán eliminados
+        $builder = $this->builder();
+        $rows = $builder->get()->getResultArray();
+
+        // Pasar los IDs de los registros a la función beforeDeleteAction
+        $ids = $rows[0]['id'];
+        $this->beforeDeleteAction($ids);
+
+        // Si se usa soft deletes, marcar los registros como eliminados
+        if ($this->useSoftDeletes) {
+            return $builder->where('id', $ids)->set([$this->deletedField => date('Y-m-d H:i:s')])->update();
+        }
+
+        return $builder->delete($id, $purge);
+    }
+
+    protected function beforeDeleteAction($id)
+    {
+        $updateFields = [['deleted', 'activa', 'borrada']];
+        $updateModel = new TranspoHistoryModel();
+        $updateModel->edit($id, $updateFields);
+    }
+
     public function getFilteredTransportaciones($inicio, $fin, $status, $hotel = null, $tipo = null, $guest = null, $correo = null, $folio = null)
     {
-        $builder = $this->db->table('qwt_transportaciones');
-
-        $builder->select("*, CONCAT('{\"requests\":', COALESCE(ticket_sent_request,'[]'),',\"pagos\":', COALESCE(ticket_pago,'[]'),',\"payment\":', COALESCE(ticket_payment,'[]'),'}') as allTickets");
+        $this->builder->select("*, CONCAT('{\"requests\":', COALESCE(ticket_sent_request,'[]'),',\"pagos\":', COALESCE(ticket_pago,'[]'),',\"payment\":', COALESCE(ticket_payment,'[]'),'}') as allTickets");
 
         if (!empty($guest)) {
-            $builder->like('guest', $guest);
+            $this->builder->like('guest', $guest);
         } elseif (!empty($folio)) {
-            $builder->where('folio', $folio);
+            $this->builder->where('folio', $folio);
         } elseif (!empty($correo)) {
-            $builder->like('correo', $correo);
+            $this->builder->like('correo', $correo);
         } else {
 
-            if( $inicio ){ $builder->where('date >=', $inicio); } 
-            if( $fin ){ $builder->where('date <=', $fin); } 
+            if( $inicio ){ $this->builder->where('date >=', $inicio); } 
+            if( $fin ){ $this->builder->where('date <=', $fin); } 
             
             if (!empty($status)) {
-                $builder->whereIn('status', $status);
+                $this->builder->whereIn('status', $status);
             }
 
             if (!empty($hotel)) {
-                $builder->whereIn('hotel', $hotel);
+                $this->builder->whereIn('hotel', $hotel);
             }
 
             if (!empty($tipo)) {
-                $builder->whereIn('tipo', $tipo);
+                $this->builder->whereIn('tipo', $tipo);
             }
 
         }
 
-        $builder->orderBy('guest');
+        $this->builder->orderBy('guest');
 
-        return $builder->get()->getResultArray();
+        return $this->builder->get()->getResultArray();
     }
 
     public function searchComplete( $searchTerm ){
@@ -88,7 +128,9 @@ class TransportacionesModel extends BaseModel
                                 IF(st.status = nd.status, st.status,null) as globalStatus
                             ')
                             ->join('cycoasis_adh.qwt_transportaciones nd', 'st.folio = nd.folio AND st.item = nd.item AND st.tipo = "ENTRADA" AND nd.tipo = "SALIDA"', 'left')
-                            ->where('(nd.folio = "'.$searchTerm.'" OR COALESCE(nd.crs_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.pms_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.agency_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.guest,"x") LIKE "%'.$searchTerm.'%")');
+                            ->where('st.deleted_at', null)
+                            ->where('(nd.folio = "'.$searchTerm.'" OR COALESCE(nd.crs_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.pms_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.agency_id,"x") = "'.$searchTerm.'" OR COALESCE(nd.guest,"x") LIKE "%'.$searchTerm.'%")')
+                            ->where('nd.deleted_at', null);
 
         return $builder->get()->getResultArray();
 
@@ -96,11 +138,8 @@ class TransportacionesModel extends BaseModel
 
     public function searchAllIds( $arr ){
 
-        $builder = $this->db->table('qwt_transportaciones');
-
-        $builder->whereIn('id', $arr);
-
-        $result = $builder->get()->getResultArray();
+        $this->builder->whereIn('id', $arr);
+        $result = $this->builder->get()->getResultArray();
 
         foreach( $result as $r => $f ){
             $tickets = json_decode( $f['tickets'] ?? "[]" );
@@ -127,38 +166,32 @@ class TransportacionesModel extends BaseModel
 
     public function searchAll( $id ){
 
-        $builder = $this->db->table('qwt_transportaciones');
-
-        $builder->where('folio', $id)
+        $this->builder->where('folio', $id)
                 ->orWhere('crs_id',$id)
                 ->orWhere('pms_id',$id)
                 ->orWhere('agency_id',$id)
                 ->orLike('guest',$id)
                 ->orderBy('tipo, item');
 
-        return $builder->get()->getResultArray();
+        return $this->builder->get()->getResultArray();
 
     }
 
     public function getByFolio( $id ){
-        $builder = $this->db->table('qwt_transportaciones');
+        $this->builder->where('folio', $id)->orderBy('tipo, item');
 
-        $builder->where('folio', $id)->orderBy('tipo, item');
-
-        return $builder->get()->getResultArray();
+        return $this->builder->get()->getResultArray();
     }
 
     public function updateById($id, $data){
-        $builder = $this->db->table('qwt_transportaciones');
-
         if( is_array( $id ) ){
-            $builder->whereIn('id', $id);
+            $this->builder->whereIn('id', $id);
         }else{
-            $builder->where('id', $id);
+            $this->builder->where('id', $id);
         }
-        $builder->set($data);
+        $this->builder->set($data);
 
-        return $builder->update();
+        return $this->builder->update();
     }
 
     public function validFormDate( $data ){
@@ -171,26 +204,23 @@ class TransportacionesModel extends BaseModel
 
     public function nextDayServices(){
 
-        $builder = $this->db->table('qwt_transportaciones');
-
-        $builder->select("id, shuttle, isIncluida, hotel, tipo, folio, item, date, pax, guest, flight, airline, 
+        $this->builder->select("id, shuttle, isIncluida, hotel, tipo, folio, item, date, pax, guest, flight, airline, 
                           status, precio, correo, phone, tickets, related, ticket_payment, ticket_pago, ticket_sent_request, 
                           crs_id, pms_id, agency_id,
                           CASE WHEN time IS NOT NULL THEN TIME_FORMAT(time, '%h:%i %p') ELSE NULL END as time,
                           CASE WHEN pick_up IS NOT NULL THEN TIME_FORMAT(pick_up, '%h:%i %p') ELSE NULL END as pick_up");
 
-        $builder->like('status', 'captur')->where('date', 'ADDDATE(CURDATE(), 1)', false);
-        $builder->orderBy('guest');
+        $this->builder->like('status', 'captur')->where('date', 'ADDDATE(CURDATE(), 1)', false);
+        $this->builder->orderBy('guest');
 
-        return $builder->get()->getResultArray();
+        return $this->builder->get()->getResultArray();
 
     }
 
     public function getRoundIds($id){
-        $builder = $this->db->table('qwt_transportaciones');
         
         // Obtener la reserva original por ID
-        $rsva = $builder->where('id', $id)->get()->getResultArray();
+        $rsva = $this->builder->where('id', $id)->get()->getResultArray();
         if (empty($rsva)) {
             return false; // Si no se encuentra la reserva, retornar false o manejar el error apropiadamente
         }
@@ -199,6 +229,7 @@ class TransportacionesModel extends BaseModel
         $builder = $this->db->table('qwt_transportaciones');
         $rsvas = $builder->where('folio', $rsva[0]['folio'])
                         ->where('item', $rsva[0]['item'])
+                        ->where('deleted_at', null)
                         ->get()->getResultArray();
 
         $ids = [];
@@ -215,22 +246,23 @@ class TransportacionesModel extends BaseModel
     }
 
     public function duplicate($id){
-        $builder = $this->db->table('qwt_transportaciones');
         
         // Obtener la reserva original por ID
-        $rsva = $builder->where('id', $id)->get()->getResultArray();
+        $rsva = $this->builder->where('id', $id)->get()->getResultArray();
         if (empty($rsva)) {
             return false; // Si no se encuentra la reserva, retornar false o manejar el error apropiadamente
         }
         
         // Obtener el nuevo valor para 'item'
         $builder = $this->db->table('qwt_transportaciones');
-        $itemRes = $builder->select('MAX(item) + 1 as newItem')->where('folio', $rsva[0]['folio'])->get()->getResultArray();
+        $itemRes = $builder->select('MAX(item) + 1 as newItem')
+            ->where('deleted_at', null)->where('folio', $rsva[0]['folio'])->get()->getResultArray();
         $item = $itemRes[0]['newItem'] ?? 1; // Si no se encuentra un nuevo item, iniciar en 1
         
         // Obtener todas las reservas relacionadas con 'folio' y 'item'
         $builder = $this->db->table('qwt_transportaciones');
         $rsvas = $builder->where('folio', $rsva[0]['folio'])
+                        ->where('deleted_at', null)
                         ->where('item', $rsva[0]['item'])
                         ->get()->getResultArray();
         
