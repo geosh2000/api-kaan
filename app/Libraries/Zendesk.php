@@ -42,6 +42,27 @@ class Zendesk{
         return array( 'response' => $status, 'data' => json_decode($data) );
     }
     
+    public function postDataAttach( $url, $arr ){
+        
+        $ch = curl_init();
+        
+        curl_setopt( $ch, CURLOPT_URL, $this->baseUrl."/$url" );
+        curl_setopt( $ch, CURLOPT_USERPWD, $this->username . '/token:' . $this->password );
+        curl_setopt( $ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/binary'));
+        curl_setopt($ch,CURLOPT_POST, 1);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $arr);
+        curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
+        
+        $data = curl_exec( $ch );
+        $status = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+        
+        curl_close( $ch );
+        
+        return array( 'response' => $status, 'data' => json_decode($data, true) );
+    }
+    
     public function postData( $url, $arr ){
         
         $ch = curl_init();
@@ -252,6 +273,10 @@ class Zendesk{
         }else{
             $newTicket['ticket']['comment']['body'] = $params['msg'];
         }
+                
+        if( isset($params['uploads']) ){
+            $newTicket['ticket']['comment']['uploads'] = $params['uploads'];
+        }
         
         if( isset($params['requester']) ){
             $newTicket['ticket']['requester_id'] = $params['requester'];
@@ -405,6 +430,20 @@ class Zendesk{
     
     public function whRetry( $url, $params ){
         return $this->putData( $url, $params );
+    }
+
+    public function addAttach( $filePath ){
+        $url = "api/v2/uploads.json?filename=" . basename($filePath);
+
+        // Leer el contenido del archivo
+        $fileContent = file_get_contents($filePath);
+
+        $result = $this->postDataAttach( $url, $fileContent);
+
+        $uploadToken = $result['data']['upload']['token'];
+
+
+        return $uploadToken;  
     }
 
 }

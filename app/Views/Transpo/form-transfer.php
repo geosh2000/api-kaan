@@ -1,5 +1,11 @@
 <?= $this->extend('layouts/confirmations/adhHtml') ?>
 
+<?php
+    $session = session();
+    $autor = $session->get('username') ?? 'cliente';
+    $autor = $autor == "" ? 'cliente' : $autor;
+?>
+
 <?= $this->section('styles') ?>
 
         .form-container {
@@ -62,6 +68,11 @@
             <div class="form-group" hidden>
                 <label for="email"><?php echo ($lang === 'esp') ? 'Correo electrónico:' : 'E-mail:'; ?></label>
                 <input type="text" class="form-control" id="email" name="email" value="<?php echo $data["email"]; ?>" readonly>
+            </div>
+            <!-- AUTHOR -->
+            <div class="form-group" hidden>
+                <label for="author">Autor</label>
+                <input type="text" class="form-control" id="author" name="author" value="<?= $autor ?>" readonly>
             </div>
             <!-- Hotel -->
             <div class="form-group">

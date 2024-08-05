@@ -86,6 +86,9 @@ $routes->group('transpo', function($routes){
     $routes->post('duplicate/(:num)', 'Transpo\TransportacionController::duplicateService/$1');
     $routes->post('sendNewRequest/(:num)', 'Transpo\TransportacionController::newMailRequest/$1');
     $routes->post('conf', 'Transpo\TransportacionController::confirmTranspoMail');
+    $routes->get('expotNewQwt', 'Transpo\TransportacionController::exportNew');
+    $routes->post('confirmExport', 'Transpo\TransportacionController::exportNewConfirm');
+    $routes->post('sendQwtServices', 'Transpo\TransportacionController::sendQwtConfirms');
 });
 
 // $routes->group('zd|app', function($routes){

@@ -125,6 +125,26 @@
     return true;
     }
 
+    function createCSV($data, $filename = 'export.csv') {
+        $filepath = WRITEPATH . 'exports/' . $filename;
+        
+        // Abrir el archivo para escritura
+        $file = fopen($filepath, 'w');
+        
+        // Escribir la cabecera del CSV (opcional)
+        fputcsv($file, array_keys($data[0]));
+        
+        // Escribir los datos
+        foreach ($data as $row) {
+            fputcsv($file, $row);
+        }
+        
+        // Cerrar el archivo
+        fclose($file);
+        
+        return $filepath;
+    }
+
 
 ?>
 

@@ -10,7 +10,7 @@ class TransportacionesModel extends BaseModel
     protected $DBGroup = 'production';
     protected $table = 'qwt_transportaciones';
     protected $primaryKey = ['folio', 'item', 'tipo'];
-    protected $allowedFields = ['id', 'shuttle', 'isIncluida', 'hotel', 'tipo', 'folio', 'item', 'date', 'pax', 'guest', 'time', 'flight', 'airline', 'pick_up', 'status', 'precio', 'correo', 'phone','tickets','related', 'ticket_payment', 'ticket_pago', 'ticket_sent_request', 'ticket_confirm', 'crs_id', 'pms_id', 'agency_id'];
+    protected $allowedFields = ['id', 'shuttle', 'isIncluida', 'hotel', 'tipo', 'folio', 'item', 'date', 'pax', 'guest', 'time', 'flight', 'airline', 'pick_up', 'status', 'precio', 'correo', 'phone','tickets','related', 'ticket_payment', 'ticket_pago', 'ticket_sent_request', 'ticket_confirm', 'ticket_qwantour', 'crs_id', 'pms_id', 'agency_id'];
 
     protected $useSoftDeletes = true;
     protected $deletedField  = 'deleted_at';
@@ -187,7 +187,9 @@ class TransportacionesModel extends BaseModel
         return $this->builder->get()->getResultArray();
     }
 
-    protected function afterUpdateAction($id, $data, $old) {
+    public function afterUpdateAction($id, $data, $old) {
+
+        $author = $_POST['author'] ?? "";
 
         $oldData = [];
         $updateData = [];
@@ -208,10 +210,46 @@ class TransportacionesModel extends BaseModel
 
         foreach($updateData as $i => $ud){
             if ( count($ud) > 0) {
-                $updateModel->edit( $i, $ud );
+                $updateModel->edit( $i, $ud, $author );
             }
         }
 
+    }
+
+    public function updateByIdSet($id, $data){
+
+        $builder = $this->db->table($this->table);
+        $builder->where('deleted_at', null);
+
+        if( is_array( $id ) ){
+            $builder->whereIn('id', $id);
+        }else{
+            $builder->where('id', $id);
+        }
+        $old = $builder->get()->getResultArray();
+
+        if( is_array( $id ) ){
+            $this->builder->whereIn('id', $id);
+        }else{
+            $this->builder->where('id', $id);
+        }
+
+        foreach( $data as $i => $d ){
+            $this->builder->set($d[0], $d[1], $d[2]);                
+        }
+
+        if( $result = $this->builder->update() ){
+            $udata = [];
+            foreach( $data as $i => $d ){
+                if( $d[2] ){
+                    $udata[$d[0]] = $d[1];
+                }
+            }
+            $this->afterUpdateAction($id, $udata, $old);
+            return $result;
+        }else{
+            return false;
+        }
     }
 
     public function updateById($id, $data){
@@ -343,6 +381,19 @@ class TransportacionesModel extends BaseModel
         }
 
         return true; // Retornar true si se realiza la inserción correctamente
+    }
+
+    public function qwtData( $ids ){
+        $this->builder->whereIn('id', $ids);
+
+        $select = "date as FECHA, NULL `N° SERV`,NULL as TAREA, NULL as CITA,
+        IF(tipo='ENTRADA',time,pick_up) as HORA, pax as PAX, CONCAT(tipo, ' ', IF(hotel LIKE '%atelier%', 'DE LUJO', 'REGULAR')) as `TIPO DE SERVICIO`,
+        hotel as CONTRATANTE,IF(tipo='ENTRADA','AEROPUERTO',hotel) as ORIGEN, flight as `NO. VUELO`,IF(tipo='SALIDA','AEROPUERTO',hotel) as DESTINO,
+        NULL as `POSIBLE OPERADOR`, NULL as UNIDAD,guest as `NOMBRE PASAJERO`,NULL as OBSERVACIONES,NULL as ZONA,NULL as TERMINAL,NULL as AREA,NULL as FOLIO,
+        CONCAT(folio,'-',item) as LOCALIZADOR, NULL as `COBRO PESOS` ,NULL as `COBRO USD`, NULL as `PRECIO CON IVA` , NULL as APOYO ,NULL as `COMISION VENTAS`, 
+        NULL as `COMISION DRIVERS`,NULL as `COMISION OPERDOR`,NULL as OBSEVACIONES,NULL as CUENTA";
+        
+        return $this->builder->select($select)->get()->getResultArray();
     }
 
 

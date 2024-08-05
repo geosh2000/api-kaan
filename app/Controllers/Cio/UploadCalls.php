@@ -146,7 +146,7 @@ class UploadCalls extends BaseController {
 
         // Cargar los datos en lotes y actualizar en caso de duplicados
         if (!empty($data)) {
-            $db = db_connect('default');
+            $db = db_connect('production');
             $query = insertOnDuplicateUpdateBatch('llamadas_cio', $data, $this->arreglo);
 
             // gg_response(200, $query);

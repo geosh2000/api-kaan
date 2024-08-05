@@ -541,20 +541,22 @@ class TransportacionController extends BaseController
                 foreach($existing as $r => $t){
                     if( $t['tipo'] == 'ENTRADA'){
                         if( strpos($t['status'], 'SOLICITADO') !== false || $noRestrict ){
+                            $ticketReq = $this->reBuildTicket( $t['ticket_sent_request'], $this->request->getPost('newTicket') );
                             array_push($ids,$t['id']);
+                            $data['arrival']['ticket_sent_request'] = json_encode($ticketReq);
                             $model->updateById($t['id'],$data['arrival']);
                             
-                            $updateFields = [];
+                            // $updateFields = [];
 
-                            foreach( $data['arrival'] as $field => $val ){
-                                if( $val != $t[$field] ){
-                                    array_push($updateFields, [$field, $t[$field], $val]);
-                                }
-                            }
+                            // foreach( $data['arrival'] as $field => $val ){
+                            //     if( $val != $t[$field] ){
+                            //         array_push($updateFields, [$field, $t[$field], $val]);
+                            //     }
+                            // }
 
-                            if( count($updateFields) > 0 ){
-                                $updateModel->edit($t['id'], $updateFields);
-                            }
+                            // if( count($updateFields) > 0 ){
+                            //     $updateModel->edit($t['id'], $updateFields);
+                            // }
 
                         }else{
                             return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
@@ -568,20 +570,10 @@ class TransportacionController extends BaseController
             foreach($existing as $r => $t){
                 if( $t['tipo'] == 'SALIDA'){
                     if( strpos($t['status'], 'SOLICITADO') !== false || $noRestrict ){
+                        $ticketReq = $this->reBuildTicket( $t['ticket_sent_request'], $this->request->getPost('newTicket') );
                         array_push($ids,$t['id']);
+                        $data['departure']['ticket_sent_request'] = json_encode($ticketReq);
                         $model->updateById($t['id'],$data['departure']);
-
-                        $updateFields = [];
-
-                        foreach( $data['arrival'] as $field => $val ){
-                            if( $val != $t[$field] ){
-                                array_push($updateFields, [$field, $t[$field], $val]);
-                            }
-                        }
-
-                        if( count($updateFields) > 0 ){
-                            $updateModel->edit($t['id'], $updateFields);
-                        }
                     }else{
                         return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
                     }
@@ -1086,6 +1078,7 @@ class TransportacionController extends BaseController
         }
 
         $author = $_POST['author'] ?? 0;
+        $authorId = $_POST['author_id'] ?? 0;
         $hasTicket = isset($_POST['ticket']);
         $ticket = $_POST['ticket'] ?? '';
         $lang = $_POST['lang'] ?? 0;
@@ -1118,7 +1111,7 @@ class TransportacionController extends BaseController
             if( $r['tipo'] == 'SALIDA' ){ $transpo['out'] = $r; }
 
             if( !$hasTicket ){
-                $req = json_decode($r['ticket_request'] ?? "[]");
+                $req = json_decode($r['ticket_sent_request'] ?? "[]");
                 foreach( $req as $ti => $t){
                     $ticket = $t > $ticket ? $t : $ticket;
                 }
@@ -1146,7 +1139,7 @@ class TransportacionController extends BaseController
             ],
             "status" => "solved"
         ];
-        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+        if($authorId != 0){ $dataTicket["comment"]["author_id"] = $authorId; }
 
         if( !$hasTicket ){
 
@@ -1233,5 +1226,84 @@ class TransportacionController extends BaseController
 
         return $tickets;
     }
+
+    public function exportNew(){
+        if( !permiso("exportToQwt") ){
+            return view('error', ["msg" => "No cuentas con permisos para esta función"]);
+        }
+
+        // 123456
+
+        $model = new TransportacionesModel();
+        $data = $model->like('status', 'captura pendiente')
+                ->where('folio', 123456) // Para asegurarse de que 'ticket_qwuantour' sea NULL
+                ->where('ticket_qwantour IS NULL', null, false) // Para asegurarse de que 'ticket_qwuantour' sea NULL
+                ->orderBy('date')->findAll();
+
+        return view('Transpo/exportQwt', ['transportaciones' => $data]);
+
+
+    }
+
+    public function exportNewConfirm(){
+
+        $ids = $_POST['ids'];
+        $ids = json_decode($ids);
+
+        if( !permiso("exportToQwt") ){
+            return view('error', ["msg" => "No cuentas con permisos para esta función"]);
+        }
+
+        $model = new TransportacionesModel();
+        $data = $model->whereIn('id', $ids)
+                ->orderBy('date')->findAll();
+
+        return view('Transpo/exportQwtConfirm', ['transportaciones' => $data, "ids" => $ids]);
+
+    }
+
+    public function sendQwtConfirms(){
+
+        $ids = $_POST['ids'];
+        $ids = json_decode($ids);
+
+        $model = new TransportacionesModel();
+        $data = $model->qwtData($ids);
+
+        $filePath = createCSV($data, 'serviciosADH.csv');
+
+        $zd = new Zendesk();
+        $uploadToken = $zd->addAttach( $filePath );
+
+        $params = [
+            "title" => "Prueba de envio de nuevos servicios",
+            "requesterNew" => [ "name" => "Jorge Sanchez", "email" => "geosh2000@gmail.com" ],
+            "html_body" => view('Transpo/mailing/exportQwtConfirm', ['transportaciones' => $data, "hotel" => 'atpm', "lang" => true]),
+            // "html_body" => "Envio de confirmaciones a Qwantour",
+            "group" => 26408623595412,
+            "status" => "pending",
+            "public" => true,
+            "tags" => ['envio_qwt'],
+            'uploads' => [$uploadToken]
+        ];
+
+        $ticketId = $zd->newTicketSend($params);
+
+        if( $ticketId != null ){
+
+            $updates = [
+                ['status', 'REPLACE(status, "(CAPTURA PENDIENTE)", "(CAPTURADO)")', false],
+                ['ticket_qwantour', $ticketId, true],
+            ];
+
+            $mdl = new TransportacionesModel();
+            $mdl->updateByIdSet($ids, $updates);
+
+            gg_response(200, ["Ticket de confirmacion" => $ticketId]);
+        }
+
+    }
+
+
 
 }

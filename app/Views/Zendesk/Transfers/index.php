@@ -629,7 +629,8 @@
                         'id2': data[zdFields.idVuelta],
                         'ticket': data.ticket.id,
                         'lang': lang,
-                        "author": data.currentUser.id
+                        "author": data.currentUser.name,
+                        "author_id": data.currentUser.id
                     }
     
                     $.ajax({
