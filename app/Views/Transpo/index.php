@@ -415,6 +415,7 @@
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button type="submit" class="loadbtn btn btn-primary mr-2">Filtrar</button>
+                    <a href="<?= site_url('transpo/pendingConf') ?>" target="_blank" class="btn btn-info mr-2">Por Confirmar</a>
                     <?php if( permiso("createTransRegs") ): ?>
                         <button type="button" class="create-button loadbtn btn btn-success mr-2">Crear</button>
                         <?php endif; ?>
@@ -560,6 +561,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <button id="exportXls" class="btn btn-success mr-2"><i class="far fa-file-excel"></i></button>
     </div>
 
 
@@ -644,7 +646,22 @@
 
             $('#transferTable').DataTable({
                 "order": [], // No hay un orden inicial
-                "ordering": true // Permitir ordenamiento
+                "ordering": true, // Permitir ordenamiento
+                "dom": '<"top"f>rt<"bottom"lp><"clear">', // Custom DOM positioning
+            });
+
+            // Mueve el botón de exportación junto al cuadro de búsqueda
+            $("#exportXls").insertBefore("#transferTable_filter label");
+
+            $(document).on('click', '#exportXls', function() {
+                // Obtén la referencia de la tabla
+                var table = $('#transferTable');
+                
+                // Convierte la tabla a una hoja de cálculo
+                var wb = XLSX.utils.table_to_book(table[0], {sheet: "Sheet1"});
+                
+                // Genera el archivo XLSX
+                XLSX.writeFile(wb, 'transportaciones.xlsx');
             });
         });
 
@@ -683,7 +700,10 @@
                         $('#historyTable').html(data); // Carga los datos en la tabla
 
                         console.log(data);
-                        $('#historyTable').DataTable();
+                        $('#historyTable').DataTable({
+                            "order": [], // No hay un orden inicial
+                            "ordering": true // Permitir ordenamiento
+                        });
                         $('#historyModal').modal('show'); // Muestra el modal
                         startLoader(false);
                     },

@@ -43,6 +43,9 @@ $routes->group('cio', function($routes){
         $routes->get('queues', 'Cio\QueryCalls::queues');
         $routes->get('langs', 'Cio\QueryCalls::langs');
         $routes->get('hotels', 'Cio\QueryCalls::hotels');
+        $routes->get('hotels/(:any)', 'Cio\QueryCalls::hotels/$1');
+        $routes->get('hotels/(:any)/(:any)', 'Cio\QueryCalls::hotels/$1/$2');
+        $routes->get('hotels/(:any)/(:any)/(:any)', 'Cio\QueryCalls::hotels/$1/$2/$3');
         $routes->get('callJourney', 'Cio\QueryCalls::callJourney');
         $routes->get('callJourney/(:any)', 'Cio\QueryCalls::callJourney/$1');
         $routes->get('callJourney/(:any)/(:any)', 'Cio\QueryCalls::callJourney/$1/$2');
@@ -89,6 +92,7 @@ $routes->group('transpo', function($routes){
     $routes->get('expotNewQwt', 'Transpo\TransportacionController::exportNew');
     $routes->post('confirmExport', 'Transpo\TransportacionController::exportNewConfirm');
     $routes->post('sendQwtServices', 'Transpo\TransportacionController::sendQwtConfirms');
+    $routes->get('pendingConf', 'Transpo\TransportacionController::pendingConf');
 });
 
 // $routes->group('zd|app', function($routes){

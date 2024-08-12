@@ -216,13 +216,14 @@ class QueryCalls extends BaseController {
             
     }
     
-    public function hotels( $start = "weekstart", $end = "weekend" ){
+    public function hotels( $queue = "Voz_Reservas,Voz_grupos", $start = "weekstart", $end = "weekend" ){
 
         $lu = $this->getLastUpdate();
         $builder = $this->db->table('llamadas_cio');
        
         $start = $start == "weekstart" || $start == "" ? $this->weekDays() : $start;
         $end = $end == "weekend" || $end == "" ? $this->weekDays( true ) : $end;
+        $queue = explode(',',$queue);
 
         $select = "IF(hotel = '','NA', hotel) as Field, COUNT(*) as val";
         
@@ -230,6 +231,7 @@ class QueryCalls extends BaseController {
             ->where("Fecha BETWEEN '$start' AND '$end'")
             ->where("desde != 5370")
             ->where("Fecha >=", "20240501")
+            ->whereIn("servicio_campana", $queue)
             ->groupStart()
                 ->whereNotIn("tipo_llamada", ['Outbound','External','Internal'])
                 ->orGroupStart()

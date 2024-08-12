@@ -739,6 +739,7 @@ class TransportacionController extends BaseController
         $ticket = $_POST['ticket'];
         $lang = $_POST['lang'] ?? 0;
         $author = $_POST['author'] ?? 0;
+        $author_id = $_POST['author_id'] ?? 0;
         $noRestrict = $_POST['noRestrict'] ?? 0;
 
 
@@ -793,7 +794,7 @@ class TransportacionController extends BaseController
             ]
         ];
 
-        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+        if($author_id != 0){ $dataTicket["comment"]["author_id"] = $author_id; }
 
         $result = $zd->updateTicket($ticket, $dataTicket);
         
@@ -897,6 +898,7 @@ class TransportacionController extends BaseController
         $lang = $_POST['lang'] ?? 0;
         $link = $_POST['link'] ?? 0;
         $author = $_POST['author'] ?? 0;
+        $author_id = $_POST['author_id'] ?? 0;
 
         if( $link == 0 ){
             gg_response(400, ["err" => true, "msg" => "No se obtuvo ninguna liga de pago"]);
@@ -947,7 +949,7 @@ class TransportacionController extends BaseController
             "custom_fields" => [["id" => 28727761630100, "value" => $link], [ "id" => 28774341519636, "value" => 'transpo_status_pago_pendiente' ]]
         ];
 
-        if($author != 0){ $dataTicket["comment"]["author_id"] = $author; }
+        if($author_id != 0){ $dataTicket["comment"]["author_id"] = $author_id; }
 
         $result = $zd->updateTicket($ticket, $dataTicket);
         
@@ -1149,7 +1151,7 @@ class TransportacionController extends BaseController
                 if( $status != 'closed' ){
                     $result = $zd->updateTicket($ticket, $dataTicket);
                     $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticket);
-                    $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+                    $model->updateById([$id1, $id2], ['ticket_confirm' => json_encode($conf_tickets)]);
                     gg_response(200, ['sent' => true, 'data' => $result ] );
                 }else{
                     $params = [
@@ -1203,7 +1205,7 @@ class TransportacionController extends BaseController
                 
             if (is_int($ticketId)) {
                 $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticketId);
-                $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+                $model->updateById([$id1, $id2], ['ticket_confirm' => json_encode($conf_tickets)]);
             
                 gg_response(200, ['sent' => true ] );
             } else {
@@ -1212,11 +1214,12 @@ class TransportacionController extends BaseController
         }else{
             $result = $zd->updateTicket($ticket, $dataTicket);
             $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticket);
-            $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['ticket_confirm' => json_encode($conf_tickets)]);
+            $model->updateById([$id1, $id2], ['ticket_confirm' => json_encode($conf_tickets)]);
             gg_response(200, ['sent' => true, 'data' => $result ] );
         }
 
     }
+
 
     private function reBuildTicket( $arr, $t ){
         $tickets = json_decode($arr ?? "[]");
@@ -1225,6 +1228,24 @@ class TransportacionController extends BaseController
         }
 
         return $tickets;
+    }
+
+    public function pendingConf(){
+        if( !permiso("exportToQwt") ){
+            return view('error', ["msg" => "No cuentas con permisos para esta función"]);
+        }
+
+        // 123456
+
+        $model = new TransportacionesModel();
+        $data = $model->like('status', 'capturado')
+                ->where('ticket_qwantour IS NOT NULL', null, false) // Para asegurarse de que 'ticket_qwuantour' sea NULL
+                ->where('ticket_confirm IS NULL', null, false) // Para asegurarse de que 'ticket_qwuantour' sea NULL
+                ->orderBy('folio')->findAll();
+
+        return view('Transpo/pendingConf', ['transportaciones' => $data]);
+
+
     }
 
     public function exportNew(){
@@ -1236,9 +1257,8 @@ class TransportacionController extends BaseController
 
         $model = new TransportacionesModel();
         $data = $model->like('status', 'captura pendiente')
-                ->where('folio', 123456) // Para asegurarse de que 'ticket_qwuantour' sea NULL
                 ->where('ticket_qwantour IS NULL', null, false) // Para asegurarse de que 'ticket_qwuantour' sea NULL
-                ->orderBy('date')->findAll();
+                ->orderBy('folio, tipo, id')->findAll();
 
         return view('Transpo/exportQwt', ['transportaciones' => $data]);
 
@@ -1256,7 +1276,7 @@ class TransportacionController extends BaseController
 
         $model = new TransportacionesModel();
         $data = $model->whereIn('id', $ids)
-                ->orderBy('date')->findAll();
+                ->orderBy('folio, tipo, id')->findAll();
 
         return view('Transpo/exportQwtConfirm', ['transportaciones' => $data, "ids" => $ids]);
 
@@ -1276,15 +1296,20 @@ class TransportacionController extends BaseController
         $uploadToken = $zd->addAttach( $filePath );
 
         $params = [
-            "title" => "Prueba de envio de nuevos servicios",
-            "requesterNew" => [ "name" => "Jorge Sanchez", "email" => "geosh2000@gmail.com" ],
+            "title" => "Envio de nuevos servicios ATELIER y OLEO",
+            "requesterNew" => [ "name" => "Jose Luis Agosto", "email" => "jagosto@qwantour.com" ],
             "html_body" => view('Transpo/mailing/exportQwtConfirm', ['transportaciones' => $data, "hotel" => 'atpm', "lang" => true]),
             // "html_body" => "Envio de confirmaciones a Qwantour",
             "group" => 26408623595412,
             "status" => "pending",
             "public" => true,
             "tags" => ['envio_qwt'],
-            'uploads' => [$uploadToken]
+            'uploads' => [$uploadToken],
+            'cc' => [
+                    ["user_email" => "operacion@qwantour.com", "user_name" => "Operacion Qwantour"],
+                    ["user_email" => "operacion2@qwantour.com", "user_name" => "Operacion 2 Qwantour"],
+                    ["user_email" => "booking@qwantour.com", "user_name" => "Booking Qwantour"]
+                ]
         ];
 
         $ticketId = $zd->newTicketSend($params);

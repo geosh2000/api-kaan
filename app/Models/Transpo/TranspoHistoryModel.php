@@ -88,7 +88,7 @@ class TranspoHistoryModel extends BaseModel
     public function getAll($id){
         $builder = $this->db->table($this->table);
         
-        return $builder->where('id',$id)->orderBy('dtCreated')->get()->getResultArray();
+        return $builder->where('id',$id)->orderBy('dtCreated', 'DESC')->get()->getResultArray();
     }
     
     

@@ -82,31 +82,31 @@ class Mailing extends BaseController{
         $params = [
             "data"  => [
                 "hotel"=>"hotel_atpm",
-                "conf_number"   => "409287",
-                "main_guest"    => "Carmen Zaldivar",
-                "date_in"   => "2024-07-20",
+                "conf_number"   => "414236",
+                "main_guest"    => "Jaime Farias",
+                "date_in"   => "2024-08-30",
                 "time_in"   => "",
-                "date_out"  => "2024-07-21",
+                "date_out"  => "2024-09-01",
                 "time_out"  => "",
-                "room_code" => "",
-                "room_name" => "",
-                "adults"    => "2",
+                "room_code" => "AXJRVQ",
+                "room_name" => "Junior Suite Ocean View - Doble",
+                "adults"    => "3",
                 "children"  => "",
-                "payment_type"  => "Pre-pago",
+                "payment_type"  => "Cortesia",
                 "currency"  => "mxn",
-                "total" => "11822.63",
+                "total" => "0",
                 "notes" => "",
                 "xld_policy"    => "-",
                 "rsv_channel"   => "rsv_chan_direct",
-                "deposit"   => "0",
+                "deposit"   => "",
                 "rate_type" => "-",
                 "isa" => "$40 MXN por persona por noche"
             ],
             "params" => [
-                'ROOM TYPE'     =>  false,
-                'BALANCE'       => 'show_balance',
+                'ROOM TYPE'     =>  'show_roomtype',
+                'BALANCE'       => 'hide_balance',
                 'AutoXld'   => '-',
-                'DEPOSITOS' => 'show_deposit',
+                'DEPOSITOS' => 'hide_deposit',
                 "AMOUNT" => 'show_amount'
             ]
         ];
@@ -265,11 +265,11 @@ class Mailing extends BaseController{
         $limit =  longDateFormat($inicioDate->format('Y-m-d'), $filter['lang']);
 
         $text = [
-            "Esp" => "Cancelación gratuita hasta el $limit. Después de esta fecha, se aplica una penalidad del ".($penalty['penalty'] * 100)."%.",
-            "Eng" => "Free cancellation until $limit. Between 0 and 14 days before arrival, a ".($penalty['penalty'] * 100)."% penalty applies."
+            "esp" => "Cancelación gratuita hasta el $limit. Después de esta fecha, se aplica una penalidad del ".($penalty['penalty'] * 100)."%.",
+            "eng" => "Free cancellation until $limit. Between 0 and 14 days before arrival, a ".($penalty['penalty'] * 100)."% penalty applies."
         ];
 
-        return $text[$filter['lang']];
+        return $text[strtolower($filter['lang'])];
 
     }
 }

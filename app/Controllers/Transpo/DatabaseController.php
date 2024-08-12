@@ -200,7 +200,8 @@ class DatabaseController extends BaseController
                     "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470,
                     "crs_id" => $r['crs_id'],
                     "agency_id" => $r['agency_id'],
-                    "pms_id" => $r['pms_id']
+                    "pms_id" => $r['pms_id'],
+                    "isIncluida" => 1
                 ];
                 $tmpOut = [
                     "shuttle" => "QWANTOUR",
@@ -216,7 +217,8 @@ class DatabaseController extends BaseController
                     "precio" => ($r['Hotel'] == "Atelier Playa Mujeres" || $r['Hotel'] == "ATELIER") ? 1213.71 : 470,
                     "crs_id" => $r['crs_id'],
                     "agency_id" => $r['agency_id'],
-                    "pms_id" => $r['pms_id']
+                    "pms_id" => $r['pms_id'],
+                    "isIncluida" => 1
                 ];
                 array_push( $regs, $tmpIn );
                 array_push( $regs, $tmpOut );

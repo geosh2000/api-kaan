@@ -589,7 +589,8 @@
                         'id2': data[zdFields.idVuelta],
                         'ticket': data.ticket.id,
                         'lang': lang,
-                        "author": data.currentUser.id,
+                        "author": data.currentUser.name,
+                        "author_id": data.currentUser.id,
                         "noRestrict": nr
                     }
     
@@ -670,7 +671,8 @@
                         'ticket': data.ticket.id,
                         'lang': lang,
                         'link': data[zdFields.ligaPago] ?? "",
-                        "author": data.currentUser.id
+                        "author": data.currentUser.name,
+                        "author_id": data.currentUser.id
                     }
 
                     if( params.link.trim() == "" ){
@@ -710,6 +712,7 @@
                         'id1': data[zdFields.idIda],
                         'id2': data[zdFields.idVuelta],
                         "author": data.currentUser.name,
+                        "author_id": data.currentUser.id,
                         "paymentTicket": ticket
                     }
 
@@ -828,7 +831,8 @@
                         'id2': data[zdFields.idVuelta],
                         'ticket': data.ticket.id,
                         'lang': data.lang,
-                        "author": data.currentUser.id,
+                        "author": data.currentUser.name,
+                        "author_id": data.currentUser.id,
                         "noRestrict": 1
                     };
     
