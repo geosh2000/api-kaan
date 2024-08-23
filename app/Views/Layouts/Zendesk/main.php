@@ -44,7 +44,7 @@
 
 <!-- Navbar fijo -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#" id="appTitle">GG - ConnApp</a>
+    <a class="navbar-brand" href="#" id="appTitle">GG - <span id="moduleTitle">ConnApp</span></a>
     <button class="ml-auto mr-2 btn btn-secondary reloadBtn"><i class="fas fa-sync-alt"></i></button>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -85,6 +85,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <!-- Bootstrap Datepicker locales (opcional) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
+
 
 <!-- TOAST SUCCESS -->
 <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
@@ -131,7 +132,14 @@
     </div>
 </div>
 
+<script>
+    var zdToken = '<?= $token ?>';
+    var zdSiteUrl = '<?= site_url() ?>';
+    var zdQs = '<?= $qs ?>';
+</script>
 
+<!-- BASE JS FOR ZENDESK -->
+<script src="<?= base_url('public/js/zendesk/base.js') ?>"></script>
 <script>
     $(document).ready(function () {
         console.log("Main grupo de funciones ready");
@@ -192,6 +200,14 @@
 
     $(document).on('click', '.loadbtn', function() {
         startLoader();    
+    });
+
+    $(document).on('click', '#confirmLink', function(e) {
+
+        e.preventDefault(); // Evitar la acción predeterminada del enlace
+        // linkApp( "<?= site_url('/zdapp/conf') ?>?<?= $qs ?>");
+        linkApp( "/zdapp/conf");
+        
     });
 </script>
 <?= $this->renderSection('scripts') ?>

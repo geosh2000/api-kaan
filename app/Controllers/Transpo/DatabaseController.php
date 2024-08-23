@@ -96,6 +96,15 @@ class DatabaseController extends BaseController
         $dbArray = $built[0];
 
         if( count($newFolios) > 0 ){
+            
+            foreach ($dbArray as &$row) {
+                foreach ($row as &$value) {
+                    if ($value !== null) {
+                        $value = $db->escapeString($value);
+                    }
+                }
+            }
+            
             // $transpoModel->insertIgnore($dbArray);
             $query = insertIgnoreBatch('qwt_transportaciones', $dbArray);
 

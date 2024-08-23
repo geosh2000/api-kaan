@@ -118,6 +118,11 @@
     function permiso( $p ){
         $session = session();
         $perm = $session->get('permissions');
+
+        if( !$perm ){
+            return false;
+        }
+
         $jsonData = base64_decode($perm);
         $permisos = json_decode($jsonData, true);
 
@@ -143,6 +148,46 @@
         fclose($file);
         
         return $filepath;
+    }
+
+    function truncateText( $texto, $limite ){
+        // Verifica si la longitud del texto es mayor al límite
+        if (strlen($texto) > $limite) {
+            // Resta el número de caracteres de "..." al límite
+            $texto = substr($texto, 0, $limite - 3) . '...';
+        }
+        return $texto;
+    }
+
+    function minutesSince( $reference ){
+        // Fecha y hora dada
+        $fecha_dada = new DateTime($reference);
+
+        // Fecha y hora actual
+        $fecha_actual = new DateTime("now", new DateTimeZone("UTC"));
+
+        // Calcula la diferencia
+        $diferencia = $fecha_actual->diff($fecha_dada);
+
+        // Convierte la diferencia a minutos
+        $minutos = ($diferencia->days * 24 * 60) + ($diferencia->h * 60) + $diferencia->i;
+
+        return $minutos;
+    }
+
+    function getPost(){
+        // Obtén la instancia del servicio de solicitud
+        $request = \Config\Services::request();
+        
+        // Obtén los datos del POST
+        $postData = $request->getPost();
+        
+        if (empty($postData)) {
+            // Si no se encuentran datos, intenta obtenerlos usando getJSON()
+            $postData = $request->getJSON(true); // El parámetro true convierte JSON a array
+        }
+
+        return $postData;
     }
 
 

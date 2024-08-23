@@ -42,39 +42,217 @@ class Tickets extends BaseController{
         gg_response(200, [ "ticket" => $result['data']->ticket, "bloqueo" => $bloqueo, "deadline" => $deadline ?? null ]);
         
     }
+    
+    public function metrics( $ticket_id = 3091 ){
+        
+       
+        $result = $this->zd->getData( "api/v2/tickets/".$ticket_id."/metrics" );
+
+        if( $result["response"] != 200 ){
+            gg_response(400, $result['data']);
+        }
+
+        if($result['response'] == 200 ){
+            $metrics = json_decode(json_encode($result['data']->ticket_metric),true);
+
+            $resume = [];
+
+            $lastIsRequester = $metrics['assignee_updated_at'] < $metrics['requester_updated_at'];
+
+            $resume = [
+                'lastIsRequester' => $lastIsRequester,
+                'minutesSinceLastRequester' => $lastIsRequester ? minutesSince($metrics['requester_updated_at']) : 0
+            ];
+
+            gg_response($result['response'], [ "metrics" => $resume, "data" => $metrics ]);
+        }
+
+        gg_response($result['response'], [ "data" => $result ]);
+        
+    }
+
+    public function whatsVipSlaJob(){
+
+        $tags = "via:whatsapp status<solved tags:whatsapp_vip";
+        $encoded_tags = urlencode($tags);
+
+        // Busca tickets de Whatsapp VIP sin notificacion
+        $result = $this->zd->getData( "api/v2/search.json?query=$encoded_tags");
+
+        if( $result['response'] != 200 ){
+            gg_response(400, ['data' => $result]);
+        }
+        
+        $tickets = json_decode(json_encode($result['data']->results),true);
+
+        $wvt = [];
+        $notified = [];
+
+        // Define el arreglo de conversaciones VIP activas
+        foreach($tickets as $tkt => $t){
+            if( in_array("sla_breach_notified_vip", $t['tags']) ){
+                array_push($notified,$t['id']);
+            }else{
+                array_push($wvt,$t['id']);
+            }
+        }
+
+        // Busca los eventos desde medianoche 
+        date_default_timezone_set('UTC');
+        $time = strtotime("today midnight");
+        $result = $this->zd->getData( "api/v2/incremental/ticket_metric_events?start_time=$time" );
+        $data = json_decode(json_encode($result['data']->ticket_metric_events),true);
+
+        // Filtra solo eventos con SLA
+        $events = [];
+        foreach($data as $event => $e){
+            
+            $flag = in_array([$e['metric'], $e['type']], [
+                ['reply_time', 'breach'],
+                ['reply_time', 'apply_sla'],
+                ['reply_time', 'update_status'],
+            ]);
+
+            if( $flag ){
+                if( isset($events[$e['ticket_id']]) ){
+                    $events[$e['ticket_id']][$e['type']] = $e;
+
+                }else{
+                    $tmp = [$e['type'] => $e];
+                    $events[$e['ticket_id']] = $tmp;
+                }
+            }
+        }
+
+        $updateTag = [];
+        $removeTag = [];
+
+        // Filtra solo eventos de tickets activos sin notificaciones
+        foreach( $events as $ticket => $t){
+            // if( in_array($ticket, $wvt) && isset($t['apply_sla']) && isset($t['apply_sla']['sla']['policy']['id']) ){
+            if( isset($t['apply_sla']) && isset($t['apply_sla']['sla']['policy']['id']) ){
+                $slaId = $t['apply_sla']['sla']['policy']['id'];
+
+                if( $slaId != 29502917136276 ){
+                    unset($events[$ticket]);
+                    continue;
+                }
+
+                $events[$ticket]['stillBreach'] = false;
+                if( isset($t['breach']) && isset($t['apply_sla']) ){
+                    if( !isset($t['update_status']) ){
+                        $events[$ticket]['stillBreach'] = true;
+                    }else{
+                        if( $t['breach'] > $t['update_status'] ){
+                            $events[$ticket]['stillBreach'] = true;
+                        }
+                    }
+                    
+                }
+
+                if( !$events[$ticket]['stillBreach'] ){
+                    if( in_array($ticket, $notified) ){
+                        array_push($removeTag, $ticket);
+                    }
+                    unset($events[$ticket]);
+                }else{
+                    if( in_array($ticket, $wvt) ){
+                        array_push($updateTag, $ticket);
+                    }
+                }
+
+            }else{
+                unset($events[$ticket]);
+            }
+        }
+
+        if( count($updateTag) > 0 ){
+            $tids = implode(",",$updateTag);
+            $result = $this->zd->putData( "https://atelierdehoteles.zendesk.com/api/v2/tickets/update_many.json?ids=$tids", ["ticket" => ["additional_tags" => ["send_sla_breach_notification"]]] );
+        }
+        if( count($removeTag) > 0 ){
+            $tids = implode(",",$removeTag);
+            $result = $this->zd->putData( "https://atelierdehoteles.zendesk.com/api/v2/tickets/update_many.json?ids=$tids", ["ticket" => ["remove_tags" => ["sla_breach_notified_vip"]]] );
+        }
+    
+        gg_response($result['response'], [ "events" => $events ]);
+    }
+
+    public function searchQuery( $query ){
+        $result = $this->zd->getData( "api/v2/search.json?query=".$query );
+        
+    
+        gg_response($result['response'], [ "data" => $result ]);
+    }
 
     public function audits( $ticket_id ){
-
-        $result = $this->zd->getData( "/api/v2/incremental/tickets/$ticket_id/emails.json?resource=20614455/203aee2d-6b04-49d1-b307-f6536c63f04f.json" );
-        gg_response($result['response'], [ "data" => $result]); 
-        // $result = $this->zd->getData( "/api/v2/tickets/$ticket_id/audits/26669641271060" );
-
-        // $result['data'] = json_decode(json_encode($result['data']),true);
-
-        // $result['json']=$result['data']['audit']['metadata']['system'];
-
-        // $json = $result['json']['json_email_identifier'];
-        // $uri  = "/api/v2/incremental/tickets/cursor.json?resource=".$json;
-
-        // $mail  = $this->zd->getData( $uri );
-
-        // gg_response($result['response'], [ "json" => $mail, "data" => $result['data']]); 
-
 
         $result = $this->zd->getData( "/api/v2/tickets/$ticket_id/audits" );
 
         $data = json_decode(json_encode($result['data']),true);
 
-        $comment = "";
+        $res = [];
 
         foreach( $data['audits'][0]['events'] as $audit => $event ){
-            if( $event["type"] == 'Comment' ){
-                $comment = $event['html_body'];
-            }
+            array_push($res, $event['type']);
         }
   
         // echo $comment;
-        gg_response($result['response'], [ "data" => $data['audits']]); 
+        gg_response(200, [ "types" => $res, "data" => $data['audits']]); 
+    }
+
+    public function whatsConv( $ticket ){
+        $result = $this->zd->ss_getMessages($ticket, false);
+  
+        gg_response(200, $result); 
+    }
+    
+    public function sendMsgToConv( $ticket ){
+
+        $content = [
+            "type" => $_POST['type'] ?? "carousel",
+            // "text" => $_POST['message'] ?? "Prueba de botones",
+            "items" => [
+                [ 
+                    "title" => "Junior Suite - 2 Double", 
+                    "description" => truncateText("Luxury suite with work desk and a single sofa bed. This suite has a balcony overlooking the golf course or with a jungle view subject to availability.", 128), 
+                    "mediaUrl" => "https://ateliercdn.azureedge.net/bookingengine/atpm/AXJRXQ/AXJRXQ_1.jpg",
+                    "mediaType" => "image/jpeg",
+                    "size" => "compact",
+                    "actions" => [
+                        [ "type" => "postback", "text" => "Elegir Habitación", "payload" => "select" ],
+                        [ "type" => "postback", "text" => "Más detalles", "payload" => "question" ]
+                    ],
+                    "metadata" => ["category" => "AXJRXQ"]
+                ],
+                [ 
+                    "title" => "Junior Suite - King", 
+                    "description" => truncateText("Luxury suite with work desk and a single sofa bed. This suite has a balcony overlooking the golf course or with a jungle view subject to availability.", 128), 
+                    "mediaUrl" => "https://ateliercdn.azureedge.net/bookingengine/atpm/AXJRXK/AXJRXK_1.jpg",
+                    "mediaType" => "image/jpeg",
+                    "size" => "compact",
+                    "actions" => [
+                        [ "type" => "postback", "text" => "Elegir Habitación", "payload" => "select" ],
+                        [ "type" => "postback", "text" => "Más detalles", "payload" => "question" ]
+                    ],
+                    "metadata" => ["category" => "AXJRXK"]
+                ]
+            ],
+        ];
+
+        $result = $this->zd->ss_sendMessage($ticket, $content);
+  
+        gg_response(200, $result); 
+    }
+
+    public function notifyWhats(){
+        
+        $dest = "529982140469";
+        $text = "Esta es una notificación de prueba";
+        
+        $result = $this->zd->ss_sendNotification( $dest, $text );
+
+        gg_response(200, ['data' => $result]);
     }
 
     public function adhFormToClient( $data ){
@@ -297,6 +475,60 @@ class Tickets extends BaseController{
         $result = $this->zd->getData( "/api/v2/apps/installations/$appInsId.json");
         
         gg_response($result['response'], $result['data']);
+    }
+
+    public function testUpdate(){
+
+        $dataTicket = [
+            "status" => "open",
+            "custom_status_id" => 25706430890260
+        ];
+
+        $result = $this->zd->updateTicket(160722, $dataTicket);
+
+        gg_response(200, ['data' => $result]);
+    }
+
+    public function fromContactForm(){
+
+        $postData = getPost();
+
+        $name = $postData['name'];
+        $mail = $postData['mail'];
+        $msg = $postData['msg'];
+
+        switch( $postData['hotel'] ){
+            case "Atelier Playa Mujeres":
+                $hotel = 'hotel_atpm';
+                break;
+            case "Oleo Cancun Playa":
+                $hotel = 'hotel_olcp';
+                break;
+        }
+
+        $params = [
+                "ticket" => [
+                    "subject" => "ATELIER DE HOTELES Site - Contacto Web", 
+                    "comment" => [
+                        "body" => $msg
+                    ], 
+                    "requester" => [
+                        "name" => $name, 
+                        "email" => $mail,
+                    ],
+                    "custom_fields" => [
+                        ["id" => 26493544435220, "value" => $hotel],
+                    ] 
+                    
+                   ] 
+             ]; 
+
+        if( isset($postData['phone']) ){
+            $params['ticket']['requester']['phone'] = $postData['phone'];
+        } 
+
+        $result = $this->zd->onBehalfTicket( $params );
+        gg_response(200, ['name' => $result]);
     }
     
 

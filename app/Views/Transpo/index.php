@@ -4,6 +4,7 @@
 
     $styleMap = [
         "ATELIER-INCLUIDA"                              => 'btn-incluNoData',
+        "ATELIER-NO FACTURADO"                              => 'btn-notInvoiced',
         "ATELIER-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "ATELIER-SOLICITADO"                            => 'btn-incluSolicitado',
         "ATELIER-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -16,6 +17,7 @@
         "ATELIER-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoAtpm',
         "ATELIER-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
         "Atelier Playa Mujeres-INCLUIDA"                              => 'btn-incluNoData',
+        "Atelier Playa Mujeres-NO FACTURADO"                              => 'btn-notInvoiced',
         "Atelier Playa Mujeres-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Atelier Playa Mujeres-SOLICITADO"                            => 'btn-incluSolicitado',
         "Atelier Playa Mujeres-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -28,6 +30,7 @@
         "Atelier Playa Mujeres-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoAtpm',
         "Atelier Playa Mujeres-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
         "OLEO-INCLUIDA"                              => 'btn-incluNoData',
+        "OLEO-NO FACTURADO"                              => 'btn-notInvoiced',
         "OLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "OLEO-SOLICITADO"                           => 'btn-incluSolicitado',
         "OLEO-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -40,6 +43,7 @@
         "OLEO-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "OLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
+        "Oleo Cancun Playa-NO FACTURADO"                              => 'btn-notInvoiced',
         "Oleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Oleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
         "Oleo Cancun Playa-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -52,6 +56,7 @@
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
         "ÓLEO-INCLUIDA"                              => 'btn-incluNoData',
+        "ÓLEO-NO FACTURADO"                              => 'btn-notInvoiced',
         "ÓLEO-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "ÓLEO-SOLICITADO"                 => 'btn-incluSolicitado',
         "ÓLEO-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -64,6 +69,7 @@
         "ÓLEO-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "ÓLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
         "Óleo Cancun Playa-INCLUIDA"                              => 'btn-incluNoData',
+        "Óleo Cancun Playa-NO FACTURADO"                              => 'btn-notInvoiced',
         "Óleo Cancun Playa-INCLUIDA (SOLICITADO)"                 => 'btn-incluSolicitado',
         "Óleo Cancun Playa-SOLICITADO"                 => 'btn-incluSolicitado',
         "Óleo Cancun Playa-LIGA PENDIENTE"                        => 'btn-ligaPendiente',
@@ -84,6 +90,24 @@
 <link rel="stylesheet" href="btnStyles.css">
 <style>
     /* Estilos para los enlaces de paginación */
+
+/* Botón NO FACTURADO - VINO */
+.btn-notInvoiced {
+    background-color: #FF0000;
+    color: white;
+    border: 1px solid #FF0000;
+}
+.btn-notInvoiced:hover {
+    background-color: #CC0000;
+    border-color: #CC0000;
+}
+.btn-notInvoiced:focus, .btn-notInvoiced.focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.5);
+}
+.btn-notInvoiced:disabled, .btn-notInvoiced.disabled {
+    background-color: #FFCCCC;
+    border-color: #FFCCCC;
+}
 
 /* Botón Cancel - Rojo */
 .btn-cancel {
@@ -495,21 +519,23 @@
                             <button style="font-size:smaller" class="btn <?= $styleMap[$transportacion['hotel'].'-'.$transportacion['status']] ?? 'btn-secondary' ?> dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <?= $transportacion && $transportacion['status'] ? $transportacion['status'] : 'Selecciona una opción' ?>
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/-') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="-">-</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA">INCLUIDA</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA (SOLICITADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA (SOLICITADO)">INCLUIDA (SOLICITADO)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/SOLICITADO') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="SOLICITADO">SOLICITADO</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/LIGA PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="LIGA PENDIENTE">LIGA PENDIENTE</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO PENDIENTE">PAGO PENDIENTE</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURA PENDIENTE)">CORTESÍA (CAPTURA PENDIENTE)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURADO)">CORTESÍA (CAPTURADO)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO EN DESTINO (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO EN DESTINO (CAPTURA PENDIENTE)">PAGO EN DESTINO (CAPTURA PENDIENTE)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO EN DESTINO (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO EN DESTINO (CAPTURADO)">PAGO EN DESTINO (CAPTURADO)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGADA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGADA (CAPTURA PENDIENTE)">PAGADA (CAPTURA PENDIENTE)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGADA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGADA (CAPTURADO)">PAGADA (CAPTURADO)</a>
-                                <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CANCELADA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CANCELADA">CANCELADA</a>
-                            </div>
+                            <?php if( $transportacion['status'] != 'NO FACTURADO' || permiso("notInvoiced") ): ?>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/-') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="-">-</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA">INCLUIDA</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/INCLUIDA (SOLICITADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="INCLUIDA (SOLICITADO)">INCLUIDA (SOLICITADO)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/SOLICITADO') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="SOLICITADO">SOLICITADO</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/LIGA PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="LIGA PENDIENTE">LIGA PENDIENTE</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO PENDIENTE') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO PENDIENTE">PAGO PENDIENTE</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURA PENDIENTE)">CORTESÍA (CAPTURA PENDIENTE)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CORTESÍA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CORTESÍA (CAPTURADO)">CORTESÍA (CAPTURADO)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO EN DESTINO (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO EN DESTINO (CAPTURA PENDIENTE)">PAGO EN DESTINO (CAPTURA PENDIENTE)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGO EN DESTINO (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGO EN DESTINO (CAPTURADO)">PAGO EN DESTINO (CAPTURADO)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGADA (CAPTURA PENDIENTE)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGADA (CAPTURA PENDIENTE)">PAGADA (CAPTURA PENDIENTE)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/PAGADA (CAPTURADO)') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="PAGADA (CAPTURADO)">PAGADA (CAPTURADO)</a>
+                                    <a class="loadbtn dropdown-item" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/CANCELADA') ?>?<?= $_SERVER['QUERY_STRING'] ?>" data-value="CANCELADA">CANCELADA</a>
+                                </div>
+                            <?php endif; ?>
                             <input type="hidden" name="status" id="status" value="<?= $transportacion ? $transportacion['status'] : '' ?>">
                         </div>
                     </td>
@@ -520,19 +546,26 @@
                         <?php if( (strpos(strtolower($transportacion['status']), 'capturado') !== false && permiso("sendConfirm")) && isset($transportacion['correo']) ): ?>
                             <button class="actionBtn btn btn-success sendConfirm" data-id="<?= $transportacion['id'] ?>"><i class="fas fa-envelope-open-text"></i></button>
                         <?php endif; ?>
-                        <?php if( permiso("editTransRegs") ): ?>
-                            <button class="actionBtn btn btn-info edit-button" id="edit-<?= $transportacion['id'] ?>">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                        <?php if( $transportacion['status'] != 'NO FACTURADO' || permiso("notInvoiced") ): ?>
+                            <?php if( permiso("editTransRegs") ): ?>
+                                <button class="actionBtn btn btn-info edit-button" id="edit-<?= $transportacion['id'] ?>">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if( permiso("deleteTransRegs") ): ?>
+                                <button class="actionBtn btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if( permiso("notInvoiced") && $transportacion['status'] != 'NO FACTURADO'): ?>
+                            <a class="actionBtn btn btn-danger notInvoice-button" href="<?= site_url('transpo/editStatus/'.$transportacion['id'].'/NO FACTURADO') ?>?<?= $_SERVER['QUERY_STRING'] ?>" id="notInvoice-<?= $transportacion['id'] ?>">
+                                <i class="fas fa-store-slash"></i>
+                            </a>
                         <?php endif; ?>
                         <?php if( permiso("createTransRegs") ): ?>
                             <button class="actionBtn btn btn-primary clone-button" id="clone-<?= $transportacion['id'] ?>">
                                 <i class="far fa-clone"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if( permiso("deleteTransRegs") ): ?>
-                            <button class="actionBtn btn btn-danger delete-button" id="delete-<?= $transportacion['id'] ?>">
-                                <i class="fas fa-trash-alt"></i>
                             </button>
                         <?php endif; ?>
                         <!-- <a href="<?= site_url('transpo/confirmDelete/'.$transportacion['id']).'?'.$_SERVER['QUERY_STRING'] ?>" class="btn btn-danger">
@@ -631,7 +664,52 @@
 <?= $this->endSection() ?>
 <?= $this->section('scripts') ?>
     <script>
+
         $(document).ready(function(){
+
+            function updateQueryString(newQueryString) {
+                // Selecciona todos los enlaces <a> en el documento
+                const links = document.querySelectorAll('a');
+                
+                // Itera sobre cada enlace y actualiza su href
+                links.forEach(link => {
+                    // Obtiene el href actual
+                    const currentHref = link.getAttribute('href');
+                    
+                    // Verifica que currentHref no sea null
+                    if (currentHref) {
+                        // Si el href ya tiene un query string, lo reemplaza
+                        if (currentHref.includes('?')) {
+                            const baseUrl = currentHref.split('?')[0];
+                            link.setAttribute('href', `${baseUrl}?${newQueryString}`);
+                        } else {
+                            // Si no hay un query string, solo añade el nuevo
+                            link.setAttribute('href', `${currentHref}?${newQueryString}`);
+                        }
+                    }
+                });
+
+                queryString = newQueryString;
+            }
+
+            let queryString = '<?= $_SERVER['QUERY_STRING'] ?>';
+
+            // Guardar el query_string actual
+            let currentQueryString = new URLSearchParams(window.location.search).toString();
+
+            // Función para verificar si el query_string ha cambiado
+            function checkQueryStringChange() {
+                const newQueryString = new URLSearchParams(window.location.search).toString();
+                console.log( 'checking url' );
+                if (newQueryString !== currentQueryString) {
+                    currentQueryString = newQueryString;
+                    updateQueryString(currentQueryString);
+                    console.log( 'updating url' );
+                }
+            }
+
+            // Comprobar periódicamente si el query_string ha cambiado
+            setInterval(checkQueryStringChange, 1000); // Ajusta el intervalo según sea necesario
 
             // Recuperar y aplicar la posición del scroll almacenada
             if (localStorage.getItem('scrollPosition') !== null) {
@@ -644,11 +722,36 @@
                 localStorage.setItem('scrollPosition', $(window).scrollTop());
             });
 
+            let params = new URLSearchParams(window.location.search);
+            let page = params.get('page') || 1;
+            let length = params.get('length') || 10;
+            console.log('page', page, 'length', length);
+
             $('#transferTable').DataTable({
                 "order": [], // No hay un orden inicial
                 "ordering": true, // Permitir ordenamiento
                 "dom": '<"top"f>rt<"bottom"lp><"clear">', // Custom DOM positioning
+                "stateSave": true, // Guardar el estado del datatable (paginación, orden, etc.)
+                "pageLength": length, // Establecer el número de elementos por página
+                "lengthMenu": [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]], // Definir los bloques de cantidad de registros
+                "stateSaveCallback": function(settings, data) {
+                    // Guarda el estado en la URL cuando cambie
+                    let params = new URLSearchParams(window.location.search);
+                    params.set('page', data.start / data.length + 1); // Guardar el número de página
+                    params.set('length', data.length); // Guardar la cantidad de elementos por página
+                    window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+                },
+                "stateLoadParams": function (settings, data) {
+                    // Recuperar el estado desde la URL
+                    let params = new URLSearchParams(window.location.search);
+                    let page = params.get('page') || 1;
+                    let length = params.get('length') || 10;
+                    console.log('page', page, 'length', length);
+                    data.start = (page - 1) * length;
+                    data.length = length;
+                }
             });
+
 
             // Mueve el botón de exportación junto al cuadro de búsqueda
             $("#exportXls").insertBefore("#transferTable_filter label");
@@ -656,6 +759,8 @@
             $(document).on('click', '#exportXls', function() {
                 // Obtén la referencia de la tabla
                 var table = $('#transferTable');
+
+                
                 
                 // Convierte la tabla a una hoja de cálculo
                 var wb = XLSX.utils.table_to_book(table[0], {sheet: "Sheet1"});
@@ -663,9 +768,6 @@
                 // Genera el archivo XLSX
                 XLSX.writeFile(wb, 'transportaciones.xlsx');
             });
-        });
-
-        $(document).ready(function(){
 
             function startLoader( v = true ){
                 if( v ){
@@ -761,7 +863,7 @@
             $(document).on('click', '.delete-button', function() {
                 startLoader();
                 var id = $(this).attr('id').split('-')[1]; // Obtiene el ID después del guion
-                var url = '<?= site_url('transpo/confirmDelete/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
+                var url = '<?= site_url('transpo/confirmDelete/') ?>' + id + '?' + queryString;
 
                 $.ajax({
                     url: url,
@@ -787,10 +889,10 @@
                 var url;
                 if( !v ){
                     id = e.attr('id').split('-')[1]; // Obtiene el ID después del guion
-                    url = '<?= site_url('transpo/edit/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
+                    url = '<?= site_url('transpo/edit/') ?>' + id + '?' + queryString;
                     editTicket = id;
                 }else{
-                    url = '<?= site_url('transpo/create/') ?>?<?= $_SERVER['QUERY_STRING'] ?>';
+                    url = '<?= site_url('transpo/create/') ?>?' + queryString;
                 }
     
                 $.ajax({
@@ -840,7 +942,7 @@
             $(document).on('click', '.clone-button', function() {
                 startLoader();
                 var id = $(this).attr('id').split('-')[1]; // Obtiene el ID después del guion
-                var url = '<?= site_url('transpo/duplicate/') ?>' + id + '?<?= $_SERVER['QUERY_STRING'] ?>';
+                var url = '<?= site_url('transpo/duplicate/') ?>' + id + '?' + queryString;
 
                 $.ajax({
                     url: url,

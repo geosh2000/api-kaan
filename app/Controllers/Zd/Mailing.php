@@ -6,6 +6,10 @@ use App\Controllers\BaseController;
 use App\Libraries\Zendesk;
 use Config\Globals as templates;
 
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 class Mailing extends BaseController{
 
     
@@ -42,6 +46,33 @@ class Mailing extends BaseController{
         
         // Envía la respuesta JSON
         gg_response(200, ["ticket_id" => $newTicket]);
+    }
+
+    //PDF Conf
+    public function pdfConf( $params ){
+        // Incluir el autoloader de dompdf
+        require_once APPPATH . 'Libraries/dompdf/autoload.inc.php';
+        
+        // Reemplaza las variables en el HTML con valores específicos
+        $html = $this->buildConfData($params['params'], $params['hotel'], $params['lang']);
+        
+        // Inicializa Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Carga el HTML
+        $dompdf->loadHtml($html);
+
+        // (Opcional) Configura el tamaño del papel
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Renderiza el PDF
+        $dompdf->render();
+
+        // Enviar el PDF al navegador
+        $dompdf->stream('documento.pdf', ['Attachment' => 1]); // 'Attachment' => 1 for download, 0 for inline view
     }
 
     // PRINT HTML
@@ -81,20 +112,64 @@ class Mailing extends BaseController{
 
         $params = [
             "data"  => [
-                "hotel"=>"hotel_atpm",
-                "conf_number"   => "414236",
-                "main_guest"    => "Jaime Farias",
-                "date_in"   => "2024-08-30",
+                "hotel"=>"hotel_atpm", // opts hotel_atpm, hotel_olcp
+                "conf_number"   => "417167", 
+                "main_guest"    => "Martin Jongmans",
+                "date_in"   => "2024-11-30",
                 "time_in"   => "",
-                "date_out"  => "2024-09-01",
+                "date_out"  => "2024-12-07",
+                "time_out"  => "",
+                "room_code" => "AXJRVK",
+                "room_name" => "Junior Suite Ocean View - King",
+                "adults"    => "2",
+                "children"  => "",
+                "payment_type"  => "Complimentary",
+                "currency"  => "usd", // opts mxn, usd
+                "total" => "0",
+                "notes" => "",
+                "xld_policy"    => "-",
+                "rsv_channel"   => "rsv_chan_direct",
+                "deposit"   => "",
+                "rate_type" => "Complimentary",
+                "isa" => "$40 MXN per person per night"
+            ],
+            "params" => [
+                'ROOM TYPE'     =>  'show_roomtype', // opts hide_roomtype, show_roomtype
+                'BALANCE'       => 'hide_balance', // opts hide_balance, show_balance
+                'AutoXld'   => '-', // opts policy_auto, policy_48_hrs_25, policy_14_dias_/_10_, policy_otro, policy_none
+                'DEPOSITOS' => 'hide_deposit', //  opts hide_deposit, show_deposit
+                "AMOUNT" => 'hide_amount' // sopts how_amount, hide_amount
+            ]
+        ];
+        
+        // Reemplaza las variables en el HTML con valores específicos
+        $html = $this->buildConfData($params, str_replace("hotel_", "", $params['data']['hotel']), $_GET['lang'] ?? 'spanish');
+
+        echo $html;
+    }
+
+    // PRINT PDF
+    public function pdfConf2(  ){
+
+        // Incluir el autoloader de dompdf
+        require_once APPPATH . 'Libraries/dompdf/autoload.inc.php';
+
+        $params = [
+            "data"  => [
+                "hotel"=>"hotel_atpm", // opts hotel_atpm, hotel_olcp
+                "conf_number"   => "416745", 
+                "main_guest"    => "Ivana Stegge",
+                "date_in"   => "2024-08-24",
+                "time_in"   => "",
+                "date_out"  => "2024-08-29",
                 "time_out"  => "",
                 "room_code" => "AXJRVQ",
                 "room_name" => "Junior Suite Ocean View - Doble",
-                "adults"    => "3",
+                "adults"    => "2",
                 "children"  => "",
-                "payment_type"  => "Cortesia",
-                "currency"  => "mxn",
-                "total" => "0",
+                "payment_type"  => "-",
+                "currency"  => "mxn", // opts mxn, usd
+                "total" => "34407",
                 "notes" => "",
                 "xld_policy"    => "-",
                 "rsv_channel"   => "rsv_chan_direct",
@@ -103,18 +178,34 @@ class Mailing extends BaseController{
                 "isa" => "$40 MXN por persona por noche"
             ],
             "params" => [
-                'ROOM TYPE'     =>  'show_roomtype',
-                'BALANCE'       => 'hide_balance',
-                'AutoXld'   => '-',
-                'DEPOSITOS' => 'hide_deposit',
-                "AMOUNT" => 'show_amount'
+                'ROOM TYPE'     =>  'hide_roomtype', // opts hide_roomtype, show_roomtype
+                'BALANCE'       => 'hide_balance', // opts hide_balance, show_balance
+                'AutoXld'   => '-', // opts policy_auto, policy_48_hrs_25, policy_14_dias_/_10_, policy_otro, policy_none
+                'DEPOSITOS' => 'hide_deposit', //  opts hide_deposit, show_deposit
+                "AMOUNT" => 'show_amount' // sopts how_amount, hide_amount
             ]
         ];
         
         // Reemplaza las variables en el HTML con valores específicos
         $html = $this->buildConfData($params, str_replace("hotel_", "", $params['data']['hotel']), $_GET['lang']);
 
-        echo $html;
+        // Inicializa Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Carga el HTML
+        $dompdf->loadHtml($html);
+
+        // (Opcional) Configura el tamaño del papel
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Renderiza el PDF
+        $dompdf->render();
+
+        // Enviar el PDF al navegador
+        $dompdf->stream('documento.pdf', ['Attachment' => 1]); // 'Attachment' => 1 for download, 0 for inline view
     }
 
     // Función para obtener el contenido HTML de un archivo remoto

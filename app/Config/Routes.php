@@ -69,8 +69,8 @@ $routes->group('mailing', function($routes){
 
 // Transportacion
 // $routes->group('transpo', function($routes){
-$routes->group('transpo', function($routes){
-// $routes->group('transpo', ['filter' => 'authFilter'], function($routes){
+// $routes->group('transpo', function($routes){
+$routes->group('transpo', ['filter' => 'authFilter'], function($routes){
     $routes->get('/', 'Transpo\TransportacionController::index');
     $routes->get('create', 'Transpo\TransportacionController::create');
     $routes->post('store', 'Transpo\TransportacionController::store');
@@ -98,9 +98,14 @@ $routes->group('transpo', function($routes){
 // $routes->group('zd|app', function($routes){
 $routes->group('zdapp', ['filter' => 'zendeskFilter'], function($routes){
     // $routes->post('/', 'Zdapp\ZendeskAppController::index');
-    $routes->post('/', 'Zdapp\ZendeskAppController::transpo');
-    $routes->post('transpo', 'Zdapp\ZendeskAppController::transpo');
-    // $routes->post('/', 'Zdapp\ZendeskAppController::index');
+    $routes->post('/', 'Zdapp\ZendeskAppController::index');
+    
+    $routes->group('conf', function($routes){
+        $routes->post('/', 'Zdapp\ZendeskAppController::confirms');
+    });
+    $routes->group('transpo', function($routes){
+        $routes->post('/', 'Zdapp\ZendeskAppController::transpo');
+    });
 });
 
 
@@ -144,6 +149,7 @@ $routes->group('zd', function($routes){
     $routes->group('mailing', function($routes){
         $routes->get('conf', 'Zd\Mailing::index');
         $routes->get('confHtml', 'Zd\Mailing::getConf');
+        $routes->get('confPdf', 'Zd\Mailing::pdfConf2');
     });
     $routes->group('object', function($routes){
         $routes->get('show', 'Zd\Objects::index');
@@ -151,9 +157,20 @@ $routes->group('zd', function($routes){
     $routes->group('user', function($routes){
         $routes->get('get/(:any)', 'Zd\Users::showUser/$1');
     });
+    $routes->group('whats', function($routes){
+        $routes->get('slaJob', 'Zd\Tickets::whatsVipSlaJob');
+        $routes->get('listConv/(:any)', 'Zd\Tickets::whatsConv/$1');
+        $routes->post('send/(:any)', 'Zd\Tickets::sendMsgToConv/$1');
+        $routes->get('listConvs/(:any)', 'Zd\Whatsapp::listConversations/$1');
+        $routes->get('getConversation/(:any)', 'Zd\Whatsapp::getConversation/$1');
+        $routes->post('notify', 'Zd\Whatsapp::sendNotification');
+        $routes->post('test', 'Zd\Whatsapp::test');
+    });
     $routes->group('ticket', function($routes){
+        $routes->get('search/(:any)', 'Zd\Tickets::searchQuery/$1');
         $routes->get('show', 'Zd\Tickets::index');
         $routes->get('show/(:any)', 'Zd\Tickets::index/$1');
+        $routes->get('metrics/(:any)', 'Zd\Tickets::metrics/$1');
         $routes->get('adhForm/(:any)', 'Zd\Tickets::adhFormToClient/$1');
         $routes->get('audits/(:any)', 'Zd\Tickets::audits/$1');
         $routes->get('fields', 'Zd\Tickets::showFields');
@@ -164,6 +181,9 @@ $routes->group('zd', function($routes){
         $routes->post('key', 'Zd\Tickets::getPublicKey');
         $routes->post('installations', 'Zd\Tickets::installations');
         $routes->post('aud', 'Zd\Tickets::appAud');
+    });
+    $routes->group('forms', function($routes){
+        $routes->post('post-msg', 'Zd\Tickets::fromContactForm');
     });
 });
 

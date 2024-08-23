@@ -10,13 +10,34 @@ class Zendesk{
     protected $baseGroup = 27081970059028; // Leisure
     protected $oAuth = "746907e0b3387a138d2dd5a19e6866bc38ad1c2d7311ed329bc740688cae16a1";
     protected $oAuthOk = "f3e073622652f4fedc8425642410bb38457734751a4bf63cd047815a0ffff5e6";
+    protected $whatsVipId = "66b5325e26d2afd65deba6c5";
+    
+    // SUNSHINE
+    protected $ss_apiID = "661ef3f45cc03e3c49831a08";
+    protected $ss_keyID = "app_66bcc7526f140a23c3bb97f2";
+    protected $ss_secret = "aLc4PRaJ96eRcgpOV9nAHJB-gPSwZRjP-NIE5PH4TiTbU41pzoZOzLB4O7yaKIyN9jJu9usbqnAf0qZvtsZcTA";
+    protected $ss_baseUrl = "https://atelierdehoteles.zendesk.com/sc/v2/apps/";
 
     
     function __construct() {
 
     }
+
+    protected function sunshineAuth($curl, $url){
+        curl_setopt( $curl, CURLOPT_URL, $this->ss_baseUrl.$this->ss_apiID."/$url" );
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_USERPWD, "$this->ss_keyID:$this->ss_secret");
+    }
+
+    protected function zendeskAuth($curl, $url){
+        curl_setopt( $curl, CURLOPT_URL, $this->baseUrl."/$url" );
+        curl_setopt( $curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
+        curl_setopt( $curl, CURLOPT_USERPWD, $this->username . '/token:' . $this->password );
+    }
+
     
-    protected function putData( $url, $arr = null ){
+    
+    public function putData( $url, $arr = null ){
         
         $ch = curl_init();
         
@@ -63,6 +84,33 @@ class Zendesk{
         return array( 'response' => $status, 'data' => json_decode($data, true) );
     }
     
+    public function postDataNew( $url, $arr, $app = 'zendesk' ){
+        
+        $ch = curl_init();
+        
+        switch( $app ){
+            case "zendesk":
+                $this->zendeskAuth($ch, $url);
+                break;
+            case "sunshine":
+                $this->sunshineAuth($ch, $url);
+                break;
+        }
+
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch,CURLOPT_POST, 1);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($arr));
+        curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
+        
+        $data = curl_exec( $ch );
+        $status = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+        
+        curl_close( $ch );
+        
+        return array( 'response' => $status, 'data' => json_decode($data) );
+    }
+    
     public function postData( $url, $arr ){
         
         $ch = curl_init();
@@ -84,13 +132,19 @@ class Zendesk{
         return array( 'response' => $status, 'data' => json_decode($data) );
     }
     
-    public function getData( $url, $noJson = false ){
+    public function getData( $url, $noJson = false, $app = 'zendesk' ){
         
         $ch = curl_init();
         
-        curl_setopt( $ch, CURLOPT_URL, $this->baseUrl."/$url" );
-        curl_setopt( $ch, CURLOPT_USERPWD, $this->username . '/token:' . $this->password );
-        curl_setopt( $ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
+        switch( $app ){
+            case "zendesk":
+                $this->zendeskAuth($ch, $url);
+                break;
+            case "sunshine":
+                $this->sunshineAuth($ch, $url);
+                break;
+        }
+        
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
         curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));     
@@ -445,5 +499,181 @@ class Zendesk{
 
         return $uploadToken;  
     }
+
+
+    // START SUNSHINE
+
+    protected function ss_getChatId( $ticket ){
+        $result = $this->getData( "/api/v2/tickets/$ticket/audits" );
+        $data = json_decode(json_encode($result['data']),true);
+
+        $chatId = [];
+        foreach( $data['audits'][0]['events'] as $audit => $event ){
+            if( $event['type'] == 'ChatStartedEvent' ){
+                array_push($chatId, $event['value']['conversation_id']);
+            }
+        }
+
+        return count($chatId) > 0 ? $chatId : false;
+    }
+
+    public function ss_getMessages( $ticket, $onlyMsgs = true ){
+        
+        $chatId = $this->ss_getChatId($ticket);
+
+        if( !$chatId ){
+            return false;
+        }
+
+        if( $result = $this->getData( "conversations/".$chatId[0]."/messages", false, 'sunshine' ) ){
+            $data = json_decode(json_encode($result),true);
+
+            if( $data['response'] == 200 ){
+
+                if( $onlyMsgs ){
+                    $msg = [];
+                    foreach( $data['data']['messages'] as $i => $m ){
+                        $tmp = [
+                            "author" => $m['author']['displayName'],
+                            "received" => $m['received'],
+                            "content" => $m['content']
+                        ];
+                        array_push($msg, $tmp);
+                    }
+                    return [ "chatId" => $chatId, "data" => $msg]; 
+                }else{
+                    return [ "chatId" => $chatId, "data" => $data['data']]; 
+                }
+            }else{
+                return false;
+            }
+        }
+        
+        return false;
+    }
+
+    public function ss_sendMessage( $ticket, $content, $override = false ){
+        
+        $chatId = $this->ss_getChatId($ticket);
+
+        if( !$chatId ){
+            return false;
+        }
+
+        $params = [
+            "author" => [
+                "type" => "business",
+                "displayName" => "ATI Bot"
+            ],
+            "content" => $content
+        ];
+
+        if( $override ){
+            $params['override'] = $override;
+        }
+
+        $result = $this->postDataNew( "conversations/".$chatId[0]."/messages", $params, 'sunshine' );
+        
+        return $result;
+    }
+
+    public function ss_sendNotification( $dest, $text ){
+
+        $params = [
+            "role" => "appMaker",
+            "destination" => [
+                "integrationId" => "<whatsapp_integration_id>",
+                "destinationId" => `whatsapp:+$dest`
+            ],
+            "message" => [
+                "type" => "text",
+                "text" => $text
+            ]
+        ];
+
+        $result = $this->postDataNew( "messages", $params, 'sunshine' );
+        
+        return $result;
+
+    }
+
+    public function ss_listConversations( $userid ){
+        return $this->getData( "conversations?filter[userId]=$userid", false, 'sunshine' );
+    }
+
+    public function wa_sendSimpleText( $ticket, $text ){
+        $content = [
+            "type" => "text",
+            "text" => $text
+        ];
+        return $this->ss_sendMessage( $ticket, $content );
+    }
+
+    public function wa_sendButtonLink( $ticket, $params, $link){
+
+        // PARAMS:
+        // internal:    REQUIRED    text to be displayed in zendesk ticket 
+        // header:      OPT         text for header. if null wont be displayed
+        // body:        REQUIRED    text for body. 
+        // footer:      OPT         text for footer. if null wont be displayed
+        // buttonTxt:   REQUIRED    text for button. 
+
+
+        $content = [
+            "type" => "text",
+            "text" => $params['internal'].": $link"
+        ];
+        $override = [
+            "whatsapp"=> [
+                "payload"=> [
+                    "type" => "interactive", 
+                    "interactive" => [
+                            "type" => "cta_url", 
+                            "body" => [
+                                "text" => $params['body']
+                                ], 
+                            "action" => [
+                                        "name" => "cta_url", 
+                                        "parameters" => [
+                                            "display_text" => $params['buttonTxt'], 
+                                            "url" => "$link" 
+                                        ] 
+                                    ] 
+                        ] 
+                ]
+            ]
+        ];
+
+        if( isset($params['header']) ){ $override['whatsapp']['payload']['interactive']['header'] = ["type" => "text", "text" => $params['header']]; }
+        if( isset($params['footer']) ){ $override['whatsapp']['payload']['interactive']['footer'] = ["text" => $params['footer']]; }
+
+        return $this->ss_sendMessage( $ticket, $content, $override );
+
+    }
+
+    public function onBehalfTicket( $params ){
+        // $params = [
+        //     "ticket" => [
+        //           "subject" => "Hello", 
+        //           "comment" => [
+        //              "body" => "Some question" 
+        //           ], 
+        //           "requester" => [
+        //                 "name" => "Jorge", 
+        //                 "email" => "geosh2000@gmail.com" 
+        //              ] 
+        //        ] 
+        //  ]; 
+
+        $tkt = json_encode($params);
+        $response = $this->postData( $this->baseUrl.'/api/v2/tickets.json', $tkt);
+        
+        $id = $response['data']->{'ticket'}->{'id'};
+        
+        return $id;
+      
+    }
+
+
 
 }

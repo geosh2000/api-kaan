@@ -9,13 +9,27 @@ class ZendeskAppController extends BaseController
 
     public function index()
     {
-        return view('Zendesk/index');
+        $token = $_POST['token'];
+        $qs = $_SERVER['QUERY_STRING'];
+        return view('Zendesk/index', ['token' => $token, "qs" => $qs]);
     }
 
     public function transpo()
     {
-        return view('Zendesk/Transfers/index');
+        $token = $_POST['token'];
+        $qs = $_SERVER['QUERY_STRING'];
+        return view('Zendesk/Transfers/index', ['token' => $token, "qs" => $qs]);
     }
+
+    public function confirms()
+    {
+        $token = $_POST['token'];
+        $qs = $_SERVER['QUERY_STRING'];
+
+        return view('Zendesk/Confirm/index', ['token' => $token, "qs" => $qs]);
+    }
+
+
 
    
 

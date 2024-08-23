@@ -124,7 +124,7 @@ class TransportacionController extends BaseController
                 'ticket_pago' => $this->request->getPost('ticket_pago'),
                 'ticket_sent_request' => $this->request->getPost('ticket_sent_request'),
             ];
-    
+
             // Validar los campos del formulario si es necesario
             $validation = \Config\Services::validation();
             $validation->setRules([
@@ -137,7 +137,7 @@ class TransportacionController extends BaseController
                 'status' => 'required',
                 'correo' => 'required|valid_email',
             ]);
-    
+
             if (!$validation->run($data)) {
                 if( $html ){
                     return redirect()->back()->withInput()->with('error', json_encode($validation->getErrors()));
@@ -239,7 +239,7 @@ class TransportacionController extends BaseController
         $in['flight'] = $data['flight_in'];
         $in['airline'] = $data['airline_in'];
         $in['pick_up'] = $data['pick_up_in'];
-        
+
         $out['tipo'] = "SALIDA";
         $out['date'] = $data['date_out'];
         $out['time'] = $data['time_out'];
@@ -251,19 +251,19 @@ class TransportacionController extends BaseController
         // Guardar los datos en la base de datos
         $transpoModel = new TransportacionesModel();
         $updateModel = new TranspoHistoryModel();
-        
+
         try{
             // INSERT IN
             $transpoModel->insert($in);
             $lastInsertIdIn = $transpoModel->getInsertID();
-            
+
             // INSERT OUT
             $transpoModel->insert($out);
             $lastInsertIdOut = $transpoModel->getInsertID();
-            
+
             $updateModel->create($lastInsertIdIn, false, $data['user']);
             $updateModel->create($lastInsertIdOut, false, $data['user']);
-    
+
             gg_response(200, ['ids' => [$lastInsertIdIn, $lastInsertIdOut]]);
         }catch (\mysqli_sql_exception $e) {
             if ($e->getCode() === 1062) {
@@ -334,7 +334,7 @@ class TransportacionController extends BaseController
         if ($model->builder()
                 ->where('id', $id)
                 ->update($data)) {
-              
+
             $updateFields = [];
 
             foreach( $data as $field => $val ){
@@ -356,7 +356,7 @@ class TransportacionController extends BaseController
             return redirect()->back()->with('error', 'Error al guardar los cambios.');
         }
 
-    
+
     }
 
     public function editStatus($id, $s)
@@ -376,7 +376,7 @@ class TransportacionController extends BaseController
                 ->where('id', $id)
                 ->update($data)) {
             // Mostrar la página de edición con un modal de éxito
-            
+
             $updateFields = [];
 
             foreach( $data as $field => $val ){
@@ -398,7 +398,7 @@ class TransportacionController extends BaseController
             return redirect()->back()->with('error', 'Error al guardar los cambios.');
         }
 
-    
+
     }
 
     // Método para mostrar la vista de confirmación de eliminación
@@ -435,15 +435,15 @@ class TransportacionController extends BaseController
         $lang = ($_GET['lang'] ?? 'esp') == 'esp';
         $json = boolval($json);
 
-        
+
         if (isset($encoded)) {
             // Decodificar el JSON de base64
             $encodedData = $encoded;
             $jsonData = base64_decode($encodedData);
-            
+
             // Decodificar el JSON en un array asociativo
             $data = json_decode($jsonData, true);
-            
+
             // Verificar si la decodificación fue exitosa y que el JSON sea válido
             if ($data === null) {
                 return view('/transpo/invalid_form.php');
@@ -451,18 +451,18 @@ class TransportacionController extends BaseController
         }else{
             return view('/transpo/invalid_form.php');
         }
-        
-        
+
+
         // Verifica status de reserva
         $ids = $data['ids'];
         $model = new TransportacionesModel();
-        
+
         $rsva = $model->searchAllIds($ids);
         $info = [];
         foreach( $rsva as $r => $t ){
             $info[$t['tipo']] = $t;
         }
-        
+
         $params = ['lang' => $lang, 'rsva' => $info, 'data' => $data, 'hotel' => ($data['hotel'] == 'ATELIER') ? 'atpm' : 'oleo'];
 
         if($json){
@@ -545,7 +545,7 @@ class TransportacionController extends BaseController
                             array_push($ids,$t['id']);
                             $data['arrival']['ticket_sent_request'] = json_encode($ticketReq);
                             $model->updateById($t['id'],$data['arrival']);
-                            
+
                             // $updateFields = [];
 
                             // foreach( $data['arrival'] as $field => $val ){
@@ -583,7 +583,7 @@ class TransportacionController extends BaseController
 
         // update ticket
         $zd = new Zendesk();
-        
+
         // Reemplaza las variables en el HTML con valores específicos
         $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? 'atelier') == 'atelier' ? 'atpm' : 'oleo']);
 
@@ -599,8 +599,11 @@ class TransportacionController extends BaseController
             ]
         ];
 
-        try{
+        if( $this->request->getPost('pago') == 'cortesia' ){
+            $dataTicket['custom_status_id'] = 25706430890260;
+        }
 
+        try{
             $result = $zd->updateTicket($this->request->getPost('newTicket'), $dataTicket);
         } catch(\Exception $e){
             $a = 1;
@@ -626,22 +629,22 @@ class TransportacionController extends BaseController
     }
 
     private function validateCort($folio){
-        
+
         $db = db_connect('adh_crs');
-        
+
         // Obtiene reservas hechas en los ultimos dias y llegadas de los próximos 10 con transpo incluida
-        $query = "SELECT 
+        $query = "SELECT
                     CASE WHEN htl.Name LIKE '%atelier playa mujeres%' THEN 'ATELIER'
                     WHEN htl.Name LIKE '%Óleo Cancún Playa%' THEN 'OLEO'
-                    ELSE htl.Name END as Hotel, ReservationNumber, DateFrom, DateTo, 
+                    ELSE htl.Name END as Hotel, ReservationNumber, DateFrom, DateTo,
                     CONCAT(rsv.Adults,'.',COALESCE(rsv.Children,0)+COALESCE(rsv.Teens,0)+COALESCE(rsv.Infants,0)) as pax,
-                    CONCAT(rsv.Name,' ',rsv.LastName) as Guest, 
+                    CONCAT(rsv.Name,' ',rsv.LastName) as Guest,
                     rsv.Email as Email, DateCancel
-                FROM 
+                FROM
                     [dbo].[Reservations] rsv
                     LEFT JOIN [dbo].[Hotels] htl ON rsv.HotelId=htl.HotelId
                     LEFT JOIN [dbo].[Agencies] agn ON rsv.AgencyId=agn.AgencyId
-                WHERE 
+                WHERE
                     ReservationNumber = $folio";
 
         $rsv = $db->query($query);
@@ -670,7 +673,7 @@ class TransportacionController extends BaseController
                 ]
             ];
         }
-        
+
         return view('transpo/history_table', ['history' => $regs]);
     }
 
@@ -768,42 +771,83 @@ class TransportacionController extends BaseController
             case 'en-US':
                 $lang = 'eng';
                 break;
-            default: 
+            default:
                 $lang = 'eng';
                 break;
         }
 
         $zd = new Zendesk();
-        
+
         // Reemplaza las variables en el HTML con valores específicos
         if( $noRestrict == "1" ){
             return $this->showForm( false, $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict) );
         }
 
-        $html = view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
+        $token = $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2], $noRestrict);
 
-        $statusVal = $rsva[0]['isIncluida'] == "1" ? 'transpo_status_incluida__solicitado_' : 'transpo_status_solicitado';
-        $dataTicket = [
-            "comment"   =>  [
-                "public"        => true,
-                "html_body"     => $html,
-            ],
-            "status" => "pending",
-            "custom_fields" => [
-                [ "id" => 28774341519636, "value" => $statusVal ]
-            ]
-        ];
+        if( isset($_POST['via']) && strtolower($_POST['via']) == 'whatsapp' ){
 
-        if($author_id != 0){ $dataTicket["comment"]["author_id"] = $author_id; }
+            $text_eng = "*Schedule your transfer service with us*
+            
+            We are glad to share with you the information about transportation service we offer in ATELIER Playa Mujeres.
 
-        $result = $zd->updateTicket($ticket, $dataTicket);
-        
+*Private luxury SUV service provided by the external company QWANTOUR*
+
+- The round-trip transportation fare to and from Atelier Playa Mujeres (airport-hotel-airport) is *$250 USD per SUV*, with a maximum of 6 people arriving and departing on the same flight. _(Only Cancun International Airport)_
+
+- The one-way transportation fare to or from Atelier Playa Mujeres (airport-hotel or hotel-airport) is *$150 USD per SUV*, with a maximum of 6 people arriving or departing on the same flight. _(Only Cancun International Airport)_
+
+In order to proceed with the reservation, please provide complete flight information by clicking the button below:";
+
+            $text_esp = "*Agenda con nosotros tu servicio de traslado*
+            
+Es un placer compartir contigo la información del servicio de transportación que ofrecemos en ATELIER Playa Mujeres.
+
+*Servicio privado de lujo en SUV proporcionado por la empresa externa QWANTOUR*
+
+- La tarifa para el transporte de ida y vuelta desde y hacia Atelier Playa Mujeres (aeropuerto-hotel-aeropuerto) es de *$250 USD* por SUV y un máximo de 6 personas que lleguen y salgan en el mismo vuelo. _(Sólo Aeropuerto Internacional de Cancún)_
+- La tarifa para el transporte de una sola ida desde o hacia Atelier Playa Mujeres (aeropuerto-hotel o hotel-aeropuerto) es de *$150 USD* por SUV y un máximo de 6 personas que lleguen o salgan en el mismo vuelo. _(Sólo Aeropuerto Internacional de Cancún)_
+
+A manera de continuar con la reservación del transporte, por favor proporciónanos la información completa de vuelo, dando click en el siguiente botón para llenar el formulario:";
+
+            $params = [
+                "internal" =>    "(format) Boton de formulario enviado en ".($lang == 'esp' ? "*Español*" : "*Inglés*"),
+                "body" =>        $lang == 'esp' ? $text_esp : $text_eng,
+                "buttonTxt" =>   $lang == 'esp' ? "Ir a Formulario" : "Fill Form",
+                "footer" =>     $rsva[0]['folio']." // ".$rsva[0]['guest']
+            ];
+
+            $link = site_url('public/transfer-reg')."?lang=".($lang == 'esp')."&d=$token";
+            
+            // $result = $zd->wa_sendSimpleText($ticket, $text );
+            $result = $zd->wa_sendButtonLink($ticket, $params, $link );
+        }else{
+            $html = view('transpo/mailing/transpoRequest', ['data' => $rsva[0], 'ids' => [$rsva[0]['id'], $id2], 'token' => $token, 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
+
+            $statusVal = $rsva[0]['isIncluida'] == "1" ? 'transpo_status_incluida__solicitado_' : 'transpo_status_solicitado';
+            $dataTicket = [
+                "comment"   =>  [
+                    "public"        => true,
+                    "html_body"     => $html,
+                ],
+                "status" => "pending",
+                "custom_fields" => [
+                    [ "id" => 28774341519636, "value" => $statusVal ]
+                ]
+            ];
+
+            if($author_id != 0){ $dataTicket["comment"]["author_id"] = $author_id; }
+
+            $result = $zd->updateTicket($ticket, $dataTicket);
+        }
+
+
         $request_tickets = json_decode($rsva[0]['ticket_sent_request'] ?? "[]");
         if( !in_array($ticket, $request_tickets) ){
             array_push($request_tickets, $ticket );
         }
         $model->updateById([$id1, $id2], ['status' => $rsva[0]['isIncluida'] == "1" ? 'INCLUIDA (SOLICITADO)' : 'SOLICITADO', 'ticket_sent_request' => json_encode($request_tickets)]);
- 
+
         gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
     }
 
@@ -813,7 +857,7 @@ class TransportacionController extends BaseController
 
         $idioma = $_GET['lang'] ?? 'eng';
         $lang = $idioma == 'esp';
-        
+
         if( !$ids ){
             gg_response(400, "No se encontraron reservas para enviar");
         }
@@ -864,26 +908,26 @@ class TransportacionController extends BaseController
                 ],
                 "status" => "pending"
             ];
-    
+
             $result = $zd->updateTicket($ticketId, $dataTicket);
-            
+
             $request_tickets = json_decode($rsva[0]['ticket_sent_request'] ?? "[]");
             if( !in_array($ticketId, $request_tickets) ){
                 array_push($request_tickets, $ticketId );
             }
             $model->updateById([$rsva[0]['id'], $rsva[1]['id']], ['status' => $rsva[0]['isIncluida'] == "1" ? 'INCLUIDA (SOLICITADO)' : 'SOLICITADO', 'ticket_sent_request' => json_encode($request_tickets)]);
-     
+
             gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
         } else {
             gg_response(400, $ticketId);
         }
 
 
-        
 
 
 
-        
+
+
     }
 
     public function linkRequest(){
@@ -930,13 +974,13 @@ class TransportacionController extends BaseController
             case 'en-US':
                 $lang = 'eng';
                 break;
-            default: 
+            default:
                 $lang = 'eng';
                 break;
         }
 
         $zd = new Zendesk();
-        
+
         // Reemplaza las variables en el HTML con valores específicos
         $html = view('transpo/mailing/transpoLinkRequest', ['data' => $rsva[0], 'link' => $link, 'ids' => [$rsva[0]['id'], $id2], 'token' => $this->encodeLink($rsva, $ticket, [$rsva[0]['id'], $id2]), 'hotel' => (strpos(strtolower($rsva[0]['hotel']),'atelier') !== false ? 'atpm' : 'oleo'), 'lang' => $lang == 'esp']);
 
@@ -952,13 +996,13 @@ class TransportacionController extends BaseController
         if($author_id != 0){ $dataTicket["comment"]["author_id"] = $author_id; }
 
         $result = $zd->updateTicket($ticket, $dataTicket);
-        
+
         $payment_tickets = json_decode($rsva[0]['ticket_payment'] ?? "[]");
         if( !in_array($ticket, $payment_tickets) ){
             array_push($payment_tickets, $ticket );
         }
         $model->updateById([$id1, $id2], ['status' => 'PAGO PENDIENTE', 'ticket_payment' => json_encode($payment_tickets)]);
- 
+
         gg_response($result['response'], ['data' => $result['data'], 'sent' => true, ] );
     }
 
@@ -974,11 +1018,11 @@ class TransportacionController extends BaseController
             "ids" => $ids,
             "noRestrict" => $noRestrict
         ];
-        
+
         // Encode data to JSON
-        $jsonData = json_encode($data);        
+        $jsonData = json_encode($data);
         $encodedData = base64_encode($jsonData);
-        
+
         return $encodedData;
     }
 
@@ -1021,11 +1065,11 @@ class TransportacionController extends BaseController
 
     public function duplicateService( $id ){
         $model = new TransportacionesModel();
-        
+
         if( $model->duplicate( $id ) ){
             gg_response(200, ["msg" => "Reserva duplicada"]);
         }
-        
+
         gg_response(400, ["msg" => "Hubo un error al duplicar esta reserva"]);
 
     }
@@ -1047,7 +1091,8 @@ class TransportacionController extends BaseController
 
         $updateData = [
             "ticket_pago" => json_encode($pago_tickets),
-            "status" => "PAGADA (CAPTURA PENDIENTE)"
+            "status" => "PAGADA (CAPTURA PENDIENTE)",
+            "custom_status_id" => 25706430890260
         ];
 
         $model->updateById( [$id1, $id2], $updateData );
@@ -1069,13 +1114,12 @@ class TransportacionController extends BaseController
 
         $model = new TransportacionesModel();
 
-        $id1 = $_POST['id1'];
-
-        if( !isset($_POST['id2']) ){
-            $getIds = $model->getRoundIds($id1);
+        if( !isset($_POST['id1']) || !isset($_POST['id2']) ){
+            $getIds = $model->getRoundIds(!isset($_POST['id1']) ? $_POST['id2'] : $_POST['id1']);
             $id1 = $getIds[0];
             $id2 = $getIds[1] ?? $getIds[0];
         }else{
+            $id1 = $_POST['id1'];
             $id2 = $_POST['id2'];
         }
 
@@ -1091,12 +1135,12 @@ class TransportacionController extends BaseController
             case 'en-US':
                 $lang = 'eng';
                 break;
-            default: 
+            default:
                 $lang = 'eng';
                 break;
         }
 
-        
+
         $rsva = $model->whereIn('id',[$id1, $id2])->findAll();
 
         if( count($rsva) == 0 ){
@@ -1198,15 +1242,15 @@ class TransportacionController extends BaseController
                     "ticket_form_id" => 26597917087124,
                     "tags" => ['solveticket']
                 ];
-        
+
             }
 
             $ticketId = $zd->newTicketSend($params);
-                
+
             if (is_int($ticketId)) {
                 $conf_tickets = $this->reBuildTicket($rsva[0]['ticket_confirm'], $ticketId);
                 $model->updateById([$id1, $id2], ['ticket_confirm' => json_encode($conf_tickets)]);
-            
+
                 gg_response(200, ['sent' => true ] );
             } else {
                 gg_response(400, $ticketId);

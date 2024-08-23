@@ -107,59 +107,11 @@
 <?= $this->section('scripts') ?>
 <script>
 
-    class zdFields {
-
-        static categoria    = 'ticket.customField:custom_field_26495291237524';
-        static reserva      = 'ticket.customField:custom_field_26260741418644';
-        static guest        = 'ticket.customField:custom_field_26260771754900';
-        static status       = 'ticket.customField:custom_field_28774341519636';
-        static hotel        = 'ticket.customField:custom_field_26493544435220';
-        static tipoTranspo  = 'ticket.customField:custom_field_28630449017748';
-        static transpoPago  = 'ticket.customField:custom_field_28630467255444';
-        static transpoStatus= 'ticket.customField:custom_field_28774341519636';
-        static transpoDefined= 'ticket.customField:custom_field_28802239047828';
-        static idIda        = 'ticket.customField:custom_field_28837284664596';
-        static idVuelta     = 'ticket.customField:custom_field_28837240808724';
-        static ligaPago     = 'ticket.customField:custom_field_28727761630100';
-
-    }
-
-    class GlobalVar {
-        constructor() {
-            this.id = '';
-            this.name = '';
-            this.lang = '';
-            this.reqId = '';
-            this.ticketId = '';
-        }
-
-        setVal(key, val) {
-            this[key] = val;
-        }
-    }
-
-    class htmlTemplates {    
-        static searchCrs = `<div class="mb-2 d-flex justify-content-end"><button class="btn btn-primary" id="extendedSearch">Extender a CRS</button></div>`;
-
-        static status = {
-            "-": '',
-            "INCLUIDA": 'btn-incluNoData',
-            "INCLUIDA (SOLICITADO)": 'btn-incluSolicitado',
-            "SOLICITADO": 'btn-incluSolicitado',
-            "LIGA PENDIENTE": 'btn-ligaPendiente',
-            "PAGO PENDIENTE": 'btn-pagoPendiente',
-            "CORTESÍA (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
-            "PAGO EN DESTINO (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
-            "PAGADA (CAPTURA PENDIENTE)": 'btn-pagadoSinIngresar',
-            "CORTESÍA (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
-            "PAGO EN DESTINO (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
-            "PAGADA (CAPTURADO)": 'btn-pagadoRegistradoAtpm',
-            "CANCELADA": 'btn-cancel',
-        }
-    }
+    
 
     $(document).ready(function () {
 
+        // Establece titulo de app
         const appTitle = document.getElementById('appTitle');
         appTitle.innerHTML = "GG - ADH Transfers";
 
@@ -183,15 +135,17 @@
         });
         
         // ZAF METHODS
-        var client = ZAFClient.init();
-        client.invoke('ticketFields:custom_field_28837284664596.hide');
-        client.invoke('ticketFields:custom_field_28837240808724.hide');
         buildData();
 
         function buildData(  ){
             client.get(getFields).then(function(data) {
                 console.log(data);
                 zafData = data;
+
+                if( data.ticket.form.id == 26597917087124 ){
+                    client.invoke('ticketFields:custom_field_28837284664596.hide');
+                    client.invoke('ticketFields:custom_field_28837240808724.hide');
+                }
 
                 globals.setVal('ticketId', data.ticket.id);
                 setUser(data.currentUser.name);
@@ -212,11 +166,6 @@
 
         // HTML DYNAMIC FIELDS START
         
-            function setUser( user ){
-                const userDiv = document.getElementById('$user');
-                userDiv.innerHTML = user;
-            }
-
             function printRsva( rsva ){
                 const rsvaId = document.getElementById('$rsva');
                 rsvaId.innerHTML = rsva;
@@ -580,7 +529,7 @@
                 var lang = $('#languageSelect').val();
 
                 var fields = [
-                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta
+                    'currentUser', 'ticket', zdFields.idIda, zdFields.idVuelta, 'channel'
                 ]
                 client.get( fields ).then(function(data) {
 
@@ -588,6 +537,7 @@
                         'id1': data[zdFields.idIda],
                         'id2': data[zdFields.idVuelta],
                         'ticket': data.ticket.id,
+                        'via': data.channel.name,
                         'lang': lang,
                         "author": data.currentUser.name,
                         "author_id": data.currentUser.id,
