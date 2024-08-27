@@ -496,19 +496,29 @@ class Tickets extends BaseController{
         $name = $postData['name'];
         $mail = $postData['mail'];
         $msg = $postData['msg'];
+        
+        if( isset( $postData['origin']) ){
+            $origin = $postData['origin'];
 
-        switch( $postData['hotel'] ){
-            case "Atelier Playa Mujeres":
-                $hotel = 'hotel_atpm';
-                break;
-            case "Oleo Cancun Playa":
-                $hotel = 'hotel_olcp';
-                break;
+            switch( $origin ){
+                case "hotel":
+                    $subject = 'ATELIER DE HOTELES Site - Contacto Web';
+                    break;
+                case "weddings":
+                    $subject = 'ATELIER DE HOTELES Site - Events';
+                    break;
+                case "groups":
+                    $subject = 'ATELIER DE HOTELES Site - Weddings';
+                    break;
+                default:
+                    $subject = 'ATELIER DE HOTELES Site - Contacto Web';
+                    break;
+            }
         }
 
         $params = [
                 "ticket" => [
-                    "subject" => "ATELIER DE HOTELES Site - Contacto Web", 
+                    "subject" => $subject, 
                     "comment" => [
                         "body" => $msg
                     ], 
@@ -516,16 +526,35 @@ class Tickets extends BaseController{
                         "name" => $name, 
                         "email" => $mail,
                     ],
-                    "custom_fields" => [
-                        ["id" => 26493544435220, "value" => $hotel],
-                    ] 
+                    "custom_fields" => [] 
                     
                    ] 
              ]; 
 
+        // Agregar telefono
         if( isset($postData['phone']) ){
             $params['ticket']['requester']['phone'] = $postData['phone'];
         } 
+
+        // Personalizar hotel
+        if( isset($postData['hotel']) ){
+            switch( $postData['hotel'] ){
+                case "Atelier Playa Mujeres":
+                    $hotel = 'hotel_atpm';
+                    break;
+                case "Oleo Cancun Playa":
+                    $hotel = 'hotel_olcp';
+                    break;
+            }
+
+            array_push($params['ticket']['custom_fields'], ["id" => 26493544435220, "value" => $hotel]);
+        }
+
+        // Personalizar Fecha Evento
+        if( isset($postData['event_date']) ){
+            $eventDate = $postData['event_date'];
+            array_push($params['ticket']['custom_fields'], ["id" => 29696818578452, "value" => $eventDate]);
+        }
 
         $result = $this->zd->onBehalfTicket( $params );
         gg_response(200, ['name' => $result]);

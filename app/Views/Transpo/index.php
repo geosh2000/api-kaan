@@ -575,11 +575,13 @@
                     </td>
                     <td class="text-center">
                          <?php $tickets = json_decode($transportacion['allTickets'],true); ?>
-                        <?php foreach ($tickets as $tkType => $tktype): ?>
-                            <?php foreach ($tktype as $tk => $tkt): ?>
-                                <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?> (<?= $tkType ?>)</a><br>
+                         <?php if( is_array($tickets) ): ?>
+                            <?php foreach ($tickets as $tkType => $tktype): ?>
+                                <?php foreach ($tktype as $tk => $tkt): ?>
+                                    <a href="https://atelierdehoteles.zendesk.com/agent/tickets/<?= $tkt ?>" target="_blank"><?= $tkt ?> (<?= $tkType ?>)</a><br>
+                                <?php endforeach; ?>
                             <?php endforeach; ?>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </td>
                     <td>
                         <div class="d-flex justify-content-end">

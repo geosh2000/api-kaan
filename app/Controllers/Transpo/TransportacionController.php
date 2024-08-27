@@ -545,19 +545,7 @@ class TransportacionController extends BaseController
                             array_push($ids,$t['id']);
                             $data['arrival']['ticket_sent_request'] = json_encode($ticketReq);
                             $model->updateById($t['id'],$data['arrival']);
-
-                            // $updateFields = [];
-
-                            // foreach( $data['arrival'] as $field => $val ){
-                            //     if( $val != $t[$field] ){
-                            //         array_push($updateFields, [$field, $t[$field], $val]);
-                            //     }
-                            // }
-
-                            // if( count($updateFields) > 0 ){
-                            //     $updateModel->edit($t['id'], $updateFields);
-                            // }
-
+                            $updateIn = $t['id'];
                         }else{
                             return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
                         }
@@ -574,6 +562,7 @@ class TransportacionController extends BaseController
                         array_push($ids,$t['id']);
                         $data['departure']['ticket_sent_request'] = json_encode($ticketReq);
                         $model->updateById($t['id'],$data['departure']);
+                        $updateOut = $t['id'];
                     }else{
                         return redirect()->to(site_url('public/invalid_form'))->with('error', 'El registro ya existe o tiene errores. Si necesitas cambios, por favor comunícate con reservations@adh.com <hr> This reservation already exists or has errors on it. If you need to do changes on it, please contact us to reservations@adh.com');
                     }
@@ -583,6 +572,14 @@ class TransportacionController extends BaseController
 
         // update ticket
         $zd = new Zendesk();
+
+        $existingTicket = $zd->getTicket( $this->request->getPost('newTicket') );
+
+        if( $existingTicket['data']->ticket->status == 'closed' ){
+            $isClosed = true;
+        }else{
+            $isClosed = false;
+        }
 
         // Reemplaza las variables en el HTML con valores específicos
         $html = view('transpo/mailing/requestRecieved', ['data' => ["guest" => $this->request->getPost('guest'), "folio" => $this->request->getPost('folio')], 'lang' => $this->request->getPost('lang') == 'esp', 'hotel' => strtolower($this->request->getPost('hotel') ?? 'atelier') == 'atelier' ? 'atpm' : 'oleo']);
@@ -604,7 +601,25 @@ class TransportacionController extends BaseController
         }
 
         try{
-            $result = $zd->updateTicket($this->request->getPost('newTicket'), $dataTicket);
+            if( $isClosed ){
+                $result = $zd->followUpTicket($this->request->getPost('newTicket'), $dataTicket);
+                $newTicket = $result['data']->ticket->id;
+
+                if( isset($updateIn) ){
+                    $ticketReq = $this->reBuildTicket( $data['arrival']['ticket_sent_request'], $newTicket );
+                    $data['arrival']['ticket_sent_request'] = json_encode($ticketReq);
+                    $model->updateById($updateIn,$data['arrival']);
+                }
+
+                if( isset($updateOut) ){
+                    $ticketReq = $this->reBuildTicket( $data['departure']['ticket_sent_request'], $newTicket );
+                    $data['departure']['ticket_sent_request'] = json_encode($ticketReq);
+                    $model->updateById($updateOut,$data['departure']);
+                }
+
+            }else{
+                $result = $zd->updateTicket($this->request->getPost('newTicket'), $dataTicket);
+            }
         } catch(\Exception $e){
             $a = 1;
         }
@@ -1236,8 +1251,8 @@ A manera de continuar con la reservación del transporte, por favor proporcióna
                         [ "id" => 26493544435220, "value" => strtolower($rsva[0]['hotel']) == 'atelier' ? 'hotel_atpm' : 'hotel_olcp' ],
                         [ "id" => 28774341519636, "value" => 'transpo_status_'.(strtolower($rsva[0]['isIncluida']) == '1' ? 'incluida__capturado_' : 'pagada__capturado_') ],
                         [ "id" => 28802239047828, "value" => "yes" ],
-                        [ "id" => 28837284664596, "value" => $rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]['id'] ],
-                        [ "id" => 28837240808724, "value" => $rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]['id']]
+                        [ "id" => 28837284664596, "value" => isset($rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]) ? $rsva[$rsva[0]['tipo'] == "ENTRADA" ? 0 : 1]['id'] : null],
+                        [ "id" => 28837240808724, "value" => isset($rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]) ? $rsva[$rsva[0]['tipo'] == "SALIDA" ? 0 : 1]['id'] : null]
                     ],
                     "ticket_form_id" => 26597917087124,
                     "tags" => ['solveticket']

@@ -50,4 +50,5 @@ class AdhApi {
         // Retorna la respuesta como JSON
         return $result;
     }
+
 }

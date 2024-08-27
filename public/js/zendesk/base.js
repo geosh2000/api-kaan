@@ -83,8 +83,11 @@ function formRedirect( form ){
         case (26261410445076):      // Confirmacion
             linkApp( '/zdapp/conf' );
             break;
+        case (29688928128916):      // Cotizacion
+            linkApp( '/zdapp/quote' );
+            break;
         default:
-            console.log("Sin app para redireccionar");
+            console.log("Sin app para redireccionar: ", form);
             return;
     }
 }

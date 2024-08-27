@@ -97,6 +97,11 @@ class Exceptions extends BaseConfig
      *          return new \App\Libraries\MyExceptionHandler();
      *      }
      */
+
+    // Añadir una propiedad para la vista personalizada del error 404
+    public string $error404View = 'custom_error_404'; 
+
+    
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
         return new ExceptionHandler($this);

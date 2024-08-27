@@ -62,6 +62,10 @@ $routes->group('public', function($routes){
     $routes->get('invalid_form', 'Transpo\TransportacionController::invalid');
 });
 
+$routes->group('cc', function($routes){
+    $routes->get('cotizador', 'Rsv\Quote::framedQuote');
+});
+
 $routes->group('mailing', function($routes){
     $routes->get('requestTemplate/(:num)', 'Transpo\TransportacionController::mailRequest/$1');
 });
@@ -105,6 +109,9 @@ $routes->group('zdapp', ['filter' => 'zendeskFilter'], function($routes){
     });
     $routes->group('transpo', function($routes){
         $routes->post('/', 'Zdapp\ZendeskAppController::transpo');
+    });
+    $routes->group('quote', function($routes){
+        $routes->post('/', 'Zdapp\ZendeskAppController::quote');
     });
 });
 

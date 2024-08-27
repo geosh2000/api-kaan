@@ -62,4 +62,30 @@ class Quote extends BaseController
         // Devolver los precios como JSON
         gg_response(200, ['error' => false, 'msg' => 'Cotización Obtenida', 'data' => $precios]);
     }
+
+    public function framedQuote(){
+        // Obtener la instancia de la base de datos
+        $db = \Config\Database::connect('production');
+
+        // Realizar el query
+        $query = $db->table('discount_codes')
+                    ->get();
+
+        // Obtener los resultados como un array de objetos
+        $results = $query->getResultArray();
+
+        $codes = [];
+        foreach($results as $row => $d){
+            if( isset($codes[$d['hotel_id']]) ){
+                $codes[$d['hotel_id']][$d['category_name']] = [ "code" => $d['code'], "descuento" => $d['discount_percentage'] ];
+            }else{
+                $codes[$d['hotel_id']] = [
+                    $d['category_name'] => [ "code" => $d['code'], "descuento" => $d['discount_percentage'] ]
+                ];
+            }
+        }
+
+        return view('Quote/index', ['codes' => $codes]);
+
+    }
 }

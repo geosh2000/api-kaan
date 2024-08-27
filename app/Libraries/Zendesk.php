@@ -193,6 +193,12 @@ class Zendesk{
         return $this->putData( $this->baseUrl."/api/v2/tickets/".$ticket, $params );
     }
 
+    public function followUpTicket( $ticket, $data ){
+        $params = ["ticket" => $data];
+        $params['ticket']['via_followup_source_id'] = $ticket;
+        return $this->postData( $this->baseUrl."/api/v2/tickets.json", json_encode($params) );
+    }
+
     public function updateManyTickets( $tickets, $data ){
         $params = ["ticket" => $data];
         $ticket = implode(",", $tickets);
