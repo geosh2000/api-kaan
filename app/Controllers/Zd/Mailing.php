@@ -248,6 +248,8 @@ class Mailing extends BaseController{
 
         $params['data']['date_in'] = longDateFormat($params['data']['date_in'], $fileLang);
         $params['data']['date_out'] = longDateFormat($params['data']['date_out'], $fileLang);
+        $params['data']['time_in'] = isset($params['data']['time_in']) && $params['data']['time_in'] !== '-' ? $params['data']['time_in'] : '15:00';
+        $params['data']['time_out'] = isset($params['data']['time_out']) && $params['data']['time_out'] !== '-' ? $params['data']['time_out'] : '12:00';
         $params['data']['time_in'] = isset($params['data']['time_in']) && $params['data']['time_in'] !== '' ? $params['data']['time_in'] : '15:00';
         $params['data']['time_out'] = isset($params['data']['time_out']) && $params['data']['time_out'] !== '' ? $params['data']['time_out'] : '12:00';
 

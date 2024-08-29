@@ -418,7 +418,8 @@ class Tickets extends BaseController{
                         "public"        => true,
                         "html_body"     => $html,
                     ],
-                    "status"        => "solved"
+                    "status"        => "solved",
+                    "tags"          => $data['tags']
                 ];
                 
                 $result = $this->zd->updateTicket($data['ticket'], $dataTicket);     

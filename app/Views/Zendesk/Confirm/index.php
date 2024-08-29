@@ -169,6 +169,9 @@
         });
 
         function buildParams( ticket ){
+            tags = ticket.ticket.tags;
+            tags.push('sent_from_gg', 'confirmed', ticket[zdFields.hotel]);
+
             return {
                 "data": {
                     "params": {
@@ -204,7 +207,8 @@
                     },
                     "hotel": ticket[zdFields.hotel],
                     "lang": $('#languageSelect').val(),
-                    "ticket": ticket.ticket.id
+                    "ticket": ticket.ticket.id,
+                    "tags": tags
                 }    
             };
         }
