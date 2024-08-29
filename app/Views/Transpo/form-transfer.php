@@ -185,13 +185,37 @@
     </div>
 </div>
 
-<!-- Loader -->
-<div id="loader" class="loader" style="display: none;">
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-</div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('extras') ?>
+    <!-- Modal de Error -->
+
+    <div class="modal fade" data-backdrop="static" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">   
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel"><i class="fas fa-exclamation-circle"></i> <?php echo ($lang === 'esp') ? 'Error' : 'Error'; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalErrorMessage">
+                    <!-- Aquí se mostrará el mensaje de error -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo ($lang === 'esp') ? 'Cerrar' : 'Close'; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -245,6 +269,64 @@
                     }
                 }
             });
+
+            // Ejecutar validateTime() cuando el formulario se envía
+            $('#flight-form').on('submit', function(event) {
+                validateTime(true, event);
+            });
+
+            // Ejecutar validateTime() cuando cambia el valor de #pickup-time o #departure-time
+            $('#pickup-time, #departure-time').change(function() {
+                validateTime();  // No se pasa 'event' aquí porque no es un submit
+            });
+
+            // Función de validación
+            function validateTime(skipWarn = false, event = null) {
+                const departureTime = $('#departure-time').val();
+                const pickupTime = $('#pickup-time').val();
+
+                if (!departureTime || !pickupTime) {
+                    return; // Si uno de los campos está vacío, no hacer nada
+                }
+
+                const departureTimeMinutes = timeToMinutes(departureTime);
+                const pickupTimeMinutes = timeToMinutes(pickupTime);
+
+                // Calcular la diferencia en minutos
+                let timeDifference = departureTimeMinutes - pickupTimeMinutes;
+
+                // Si la diferencia es negativa, significa que el pickup es en el día anterior
+                if (timeDifference < 0) {
+                    timeDifference += 1440; // 1440 es el total de minutos en un día (24 * 60)
+                }
+
+                // Validar si el pickup-time está dentro de las 6 horas anteriores
+                if (timeDifference > 360) {
+                    showModal('<?php echo ($lang === 'esp') ? "El tiempo de recogida debe ser dentro de las 6 horas antes de la hora de salida." : "Pick-up time must be within 6 hours before the departure time." ?>');
+                    if (event) event.preventDefault(); // Prevenir envío del formulario si es necesario
+                    startLoader(false);
+                    return;
+                }
+
+                // Validar si el pickup-time es demasiado cercano al departure-time (menos de 2 horas)
+                if (timeDifference <= 120 && !skipWarn) {
+                    showModal('<?php echo ($lang === 'esp') ? "Su pickup es muy cercano al vuelo, se sugiere un tiempo con mayor anticipación." : "Your pick-up time is very close to the flight, we suggest allowing more time in advance." ?>');
+                }
+            
+            }
+
+            // Convertir tiempo (HH:mm) a minutos
+            function timeToMinutes(time) {
+                const [hours, minutes] = time.split(':').map(Number);
+                return (hours * 60) + minutes;
+            }
+
+            // Función para mostrar el modal con un mensaje de error
+            function showModal(message) {
+                $('#modalErrorMessage').text(message);
+                $('#errorModal').modal('show');
+            }
+
         });
 </script>
 <?= $this->endSection() ?>

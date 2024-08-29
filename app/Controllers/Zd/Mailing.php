@@ -60,6 +60,7 @@ class Mailing extends BaseController{
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isPhpEnabled', true);
+        $options->set('isRemoteEnabled', true);
         $dompdf = new Dompdf($options);
 
         // Carga el HTML
@@ -113,19 +114,19 @@ class Mailing extends BaseController{
         $params = [
             "data"  => [
                 "hotel"=>"hotel_atpm", // opts hotel_atpm, hotel_olcp
-                "conf_number"   => "417983", 
-                "main_guest"    => "Imtiaz Kahn",
-                "date_in"   => "2024-12-17",
+                "conf_number"   => "418472", 
+                "main_guest"    => "JOSÉ LUIS RUIZ",
+                "date_in"   => "2024-11-30",
                 "time_in"   => "",
-                "date_out"  => "2024-12-21",
+                "date_out"  => "2024-12-01",
                 "time_out"  => "",
-                "room_code" => "AXJRVQ",
-                "room_name" => "Junior Suite Ocean View - Doble",
-                "adults"    => "2",
+                "room_code" => "AXJRXK",
+                "room_name" => "Junior Suite - King",
+                "adults"    => "1",
                 "children"  => "",
-                "payment_type"  => "Payment at check-in",
+                "payment_type"  => "cortesia",
                 "currency"  => "mxn", // opts mxn, usd
-                "total" => "28682",
+                "total" => "0",
                 "notes" => "",
                 "xld_policy"    => "-",
                 "rsv_channel"   => "rsv_chan_direct",
@@ -134,11 +135,11 @@ class Mailing extends BaseController{
                 "isa" => "$40 MXN por person per night"
             ],
             "params" => [
-                'ROOM TYPE'     =>  'hide_roomtype', // opts hide_roomtype, show_roomtype
+                'ROOM TYPE'     =>  'show_roomtype', // opts hide_roomtype, show_roomtype
                 'BALANCE'       => 'hide_balance', // opts hide_balance, show_balance
                 'AutoXld'   => '-', // opts policy_auto, policy_48_hrs_25, policy_14_dias_/_10_, policy_otro, policy_none
                 'DEPOSITOS' => 'hide_deposit', //  opts hide_deposit, show_deposit
-                "AMOUNT" => 'show_amount' // sopts how_amount, hide_amount
+                "AMOUNT" => 'hide_amount' // sopts how_amount, hide_amount
             ]
         ];
         
@@ -167,7 +168,7 @@ class Mailing extends BaseController{
                 "room_name" => "Junior Suite Ocean View - Doble",
                 "adults"    => "2",
                 "children"  => "",
-                "payment_type"  => "Payment at check-in",
+                "payment_type"  => "cortesia",
                 "currency"  => "mxn", // opts mxn, usd
                 "total" => "28682",
                 "notes" => "",
@@ -229,11 +230,11 @@ class Mailing extends BaseController{
     }
 
     // Función para reemplazar variables en el HTML con valores específicos
-    public function buildConfData($params, $hotel, $lang = 'english'){
+    public function buildConfData($params, $hotel, $lang = 'eng'){
 
         $lang = $_GET['lang'] ?? $lang;
 
-        $fileLang = $lang == 'spanish' || $lang == 'Español (Latinoamérica)' ? 'esp' : 'eng';
+        $fileLang = $lang == 'esp' ? 'esp' : 'eng';
 
         $params['query'] = [
             "inicio"    => $params['data']['date_in'],
@@ -288,17 +289,18 @@ class Mailing extends BaseController{
             case 'atpm':
                 $html_url = $fileLang;
                 $params['data']['hotel_name'] = "Atelier Playa Mujeres";
-                $params['data']['logo_url'] = "https://glassboardengine.azurewebsites.net//assets/img/logo.png";
+                $params['data']['logo_url'] = templates::$assets."img/logo.png";
                 $params['data']['dir_1'] = "Complejo de Condominios Playa Mujeres, SM-3 M-1 L-13 RTH-4";
                 $params['data']['dir_2'] = "Zona Continental Isla Mujeres,    ";
                 $params['data']['dir_3'] = "Quintana Roo, México, C.P. 77400  ";
                 $params['data']['dir_4'] = "+52 (998) 500 4800";
                 $params['query']['hotel'] = 1;
+                $params['data']['children'] = "0";
                 break;
             case 'olcp':
                 $html_url = $fileLang;
                 $params['data']['hotel_name'] = "Oleo Cancún Playa";
-                $params['data']['logo_url'] = "https://glassboardengine.azurewebsites.net//assets/img/logoOleo.png";
+                $params['data']['logo_url'] = templates::$assets."img/logoOleo.png";
                 $params['data']['dir_1'] = "Boulevard Kukulcán KM 19.5, Zona Hotelera,";
                 $params['data']['dir_2'] = "Cancún, Mexico, 77500.";
                 $params['data']['dir_3'] = "";
@@ -309,9 +311,84 @@ class Mailing extends BaseController{
         }
 
         // Calcular XLD Policy
-        if( $params['params']['AutoXld'] == 'policy_auto' ){
-            $params['data']['xld_policy'] = $this->getPenalties($params['query']);
+        if( $params['data']['rsv_channel'] != 'ATELIERdeHoteles.com!' ){
+            $params['data']['xld_policy'] = $fileLang == 'esp' ? "Por favor, verifica con tu agencia las políticas de cambios y cancelaciones aplicables a tu reserva" : "Please check with your agency regarding the change and cancellation policies applicable to your reservation.";              
+        }else{
+            switch( $params['data']['xld_policy'] ){
+                case "policy_48_hrs_25":
+                    $params['data']['xld_policy'] = $fileLang == 'esp' ? "Cancelación gratuita hasta 2 días antes de la llegada. Entre 0 y 2 días antes de la llegada, se aplica una penalidad del 25%" : "Free cancellation up to 2 days before arrival. Between 0 and 2 days before arrival, a 25% penalty applies";
+                    break;
+                case "policy_14_dias_/_10_":
+                    $params['data']['xld_policy'] = $fileLang == 'esp' ? "Cancelación gratuita hasta 14 días antes de la llegada. Entre 0 y 14 días antes de la llegada, se aplica una penalidad del 100%." : "Free cancellation up to 14 days before arrival. Between 0 and 14 days before arrival, a 100% penalty applies.";
+                    break;
+                case "policy_otro":
+                    $params['data']['xld_policy'] = $params['data']['xld_custom'] ?? "-";
+                    break;
+                case "policy_none":
+                    $params['data']['xld_policy'] = "-";
+                    break;
+                case "policy_auto":
+                    $params['data']['xld_policy'] = $this->getPenalties($params['query']);
+                    break;
+                default:
+                    $params['data']['xld_policy'] = "-";
+                    break;
+            }
         }
+
+
+        // Tipo Pago
+        // Payment Type
+        switch( $params['data']['payment_type'] ){
+            case "deposito_25":
+                $params['data']['payment_type'] = $fileLang == 'esp' ? "Pago adelantado del 25%" : "25% Prepayment";
+                break;
+            case "reserva_con_deposito":
+                $params['data']['payment_type'] = $fileLang == 'esp' ? "Reserva pagada con depósito" : "Reservation Paid with Deposit";
+                break;
+            case "paga_directo":
+                $params['data']['payment_type'] = $fileLang == 'esp' ? "Paga directo a la llegada" : "Pay Directly Upon Arrival";
+                break;
+            case "pago_total":
+                $params['data']['payment_type'] = $fileLang == 'esp' ? "Pagado 100%" : "Paid in Full (100%)";
+                break;
+            case "cortesia":
+                $params['data']['payment_type'] = $fileLang == 'esp' ? "Reserva en cortesía" : "Courtesy Reservation";
+                break;
+            default:
+                $params['data']['payment_type'] = "-";
+                break;
+        }
+
+        // Rate Type
+        switch( $params['data']['rate_type'] ){
+            case "rate_nr":
+                $params['data']['rate_type'] = $fileLang == 'esp' ? "No Reembolsable" : "Non-Refundable";
+                break;
+            case "rate_courtesy":
+                $params['data']['rate_type'] = $fileLang == 'esp' ? "Cortesía" : "Complimentary";
+                break;
+            case "rate_ff":
+                $params['data']['rate_type'] = "Family & Friends";
+                break;
+            default:
+                $params['data']['rate_type'] = "-";
+                break;
+        }
+
+        // ISA
+        switch( $params['data']['isa'] ){
+            case "hotel_atpm":
+                $params['data']['isa'] = $fileLang == 'esp' ? "$ 31.12 MX (pesos mexicanos) por persona, por noche" : "$31.12 MXN (Mexican pesos) per person, per night";
+                break;
+            case "hotel_olcp":
+                $params['data']['isa'] = $fileLang == 'esp' ? "$ 74 MX (pesos mexicanos) por habitación, por noche" : "$ 74 MXN (Mexican pesos) per room, per night";
+                break;
+            default:
+                $params['data']['isa'] = $fileLang == 'esp' ? "$ 31.12 MX (pesos mexicanos) por persona, por noche" : "$31.12 MXN (Mexican pesos) per person, per night";
+                break;
+        }
+        
 
         // Obtiene el contenido HTML del archivo remoto
         $html = $this->getRemoteHtml(templates::$templates.'mailConf.php?lang='.$fileLang);

@@ -387,6 +387,126 @@ class Tickets extends BaseController{
 
     }
 
+    public function previewConf(){
+
+        $postData = getPost();
+
+        $zd = new Mailing();
+
+        $data = $postData['data'] ?? false;
+
+        return $zd->buildConfData($data['params'], str_replace("hotel_", "", $data['hotel']), $data['lang']);
+
+    }
+
+    public function sendConf( $type = 'send' ){
+
+        $postData = getPost();
+
+        $zd = new Mailing();
+
+        $data = $postData['data'] ?? false;
+
+        $html = $zd->buildConfData($data['params'], str_replace("hotel_", "", $data['hotel']), $data['lang']);
+
+        switch( $type ){
+            case "send":
+                $zd = new Zendesk();
+                
+                $dataTicket = [
+                    "comment"       => [
+                        "public"        => true,
+                        "html_body"     => $html,
+                    ],
+                    "status"        => "solved"
+                ];
+                
+                $result = $this->zd->updateTicket($data['ticket'], $dataTicket);     
+                
+                // Envía la respuesta JSON
+                gg_response(200, ["result" => $result]);
+                break;
+            case "preview":
+                return $html;
+                break;
+            case "pdf":
+
+                $html = '<html>
+                <head>
+                <style>
+                    @page {
+                        size: legal;
+                        margin: 0;
+                    }
+
+                    body {
+                        margin: 10mm;
+                    }
+
+                    .content {
+                        width: 100%;
+                        height: 100%;
+                        overflow: auto;
+                        box-sizing: border-box;
+                    }
+                    .scale-content {
+                        transform: scale(1); /* Ajusta este valor según sea necesario */
+                        transform-origin: top center;
+                    }
+                </style>
+                </head>
+                <body>
+                    <div class="content scale-content">'.$html.'</div></body></html>';
+
+
+                // Incluir las clases de Dompdf solo dentro de esta función
+                require_once APPPATH . 'Libraries/dompdf/autoload.inc.php';
+                
+                // Ahora puedes usar las clases Dompdf y Options
+                $options = new \Dompdf\Options();
+                
+                // Inicializa Dompdf
+                $options->set('isHtml5ParserEnabled', true);
+                $options->set('isPhpEnabled', true);
+                $options->set('isRemoteEnabled', true);
+                $dompdf = new \Dompdf\Dompdf($options);
+
+                // Carga el HTML
+                $dompdf->loadHtml($html);
+
+                // (Opcional) Configura el tamaño del papel
+                $dompdf->setPaper('A4', 'portrait');                
+                
+                // Renderiza el PDF
+                $dompdf->render();
+
+                $dompdf->getCanvas()->scale(0.8, 0.8,0,0); 
+
+                // Guarda el PDF en el servidor
+                $output = $dompdf->output();
+                $filePath = WRITEPATH . 'pdf/' . $data['hotel'] . '-' . $data['params']['data']['conf_number'] . '.pdf';
+                file_put_contents($filePath, $output);
+
+                // Devuelve la URL del archivo guardado
+                return $this->response->setJSON(['pdf_url' => $data['hotel'] . '-' . $data['params']['data']['conf_number'] . '.pdf']);
+                break;
+        }
+
+    }
+
+    public function downloadPdf( $filename ){
+
+        $filePath = WRITEPATH . 'pdf/' . $filename;
+
+        // Verifica si el archivo existe
+        if (!file_exists($filePath)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("File not found: $filename");
+        }
+
+        // Sirve el archivo
+        return $this->response->download($filePath, null)->setFileName($filename);
+    }
+
     public function updateManyTickets( $data ){
 
         $ticket = $data['ticket'] ?? false;
@@ -560,6 +680,11 @@ class Tickets extends BaseController{
         gg_response(200, ['name' => $result]);
     }
     
+    public function showForm( $id ){
+        $result = $this->zd->getData( "api/v2/ticket_forms/".$id );
+
+        gg_response(200, $result['data']);
+    }
 
 
 }

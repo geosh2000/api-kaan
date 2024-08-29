@@ -147,7 +147,15 @@ $routes->group('zdappC', function($routes){
         
         // CREATE NEW ROUND TRIP
         $routes->post('saveNewRound', 'Transpo\TransportacionController::storeRound'); 
+        
+    });
 
+    // Confirmations
+    $routes->group('confirmations', function($routes){
+        $routes->post('confPreview', 'Zd\Tickets::sendConf/preview');
+        $routes->post('sendConf', 'Zd\Tickets::sendConf'); 
+        $routes->post('pdfConf', 'Zd\Tickets::sendConf/pdf'); 
+        $routes->get('download/(:any)', 'Zd\Tickets::downloadPdf/$1'); 
     });
 });
 
@@ -156,6 +164,7 @@ $routes->group('zd', function($routes){
     $routes->group('mailing', function($routes){
         $routes->get('conf', 'Zd\Mailing::index');
         $routes->get('confHtml', 'Zd\Mailing::getConf');
+        $routes->post('confPreview', 'Zd\Tickets::previewConf');
         $routes->get('confPdf', 'Zd\Mailing::pdfConf2');
     });
     $routes->group('object', function($routes){
@@ -188,6 +197,9 @@ $routes->group('zd', function($routes){
         $routes->post('key', 'Zd\Tickets::getPublicKey');
         $routes->post('installations', 'Zd\Tickets::installations');
         $routes->post('aud', 'Zd\Tickets::appAud');
+    });
+    $routes->group('config', function($routes){
+        $routes->get('showForm/(:num)', 'Zd\Tickets::showForm/$1');
     });
     $routes->group('forms', function($routes){
         $routes->post('post-msg', 'Zd\Tickets::fromContactForm');

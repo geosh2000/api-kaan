@@ -1107,7 +1107,6 @@ A manera de continuar con la reservación del transporte, por favor proporcióna
         $updateData = [
             "ticket_pago" => json_encode($pago_tickets),
             "status" => "PAGADA (CAPTURA PENDIENTE)",
-            "custom_status_id" => 25706430890260
         ];
 
         $model->updateById( [$id1, $id2], $updateData );

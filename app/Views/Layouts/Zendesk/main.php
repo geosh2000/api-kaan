@@ -43,8 +43,8 @@
 <body>
 
 <!-- Navbar fijo -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#" id="appTitle">GG - <span id="moduleTitle">ConnApp</span></a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" style="flex-wrap:nowrap!important">
+    <a class="navbar-brand text-truncate" href="#" id="appTitle">GG - <span id="moduleTitle">ConnApp</span></a>
     <button class="ml-auto mr-2 btn btn-secondary reloadBtn"><i class="fas fa-sync-alt"></i></button>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

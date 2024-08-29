@@ -14,9 +14,13 @@
     .conf-margin{ margin:0;line-height:1.5; }
     .conf-value{ margin:0;padding:0 10px 0 10px;vertical-align:top;display:inline-block;text-align: left; width: 430px; }
     .conf-label{ margin:0;width: 215px;vertical-align:top;display:inline-block;text-align: left; }
+    .no-page-break {
+        page-break-inside: avoid;
+    }
 </style>
 
-<div style="margin: 0 auto; width: 720px;transform: scale(0.85625, 0.85625);transform-origin: left top;">
+<div style="margin: 0 auto; width: 720px;" class="no-page-break">
+<!-- <div style="margin: 0 auto; width: 720px;transform: scale(0.85625, 0.85625);transform-origin: left top;"> -->
     <div style="background-color: black !important; margin: 0px; padding: 15px;">
         <div align="left" style="margin:0;padding:0 10px 0 20px;">
             <img data-imagetype="External" src="${logo_url}" border="0" alt="Texto alternativo" title="Texto alternativo" style="display:block;width:105px;text-decoration:none;max-width:105px;border-width:0;border-style:none;"> 
@@ -104,7 +108,7 @@
                 <!-- ROOM TYPE START -->
                 <p class="conf-margin"><strong>${room_code} - ${room_name}</strong></p>
                 <!-- ROOM TYPE END -->
-                <p class="conf-margin"><strong><?php if( $lang ): ?>${adults} Adultos ${children} Niños<?php else: ?>${adults} Adults ${children} Children<?php endif; ?></strong></p>
+                <p class="conf-margin"><strong><?php if( $lang ): ?>${adults} Adultos / ${children} Niños<?php else: ?>${adults} Adults / ${children} Children<?php endif; ?></strong></p>
                 <p class="conf-margin"><strong>${rate_type}</strong></p>
                 <p class="conf-margin"><strong>${main_guest}</strong></p>
                 <!-- AMOUNT START -->
