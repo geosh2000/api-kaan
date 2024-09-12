@@ -256,6 +256,7 @@ $routes->group('test', function($routes){
     $routes->get('test', 'Test::index', ['as' => 'test.test.index']);
     $routes->get('jwt', 'Test::jwt', ['as' => 'test.test.jwt']);
     $routes->get('show', 'Log\Login::show', ['as' => 'test.auth.show']);
+    $routes->get('cancel', 'Transpo\DatabaseController::testCancel');
 });
 
 // $routes->group('dashboard', ['filter' => 'DashboardFilter'], function($routes){

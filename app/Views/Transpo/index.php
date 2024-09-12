@@ -13,6 +13,7 @@
         "ATELIER-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "ATELIER-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "ATELIER-CANCELADA"                             => 'btn-cancel',
+        "ATELIER-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "ATELIER-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoAtpm',
         "ATELIER-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoAtpm',
         "ATELIER-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
@@ -26,6 +27,7 @@
         "Atelier Playa Mujeres-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "Atelier Playa Mujeres-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "Atelier Playa Mujeres-CANCELADA"                             => 'btn-cancel',
+        "Atelier Playa Mujeres-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "Atelier Playa Mujeres-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoAtpm',
         "Atelier Playa Mujeres-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoAtpm',
         "Atelier Playa Mujeres-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoAtpm',
@@ -39,6 +41,7 @@
         "OLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "OLEO-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "OLEO-CANCELADA"                             => 'btn-cancel',
+        "OLEO-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "OLEO-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
         "OLEO-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "OLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
@@ -52,6 +55,7 @@
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "Oleo Cancun Playa-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "Oleo Cancun Playa-CANCELADA"                             => 'btn-cancel',
+        "Oleo Cancun Playa-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "Oleo Cancun Playa-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "Oleo Cancun Playa-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
@@ -65,6 +69,7 @@
         "ÓLEO-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "ÓLEO-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "ÓLEO-CANCELADA"                             => 'btn-cancel',
+        "ÓLEO-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "ÓLEO-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
         "ÓLEO-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "ÓLEO-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
@@ -78,6 +83,7 @@
         "Óleo Cancun Playa-PAGO EN DESTINO (CAPTURA PENDIENTE)"   => 'btn-pagadoSinIngresar',
         "Óleo Cancun Playa-PAGADA (CAPTURA PENDIENTE)"            => 'btn-pagadoSinIngresar',
         "Óleo Cancun Playa-CANCELADA"                             => 'btn-cancel',
+        "Óleo Cancun Playa-PENDIENTE CANCELACION"                             => 'btn-pdt-cancel',
         "Óleo Cancun Playa-CORTESÍA (CAPTURADO)"                  => 'btn-pagadoRegistradoOlcp',
         "Óleo Cancun Playa-PAGO EN DESTINO (CAPTURADO)"           => 'btn-pagadoRegistradoOlcp',
         "Óleo Cancun Playa-PAGADA (CAPTURADO)"                    => 'btn-pagadoRegistradoOlcp',
@@ -123,6 +129,24 @@
     box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.5);
 }
 .btn-cancel:disabled, .btn-cancel.disabled {
+    background-color: #FFCCCC;
+    border-color: #FFCCCC;
+}
+
+/* Botón Cancel - Rojo */
+.btn-pdt-cancel {
+    background-color: #ff4500;
+    color: white;
+    border: 1px solid #ff4500;
+}
+.btn-pdt-cancel:hover {
+    background-color: #CC0000;
+    border-color: #CC0000;
+}
+.btn-pdt-cancel:focus, .btn-pdt-cancel.focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.5);
+}
+.btn-pdt-cancel:disabled, .btn-pdt-cancel.disabled {
     background-color: #FFCCCC;
     border-color: #FFCCCC;
 }
@@ -405,6 +429,7 @@
                             <option value="PAGO EN DESTINO (CAPTURA PENDIENTE)" <?= in_array('PAGO EN DESTINO (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURA PENDIENTE)</option>
                             <option value="PAGADA (CAPTURA PENDIENTE)" <?= in_array('PAGADA (CAPTURA PENDIENTE)', $status) ? 'selected' : '' ?>>PAGADA (CAPTURA PENDIENTE)</option>
                             <option value="CANCELADA" <?= in_array('CANCELADA', $status) ? 'selected' : '' ?>>CANCELADA</option>
+                            <option value="PENDIENTE CANCELACION" <?= in_array('PENDIENTE CANCELACION', $status) ? 'selected' : '' ?>>PENDIENTE CANCELACION</option>
                             <option value="CORTESÍA (CAPTURADO)" <?= in_array('CORTESÍA (CAPTURADO)', $status) ? 'selected' : '' ?>>CORTESÍA (CAPTURADO)</option>
                             <option value="PAGO EN DESTINO (CAPTURADO)" <?= in_array('PAGO EN DESTINO (CAPTURADO)', $status) ? 'selected' : '' ?>>PAGO EN DESTINO (CAPTURADO)</option>
                             <option value="PAGADA (CAPTURADO)" <?= in_array('PAGADA (CAPTURADO)', $status) ? 'selected' : '' ?>>PAGADA (CAPTURADO)</option>

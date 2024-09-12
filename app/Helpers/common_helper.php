@@ -83,8 +83,8 @@
 
     function longDateFormat( $fecha, $idioma = 'Eng' ){
 
-            $idioma = $idioma != 'Esp' ? 'Eng' : 'Esp';
-            $fmtLang = $idioma == 'Eng' ? 'en_US' : 'es_ES';
+            $idioma = strtolower($idioma) != 'esp' ? 'eng' : 'esp';
+            $fmtLang = $idioma == 'eng' ? 'en_US' : 'es_ES';
 
             // Separar la fecha en partes
             $partes_fecha = explode('/', str_replace("-", "/", $fecha));

@@ -189,7 +189,7 @@
                             "payment_type": ticket[zdFields.tipoPago] ?? '-',
                             "currency": ticket[zdFields.moneda] ?? '-',
                             "total": ticket[zdFields.monto] ?? '-',
-                            "notes": ticket[zdFields.notes] ?? '-',
+                            "notes": ticket[zdFields.notas] ?? '-',
                             "xld_policy": ticket[zdFields.xldPol],
                             "xld_custom": ticket[zdFields.xldPolCust],
                             "rsv_channel": ticket[zdFields.canalRsva] ?? '-',

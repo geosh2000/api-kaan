@@ -235,6 +235,7 @@ class Mailing extends BaseController{
         $lang = $_GET['lang'] ?? $lang;
 
         $fileLang = $lang == 'esp' ? 'esp' : 'eng';
+        
 
         $params['query'] = [
             "inicio"    => $params['data']['date_in'],

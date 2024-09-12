@@ -164,24 +164,103 @@ class DatabaseController extends BaseController
 
          // Busca folios existentes en base de transpo
         $transpo = new TransportacionesModel();
-        $existentes = $transpo->whereIn('folio',$foliosToXld)->findAll();
-        $existing = [];
+        $existentes = $transpo->select("*, if(status LIKE '%captur%','conf','pend') as st")
+                ->whereIn('folio',$foliosToXld)
+                ->notLike('status','cancelada')
+                ->findAll();
+        $existing = ['conf' => [], 'pend' => []];
         foreach( $existentes as $existentesx => $e ){
-            array_push($existing, $e['id']);
+            array_push($existing[$e['st']], $e['id']);
         }
 
-        if( count($existing) > 0 ){
-            $data = ['status' => 'CANCELADA'];
+        if( count($existing['conf']) > 0 ){
+            $dataConf = ['status' => 'PENDIENTE CANCELACION'];
             $model = new TransportacionesModel();
             $model->builder()
-                    ->whereIn('id',$existing)
-                    ->update($data);
+                    ->whereIn('id',$existing['conf'])
+                    ->update($dataConf);
     
             // Guardar los datos en la base de datos
             $updateModel = new TranspoHistoryModel();
-            $updateModel->cancel($existing,true);
+            $updateModel->cancel($existing['conf'],true);
+        }
+        if( count($existing['pend']) > 0 ){
+            $dataPend = ['status' => 'CANCELADA'];
+            $model = new TransportacionesModel();
+            $model->builder()
+                    ->whereIn('id',$existing['pend'])
+                    ->update($dataPend);
+    
+            // Guardar los datos en la base de datos
+            $updateModel = new TranspoHistoryModel();
+            $updateModel->cancel($existing['pend'],true);
         }
 
+        return;
+
+    }
+
+    public function testCancel($days){
+         // Obtenemos una instancia de la conexión 'adh_crs'
+         $db = db_connect('adh_crs');
+         $transpoModel = new TransportacionesModel();
+         
+         // Obtiene reservas hechas en los ultimos dias y llegadas de los próximos 10 con transpo incluida
+         $query = "SELECT 
+                     ReservationNumber
+                 FROM 
+                     [dbo].[Reservations] rsv
+                     LEFT JOIN [dbo].[Hotels] htl ON rsv.HotelId=htl.HotelId
+                     LEFT JOIN [dbo].[Agencies] agn ON rsv.AgencyId=agn.AgencyId
+                 WHERE 
+                     (
+                         [DateCancel] >= DATEADD(DAY, -($days), GETDATE())
+                         OR (DateFrom BETWEEN GETDATE() AND DATEADD(DAY, 10, GETDATE()) AND DateCancel IS NOT NULL)
+                     )
+                     AND Company IN ('Website','contactcenter')
+                     AND (Notes LIKE '%Airport Transfer%' OR Notes LIKE '%Traslados Aeropuerto%')";
+ 
+         $rsv = $db->query($query);
+         $result = $rsv->getResultArray();
+
+         $foliosToXld = [];
+         foreach( $result as $resultx => $rsv ){
+            array_push($foliosToXld, $rsv['ReservationNumber']);
+         }
+
+         // Busca folios existentes en base de transpo
+        $transpo = new TransportacionesModel();
+        $existentes = $transpo->select("*, if(status LIKE '%captur%','conf','pend') as st")
+                ->whereIn('folio',$foliosToXld)
+                ->notLike('status','cancelada')
+                ->findAll();
+        $existing = ['conf' => [], 'pend' => []];
+        foreach( $existentes as $existentesx => $e ){
+            array_push($existing[$e['st']], $e['id']);
+        }
+
+        if( count($existing['conf']) > 0 ){
+            $dataConf = ['status' => 'PENDIENTE CANCELACION'];
+            $model = new TransportacionesModel();
+            $model->builder()
+                    ->whereIn('id',$existing['conf'])
+                    ->update($dataConf);
+    
+            // Guardar los datos en la base de datos
+            $updateModel = new TranspoHistoryModel();
+            $updateModel->cancel($existing['conf'],true);
+        }
+        if( count($existing['pend']) > 0 ){
+            $dataPend = ['status' => 'CANCELADA'];
+            $model = new TransportacionesModel();
+            $model->builder()
+                    ->whereIn('id',$existing['pend'])
+                    ->update($dataPend);
+    
+            // Guardar los datos en la base de datos
+            $updateModel = new TranspoHistoryModel();
+            $updateModel->cancel($existing['pend'],true);
+        }
 
         return;
 

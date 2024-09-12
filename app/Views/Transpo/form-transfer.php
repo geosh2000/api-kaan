@@ -309,8 +309,8 @@
                 }
 
                 // Validar si el pickup-time es demasiado cercano al departure-time (menos de 2 horas)
-                if (timeDifference <= 120 && !skipWarn) {
-                    showModal('<?php echo ($lang === 'esp') ? "Su pickup es muy cercano al vuelo, se sugiere un tiempo con mayor anticipación." : "Your pick-up time is very close to the flight, we suggest allowing more time in advance." ?>');
+                if (timeDifference <= 180 && !skipWarn) {
+                    showModal('<?php echo ($lang === 'esp') ? "Su pickup es muy cercano al vuelo, se sugiere un tiempo de 4 horas antes de su salida para vuelos internacionales, y 3 para nacionales. Considere que el trayecto del hotel al aeropuerto es de aproximadamente 45 minutos a 1 hora sin tráfico." : "Your pickup is very close to your flight time. It is recommended to allow 4 hours before your departure for international flights, and 3 hours for domestic flights. Please consider that the journey from the hotel to the airport takes approximately 45 minutes to 1 hour without traffic." ?>');
                 }
             
             }
