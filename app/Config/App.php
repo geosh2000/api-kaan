@@ -16,8 +16,7 @@ class App extends BaseConfig
      *
      *    http://example.com/
      */
-    public string $baseURL = 'https://atelier-cc.azurewebsites.net/index.php/';
-
+    public string $baseURL = 'https://zd.geoshglobal.com/';
     public $sessionDriver   = 'CodeIgniter\Session\Handlers\FileHandler';
     public $sessionSavePath = WRITEPATH . 'session';
 
@@ -187,8 +186,8 @@ class App extends BaseConfig
         // we are currently running an automated test suite, so that
         // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'development') {
-            $this->baseURL = 'http://localhost:8888/adhApi/';
-            $this->indexPage = 'index.php';
+            $this->baseURL = 'http://localhost:8888/marketplace/geoshGlobal/';
+            // $this->indexPage = 'index.php';
         }
     }
 }

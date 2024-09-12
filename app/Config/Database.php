@@ -27,9 +27,9 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'cycoasis_apirest_admin',
-        'password'     => '@8370Apirest',
-        'database'     => 'cycoasis_apirest',
+        'username'     => 'cycoasis_zendeskadmin',
+        'password'     => '@Dyj21278370',
+        'database'     => 'cycoasis_zendesk',
         'DBDriver'     => '',
         'DBPrefix'     => '',
         'pConnect'     => false,
@@ -66,54 +66,13 @@ class Database extends Config
         'numberNative' => false,
     ];
     
-    public array $adh_wh = [
-        'DSN'          => '',
-        'hostname'      => 'tcp:atelier-datawarehouse.database.windows.net', // Aquí se especifica el protocolo TCP para Azure SQL Database
-        'username'     => 'CVReports3',
-        'password'     => '7ZUMPHoLR7$8',
-        'database'     => 'DataWareHouse',
-        'DBDriver'     => 'SQLSRV',
-        'DBPrefix'     => '',
-        'pConnect' => false,
-        'DBDebug'  => (ENVIRONMENT !== 'production'),
-        'cacheOn'  => false,
-        'cacheDir' => '',
-        'charset'  => 'utf8',
-        'DBCollat' => 'utf8_general_ci',
-        'swapPre'  => '',
-        'encrypt'  => true, // Se recomienda utilizar el cifrado SSL para conexiones seguras a Azure SQL Database
-        'compress' => false,
-        'strictOn' => false,
-        'failover' => [],
-    ];
-    
-    public array $adh_crs = [
-        'DSN'          => '',
-        'hostname'      => 'tcp:atelier-hoteles.database.windows.net', // Aquí se especifica el protocolo TCP para Azure SQL Database
-        'username'     => 'CVReports3',
-        'password'     => '7ZUMPHoLR7$8',
-        'database'     => 'Atelier_Front_CRS',
-        'DBDriver'     => 'SQLSRV',
-        'DBPrefix'     => '',
-        'pConnect' => false,
-        'DBDebug'  => (ENVIRONMENT !== 'production'),
-        'cacheOn'  => false,
-        'cacheDir' => '',
-        'charset'  => 'utf8',
-        'DBCollat' => 'utf8_general_ci',
-        'swapPre'  => '',
-        'encrypt'  => true, // Se recomienda utilizar el cifrado SSL para conexiones seguras a Azure SQL Database
-        'compress' => false,
-        'strictOn' => false,
-        'failover' => [],
-    ];
 
     public array $production = [
         'DSN'         => '',
         'hostname'    => '65.99.248.168',
-        'username'     => 'cycoasis_apirest_admin',
-        'password'     => '@8370Apirest',
-        'database'    => 'cycoasis_adh',
+        'username'     => 'cycoasis_zendeskadmin',
+        'password'     => '@Dyj21278370',
+        'database'     => 'cycoasis_zendesk',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,
