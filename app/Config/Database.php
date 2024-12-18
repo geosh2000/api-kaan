@@ -70,9 +70,9 @@ class Database extends Config
     public array $production = [
         'DSN'         => '',
         'hostname'    => '65.99.248.168',
-        'username'     => 'cycoasis_zendeskadmin',
-        'password'     => '@Dyj21278370',
-        'database'     => 'cycoasis_zendesk',
+        'username'     => 'cycoasis_kaanapi',
+        'password'     => 'iEQ.!(4k{T4R',
+        'database'     => 'cycoasis_kaan',
         'DBDriver'    => 'MySQLi',
         'DBPrefix'    => '',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
         'pConnect'    => false,

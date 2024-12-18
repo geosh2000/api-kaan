@@ -6,9 +6,6 @@ class Globals
 {
     public static $jwtKey = 'gg_geoshGlobal_zendesk';
 
-    public static $templates = ENVIRONMENT === 'development' ? 'http://localhost:8888/marketplace/geoshGlobal/public/html/mailing/' : 'https://zd.geoshglobal.com/public/html/mailing/';
-    public static $public = ENVIRONMENT === 'development' ? 'http://localhost:8888/marketplace/geoshGlobal/public/' : 'https://zd.geoshglobal.com/public/';
-    public static $assets = ENVIRONMENT === 'development' ? 'http://localhost:8888/marketplace/geoshGlobal/public/assets/' : 'https://zd.geoshglobal.com/public/assets/';
 
     public function __construct()
     {

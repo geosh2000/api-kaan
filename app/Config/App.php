@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      *    http://example.com/
      */
-    public string $baseURL = 'https://zd.geoshglobal.com/';
+    public string $baseURL = 'https://kaan.geoshglobal.com/';
     public $sessionDriver   = 'CodeIgniter\Session\Handlers\FileHandler';
     public $sessionSavePath = WRITEPATH . 'session';
 
@@ -186,7 +186,7 @@ class App extends BaseConfig
         // we are currently running an automated test suite, so that
         // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'development') {
-            $this->baseURL = 'http://localhost:8888/marketplace/geoshGlobal/';
+            $this->baseURL = 'http://localhost:8888/kaan/api/';
             // $this->indexPage = 'index.php';
         }
     }

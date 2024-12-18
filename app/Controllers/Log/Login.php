@@ -94,7 +94,7 @@ class Login extends BaseController
     }
 
     public function passHash(){
-        echo password_hash("Atelier2024", PASSWORD_DEFAULT);
+        echo password_hash("Kaan2024", PASSWORD_DEFAULT);
     }
 }
 
